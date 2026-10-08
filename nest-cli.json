@@ -1,0 +1,104 @@
+{
+  "$schema": "https://json.schemastore.org/nest-cli",
+  "collection": "@nestjs/schematics",
+  "sourceRoot": "apps/chatsystem/src",
+  "compilerOptions": {
+    "deleteOutDir": true,
+    "builder": "rspack",
+    "tsConfigPath": "apps/chatsystem/tsconfig.app.json"
+  },
+  "monorepo": true,
+  "root": "apps/chatsystem",
+  "projects": {
+    "chatsystem": {
+      "type": "application",
+      "root": "apps/chatsystem",
+      "entryFile": "main",
+      "sourceRoot": "apps/chatsystem/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/chatsystem/tsconfig.app.json"
+      }
+    },
+    "common": {
+      "type": "library",
+      "root": "libs/common",
+      "entryFile": "index",
+      "sourceRoot": "libs/common/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/common/tsconfig.lib.json"
+      }
+    },
+    "config": {
+      "type": "library",
+      "root": "libs/config",
+      "entryFile": "index",
+      "sourceRoot": "libs/config/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/config/tsconfig.lib.json"
+      }
+    },
+    "database": {
+      "type": "library",
+      "root": "libs/database",
+      "entryFile": "index",
+      "sourceRoot": "libs/database/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/database/tsconfig.lib.json"
+      }
+    },
+    "gateway": {
+      "type": "application",
+      "root": "apps/gateway",
+      "entryFile": "main",
+      "sourceRoot": "apps/gateway/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/gateway/tsconfig.app.json"
+      }
+    },
+    "kafka": {
+      "type": "library",
+      "root": "libs/kafka",
+      "entryFile": "index",
+      "sourceRoot": "libs/kafka/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/kafka/tsconfig.lib.json"
+      }
+    },
+    "redis": {
+      "type": "library",
+      "root": "libs/redis",
+      "entryFile": "index",
+      "sourceRoot": "libs/redis/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/redis/tsconfig.lib.json"
+      }
+    },
+    "scylla": {
+      "type": "library",
+      "root": "libs/scylla",
+      "entryFile": "index",
+      "sourceRoot": "libs/scylla/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/scylla/tsconfig.lib.json"
+      }
+    },
+    "snowflake": {
+      "type": "library",
+      "root": "libs/snowflake",
+      "entryFile": "index",
+      "sourceRoot": "libs/snowflake/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/snowflake/tsconfig.lib.json"
+      }
+    },
+    "voice-signaling": {
+      "type": "application",
+      "root": "apps/voice-signaling",
+      "entryFile": "main",
+      "sourceRoot": "apps/voice-signaling/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/voice-signaling/tsconfig.app.json"
+      }
+    }
+  }
+}

@@ -57,7 +57,10 @@ export const ModelName = {
   Member: 'Member',
   Role: 'Role',
   Message: 'Message',
-  Friendship: 'Friendship'
+  Friendship: 'Friendship',
+  Invite: 'Invite',
+  DirectChannel: 'DirectChannel',
+  DirectChannelMember: 'DirectChannelMember'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -78,7 +81,11 @@ export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof
 
 export const UserScalarFieldEnum = {
   userId: 'userId',
-  username: 'username'
+  username: 'username',
+  avatarUrl: 'avatarUrl',
+  roleTitle: 'roleTitle',
+  currentActivity: 'currentActivity',
+  lastPresence: 'lastPresence'
 } as const
 
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
@@ -99,6 +106,9 @@ export const ChannelScalarFieldEnum = {
   channelId: 'channelId',
   guildId: 'guildId',
   name: 'name',
+  topic: 'topic',
+  icon: 'icon',
+  capacity: 'capacity',
   type: 'type',
   categoryId: 'categoryId',
   position: 'position'
@@ -112,7 +122,8 @@ export const MemberScalarFieldEnum = {
   userId: 'userId',
   nickname: 'nickname',
   roleIds: 'roleIds',
-  joinedAt: 'joinedAt'
+  joinedAt: 'joinedAt',
+  voiceChannelId: 'voiceChannelId'
 } as const
 
 export type MemberScalarFieldEnum = (typeof MemberScalarFieldEnum)[keyof typeof MemberScalarFieldEnum]
@@ -150,6 +161,36 @@ export const FriendshipScalarFieldEnum = {
 } as const
 
 export type FriendshipScalarFieldEnum = (typeof FriendshipScalarFieldEnum)[keyof typeof FriendshipScalarFieldEnum]
+
+
+export const InviteScalarFieldEnum = {
+  inviteId: 'inviteId',
+  guildId: 'guildId',
+  code: 'code',
+  createdById: 'createdById',
+  createdAt: 'createdAt',
+  expiresAt: 'expiresAt'
+} as const
+
+export type InviteScalarFieldEnum = (typeof InviteScalarFieldEnum)[keyof typeof InviteScalarFieldEnum]
+
+
+export const DirectChannelScalarFieldEnum = {
+  channelId: 'channelId',
+  userA: 'userA',
+  userB: 'userB',
+  createdAt: 'createdAt'
+} as const
+
+export type DirectChannelScalarFieldEnum = (typeof DirectChannelScalarFieldEnum)[keyof typeof DirectChannelScalarFieldEnum]
+
+
+export const DirectChannelMemberScalarFieldEnum = {
+  channelId: 'channelId',
+  userId: 'userId'
+} as const
+
+export type DirectChannelMemberScalarFieldEnum = (typeof DirectChannelMemberScalarFieldEnum)[keyof typeof DirectChannelMemberScalarFieldEnum]
 
 
 export const SortOrder = {

@@ -64,7 +64,7 @@ model Channel {
   guild      Guild       @relation(fields: [guildId], references: [guildId], onDelete: Cascade)
   category   Channel?    @relation("Category", fields: [categoryId], references: [channelId], onDelete: SetNull)
   children   Channel[]   @relation("Category")
-  messages   Message[]
+  messages   Message[]   @relation("ChannelMessages")
 
   @@index([guildId, position])
   @@map("channel")
@@ -106,8 +106,8 @@ model Message {
   attachments Json?
   createdAt   DateTime       @default(now()) @map("created_at")
   editedAt    DateTime?      @map("edited_at")
-  channel     Channel?       @relation(fields: [channelId], references: [channelId], onDelete: Cascade)
-  dmChannel   DirectChannel? @relation(fields: [channelId], references: [channelId], onDelete: Cascade)
+  channel     Channel?       @relation("ChannelMessages", fields: [channelId], references: [channelId], onDelete: Cascade, map: "message_channel_id_fkey")
+  dmChannel   DirectChannel? @relation("DmChannelMessages", fields: [channelId], references: [channelId], onDelete: Cascade, map: "message_dm_channel_id_fkey")
   author      User           @relation(fields: [authorId], references: [userId])
 
   @@index([channelId, messageId])
@@ -127,14 +127,14 @@ model Friendship {
 }
 
 model Invite {
-  inviteId    BigInt   @id @default(autoincrement()) @map("invite_id")
-  guildId     BigInt   @map("guild_id")
-  code        String   @unique
-  createdById BigInt   @map("created_by_id")
-  createdAt   DateTime @default(now()) @map("created_at")
+  inviteId    BigInt    @id @default(autoincrement()) @map("invite_id")
+  guildId     BigInt    @map("guild_id")
+  code        String    @unique
+  createdById BigInt    @map("created_by_id")
+  createdAt   DateTime  @default(now()) @map("created_at")
   expiresAt   DateTime? @map("expires_at")
-  guild       Guild    @relation(fields: [guildId], references: [guildId], onDelete: Cascade)
-  createdBy   User     @relation(fields: [createdById], references: [userId])
+  guild       Guild     @relation(fields: [guildId], references: [guildId], onDelete: Cascade)
+  createdBy   User      @relation(fields: [createdById], references: [userId])
 
   @@index([guildId])
   @@map("invite")
@@ -147,7 +147,7 @@ model DirectChannel {
   userB     BigInt                    @map("user_b")
   createdAt DateTime                  @default(now()) @map("created_at")
   members   DirectChannelMember[]
-  messages  Message[]
+  messages  Message[]                 @relation("DmChannelMessages")
 
   @@unique([userA, userB])
   @@map("direct_channel")

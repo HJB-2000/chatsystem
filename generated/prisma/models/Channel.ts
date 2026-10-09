@@ -29,6 +29,7 @@ export type AggregateChannel = {
 export type ChannelAvgAggregateOutputType = {
   channelId: number | null
   guildId: number | null
+  capacity: number | null
   categoryId: number | null
   position: number | null
 }
@@ -36,6 +37,7 @@ export type ChannelAvgAggregateOutputType = {
 export type ChannelSumAggregateOutputType = {
   channelId: bigint | null
   guildId: bigint | null
+  capacity: number | null
   categoryId: bigint | null
   position: number | null
 }
@@ -44,6 +46,9 @@ export type ChannelMinAggregateOutputType = {
   channelId: bigint | null
   guildId: bigint | null
   name: string | null
+  topic: string | null
+  icon: string | null
+  capacity: number | null
   type: $Enums.ChannelType | null
   categoryId: bigint | null
   position: number | null
@@ -53,6 +58,9 @@ export type ChannelMaxAggregateOutputType = {
   channelId: bigint | null
   guildId: bigint | null
   name: string | null
+  topic: string | null
+  icon: string | null
+  capacity: number | null
   type: $Enums.ChannelType | null
   categoryId: bigint | null
   position: number | null
@@ -62,6 +70,9 @@ export type ChannelCountAggregateOutputType = {
   channelId: number
   guildId: number
   name: number
+  topic: number
+  icon: number
+  capacity: number
   type: number
   categoryId: number
   position: number
@@ -72,6 +83,7 @@ export type ChannelCountAggregateOutputType = {
 export type ChannelAvgAggregateInputType = {
   channelId?: true
   guildId?: true
+  capacity?: true
   categoryId?: true
   position?: true
 }
@@ -79,6 +91,7 @@ export type ChannelAvgAggregateInputType = {
 export type ChannelSumAggregateInputType = {
   channelId?: true
   guildId?: true
+  capacity?: true
   categoryId?: true
   position?: true
 }
@@ -87,6 +100,9 @@ export type ChannelMinAggregateInputType = {
   channelId?: true
   guildId?: true
   name?: true
+  topic?: true
+  icon?: true
+  capacity?: true
   type?: true
   categoryId?: true
   position?: true
@@ -96,6 +112,9 @@ export type ChannelMaxAggregateInputType = {
   channelId?: true
   guildId?: true
   name?: true
+  topic?: true
+  icon?: true
+  capacity?: true
   type?: true
   categoryId?: true
   position?: true
@@ -105,6 +124,9 @@ export type ChannelCountAggregateInputType = {
   channelId?: true
   guildId?: true
   name?: true
+  topic?: true
+  icon?: true
+  capacity?: true
   type?: true
   categoryId?: true
   position?: true
@@ -201,6 +223,9 @@ export type ChannelGroupByOutputType = {
   channelId: bigint
   guildId: bigint
   name: string
+  topic: string | null
+  icon: string | null
+  capacity: number
   type: $Enums.ChannelType
   categoryId: bigint | null
   position: number
@@ -233,6 +258,9 @@ export type ChannelWhereInput = {
   channelId?: Prisma.BigIntFilter<"Channel"> | bigint | number
   guildId?: Prisma.BigIntFilter<"Channel"> | bigint | number
   name?: Prisma.StringFilter<"Channel"> | string
+  topic?: Prisma.StringNullableFilter<"Channel"> | string | null
+  icon?: Prisma.StringNullableFilter<"Channel"> | string | null
+  capacity?: Prisma.IntFilter<"Channel"> | number
   type?: Prisma.EnumChannelTypeFilter<"Channel"> | $Enums.ChannelType
   categoryId?: Prisma.BigIntNullableFilter<"Channel"> | bigint | number | null
   position?: Prisma.IntFilter<"Channel"> | number
@@ -246,6 +274,9 @@ export type ChannelOrderByWithRelationInput = {
   channelId?: Prisma.SortOrder
   guildId?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  topic?: Prisma.SortOrderInput | Prisma.SortOrder
+  icon?: Prisma.SortOrderInput | Prisma.SortOrder
+  capacity?: Prisma.SortOrder
   type?: Prisma.SortOrder
   categoryId?: Prisma.SortOrderInput | Prisma.SortOrder
   position?: Prisma.SortOrder
@@ -262,6 +293,9 @@ export type ChannelWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.ChannelWhereInput | Prisma.ChannelWhereInput[]
   guildId?: Prisma.BigIntFilter<"Channel"> | bigint | number
   name?: Prisma.StringFilter<"Channel"> | string
+  topic?: Prisma.StringNullableFilter<"Channel"> | string | null
+  icon?: Prisma.StringNullableFilter<"Channel"> | string | null
+  capacity?: Prisma.IntFilter<"Channel"> | number
   type?: Prisma.EnumChannelTypeFilter<"Channel"> | $Enums.ChannelType
   categoryId?: Prisma.BigIntNullableFilter<"Channel"> | bigint | number | null
   position?: Prisma.IntFilter<"Channel"> | number
@@ -275,6 +309,9 @@ export type ChannelOrderByWithAggregationInput = {
   channelId?: Prisma.SortOrder
   guildId?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  topic?: Prisma.SortOrderInput | Prisma.SortOrder
+  icon?: Prisma.SortOrderInput | Prisma.SortOrder
+  capacity?: Prisma.SortOrder
   type?: Prisma.SortOrder
   categoryId?: Prisma.SortOrderInput | Prisma.SortOrder
   position?: Prisma.SortOrder
@@ -292,6 +329,9 @@ export type ChannelScalarWhereWithAggregatesInput = {
   channelId?: Prisma.BigIntWithAggregatesFilter<"Channel"> | bigint | number
   guildId?: Prisma.BigIntWithAggregatesFilter<"Channel"> | bigint | number
   name?: Prisma.StringWithAggregatesFilter<"Channel"> | string
+  topic?: Prisma.StringNullableWithAggregatesFilter<"Channel"> | string | null
+  icon?: Prisma.StringNullableWithAggregatesFilter<"Channel"> | string | null
+  capacity?: Prisma.IntWithAggregatesFilter<"Channel"> | number
   type?: Prisma.EnumChannelTypeWithAggregatesFilter<"Channel"> | $Enums.ChannelType
   categoryId?: Prisma.BigIntNullableWithAggregatesFilter<"Channel"> | bigint | number | null
   position?: Prisma.IntWithAggregatesFilter<"Channel"> | number
@@ -300,6 +340,9 @@ export type ChannelScalarWhereWithAggregatesInput = {
 export type ChannelCreateInput = {
   channelId?: bigint | number
   name: string
+  topic?: string | null
+  icon?: string | null
+  capacity?: number
   type?: $Enums.ChannelType
   position?: number
   guild: Prisma.GuildCreateNestedOneWithoutChannelsInput
@@ -312,6 +355,9 @@ export type ChannelUncheckedCreateInput = {
   channelId?: bigint | number
   guildId: bigint | number
   name: string
+  topic?: string | null
+  icon?: string | null
+  capacity?: number
   type?: $Enums.ChannelType
   categoryId?: bigint | number | null
   position?: number
@@ -322,6 +368,9 @@ export type ChannelUncheckedCreateInput = {
 export type ChannelUpdateInput = {
   channelId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  topic?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  icon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  capacity?: Prisma.IntFieldUpdateOperationsInput | number
   type?: Prisma.EnumChannelTypeFieldUpdateOperationsInput | $Enums.ChannelType
   position?: Prisma.IntFieldUpdateOperationsInput | number
   guild?: Prisma.GuildUpdateOneRequiredWithoutChannelsNestedInput
@@ -334,6 +383,9 @@ export type ChannelUncheckedUpdateInput = {
   channelId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   guildId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  topic?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  icon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  capacity?: Prisma.IntFieldUpdateOperationsInput | number
   type?: Prisma.EnumChannelTypeFieldUpdateOperationsInput | $Enums.ChannelType
   categoryId?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   position?: Prisma.IntFieldUpdateOperationsInput | number
@@ -345,6 +397,9 @@ export type ChannelCreateManyInput = {
   channelId?: bigint | number
   guildId: bigint | number
   name: string
+  topic?: string | null
+  icon?: string | null
+  capacity?: number
   type?: $Enums.ChannelType
   categoryId?: bigint | number | null
   position?: number
@@ -353,6 +408,9 @@ export type ChannelCreateManyInput = {
 export type ChannelUpdateManyMutationInput = {
   channelId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  topic?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  icon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  capacity?: Prisma.IntFieldUpdateOperationsInput | number
   type?: Prisma.EnumChannelTypeFieldUpdateOperationsInput | $Enums.ChannelType
   position?: Prisma.IntFieldUpdateOperationsInput | number
 }
@@ -361,6 +419,9 @@ export type ChannelUncheckedUpdateManyInput = {
   channelId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   guildId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  topic?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  icon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  capacity?: Prisma.IntFieldUpdateOperationsInput | number
   type?: Prisma.EnumChannelTypeFieldUpdateOperationsInput | $Enums.ChannelType
   categoryId?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   position?: Prisma.IntFieldUpdateOperationsInput | number
@@ -385,6 +446,9 @@ export type ChannelCountOrderByAggregateInput = {
   channelId?: Prisma.SortOrder
   guildId?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  topic?: Prisma.SortOrder
+  icon?: Prisma.SortOrder
+  capacity?: Prisma.SortOrder
   type?: Prisma.SortOrder
   categoryId?: Prisma.SortOrder
   position?: Prisma.SortOrder
@@ -393,6 +457,7 @@ export type ChannelCountOrderByAggregateInput = {
 export type ChannelAvgOrderByAggregateInput = {
   channelId?: Prisma.SortOrder
   guildId?: Prisma.SortOrder
+  capacity?: Prisma.SortOrder
   categoryId?: Prisma.SortOrder
   position?: Prisma.SortOrder
 }
@@ -401,6 +466,9 @@ export type ChannelMaxOrderByAggregateInput = {
   channelId?: Prisma.SortOrder
   guildId?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  topic?: Prisma.SortOrder
+  icon?: Prisma.SortOrder
+  capacity?: Prisma.SortOrder
   type?: Prisma.SortOrder
   categoryId?: Prisma.SortOrder
   position?: Prisma.SortOrder
@@ -410,6 +478,9 @@ export type ChannelMinOrderByAggregateInput = {
   channelId?: Prisma.SortOrder
   guildId?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  topic?: Prisma.SortOrder
+  icon?: Prisma.SortOrder
+  capacity?: Prisma.SortOrder
   type?: Prisma.SortOrder
   categoryId?: Prisma.SortOrder
   position?: Prisma.SortOrder
@@ -418,13 +489,9 @@ export type ChannelMinOrderByAggregateInput = {
 export type ChannelSumOrderByAggregateInput = {
   channelId?: Prisma.SortOrder
   guildId?: Prisma.SortOrder
+  capacity?: Prisma.SortOrder
   categoryId?: Prisma.SortOrder
   position?: Prisma.SortOrder
-}
-
-export type ChannelScalarRelationFilter = {
-  is?: Prisma.ChannelWhereInput
-  isNot?: Prisma.ChannelWhereInput
 }
 
 export type ChannelCreateNestedManyWithoutGuildInput = {
@@ -545,10 +612,12 @@ export type ChannelCreateNestedOneWithoutMessagesInput = {
   connect?: Prisma.ChannelWhereUniqueInput
 }
 
-export type ChannelUpdateOneRequiredWithoutMessagesNestedInput = {
+export type ChannelUpdateOneWithoutMessagesNestedInput = {
   create?: Prisma.XOR<Prisma.ChannelCreateWithoutMessagesInput, Prisma.ChannelUncheckedCreateWithoutMessagesInput>
   connectOrCreate?: Prisma.ChannelCreateOrConnectWithoutMessagesInput
   upsert?: Prisma.ChannelUpsertWithoutMessagesInput
+  disconnect?: Prisma.ChannelWhereInput | boolean
+  delete?: Prisma.ChannelWhereInput | boolean
   connect?: Prisma.ChannelWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.ChannelUpdateToOneWithWhereWithoutMessagesInput, Prisma.ChannelUpdateWithoutMessagesInput>, Prisma.ChannelUncheckedUpdateWithoutMessagesInput>
 }
@@ -556,6 +625,9 @@ export type ChannelUpdateOneRequiredWithoutMessagesNestedInput = {
 export type ChannelCreateWithoutGuildInput = {
   channelId?: bigint | number
   name: string
+  topic?: string | null
+  icon?: string | null
+  capacity?: number
   type?: $Enums.ChannelType
   position?: number
   category?: Prisma.ChannelCreateNestedOneWithoutChildrenInput
@@ -566,6 +638,9 @@ export type ChannelCreateWithoutGuildInput = {
 export type ChannelUncheckedCreateWithoutGuildInput = {
   channelId?: bigint | number
   name: string
+  topic?: string | null
+  icon?: string | null
+  capacity?: number
   type?: $Enums.ChannelType
   categoryId?: bigint | number | null
   position?: number
@@ -606,6 +681,9 @@ export type ChannelScalarWhereInput = {
   channelId?: Prisma.BigIntFilter<"Channel"> | bigint | number
   guildId?: Prisma.BigIntFilter<"Channel"> | bigint | number
   name?: Prisma.StringFilter<"Channel"> | string
+  topic?: Prisma.StringNullableFilter<"Channel"> | string | null
+  icon?: Prisma.StringNullableFilter<"Channel"> | string | null
+  capacity?: Prisma.IntFilter<"Channel"> | number
   type?: Prisma.EnumChannelTypeFilter<"Channel"> | $Enums.ChannelType
   categoryId?: Prisma.BigIntNullableFilter<"Channel"> | bigint | number | null
   position?: Prisma.IntFilter<"Channel"> | number
@@ -614,6 +692,9 @@ export type ChannelScalarWhereInput = {
 export type ChannelCreateWithoutChildrenInput = {
   channelId?: bigint | number
   name: string
+  topic?: string | null
+  icon?: string | null
+  capacity?: number
   type?: $Enums.ChannelType
   position?: number
   guild: Prisma.GuildCreateNestedOneWithoutChannelsInput
@@ -625,6 +706,9 @@ export type ChannelUncheckedCreateWithoutChildrenInput = {
   channelId?: bigint | number
   guildId: bigint | number
   name: string
+  topic?: string | null
+  icon?: string | null
+  capacity?: number
   type?: $Enums.ChannelType
   categoryId?: bigint | number | null
   position?: number
@@ -639,6 +723,9 @@ export type ChannelCreateOrConnectWithoutChildrenInput = {
 export type ChannelCreateWithoutCategoryInput = {
   channelId?: bigint | number
   name: string
+  topic?: string | null
+  icon?: string | null
+  capacity?: number
   type?: $Enums.ChannelType
   position?: number
   guild: Prisma.GuildCreateNestedOneWithoutChannelsInput
@@ -650,6 +737,9 @@ export type ChannelUncheckedCreateWithoutCategoryInput = {
   channelId?: bigint | number
   guildId: bigint | number
   name: string
+  topic?: string | null
+  icon?: string | null
+  capacity?: number
   type?: $Enums.ChannelType
   position?: number
   children?: Prisma.ChannelUncheckedCreateNestedManyWithoutCategoryInput
@@ -680,6 +770,9 @@ export type ChannelUpdateToOneWithWhereWithoutChildrenInput = {
 export type ChannelUpdateWithoutChildrenInput = {
   channelId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  topic?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  icon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  capacity?: Prisma.IntFieldUpdateOperationsInput | number
   type?: Prisma.EnumChannelTypeFieldUpdateOperationsInput | $Enums.ChannelType
   position?: Prisma.IntFieldUpdateOperationsInput | number
   guild?: Prisma.GuildUpdateOneRequiredWithoutChannelsNestedInput
@@ -691,6 +784,9 @@ export type ChannelUncheckedUpdateWithoutChildrenInput = {
   channelId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   guildId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  topic?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  icon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  capacity?: Prisma.IntFieldUpdateOperationsInput | number
   type?: Prisma.EnumChannelTypeFieldUpdateOperationsInput | $Enums.ChannelType
   categoryId?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   position?: Prisma.IntFieldUpdateOperationsInput | number
@@ -716,6 +812,9 @@ export type ChannelUpdateManyWithWhereWithoutCategoryInput = {
 export type ChannelCreateWithoutMessagesInput = {
   channelId?: bigint | number
   name: string
+  topic?: string | null
+  icon?: string | null
+  capacity?: number
   type?: $Enums.ChannelType
   position?: number
   guild: Prisma.GuildCreateNestedOneWithoutChannelsInput
@@ -727,6 +826,9 @@ export type ChannelUncheckedCreateWithoutMessagesInput = {
   channelId?: bigint | number
   guildId: bigint | number
   name: string
+  topic?: string | null
+  icon?: string | null
+  capacity?: number
   type?: $Enums.ChannelType
   categoryId?: bigint | number | null
   position?: number
@@ -752,6 +854,9 @@ export type ChannelUpdateToOneWithWhereWithoutMessagesInput = {
 export type ChannelUpdateWithoutMessagesInput = {
   channelId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  topic?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  icon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  capacity?: Prisma.IntFieldUpdateOperationsInput | number
   type?: Prisma.EnumChannelTypeFieldUpdateOperationsInput | $Enums.ChannelType
   position?: Prisma.IntFieldUpdateOperationsInput | number
   guild?: Prisma.GuildUpdateOneRequiredWithoutChannelsNestedInput
@@ -763,6 +868,9 @@ export type ChannelUncheckedUpdateWithoutMessagesInput = {
   channelId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   guildId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  topic?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  icon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  capacity?: Prisma.IntFieldUpdateOperationsInput | number
   type?: Prisma.EnumChannelTypeFieldUpdateOperationsInput | $Enums.ChannelType
   categoryId?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   position?: Prisma.IntFieldUpdateOperationsInput | number
@@ -772,6 +880,9 @@ export type ChannelUncheckedUpdateWithoutMessagesInput = {
 export type ChannelCreateManyGuildInput = {
   channelId?: bigint | number
   name: string
+  topic?: string | null
+  icon?: string | null
+  capacity?: number
   type?: $Enums.ChannelType
   categoryId?: bigint | number | null
   position?: number
@@ -780,6 +891,9 @@ export type ChannelCreateManyGuildInput = {
 export type ChannelUpdateWithoutGuildInput = {
   channelId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  topic?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  icon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  capacity?: Prisma.IntFieldUpdateOperationsInput | number
   type?: Prisma.EnumChannelTypeFieldUpdateOperationsInput | $Enums.ChannelType
   position?: Prisma.IntFieldUpdateOperationsInput | number
   category?: Prisma.ChannelUpdateOneWithoutChildrenNestedInput
@@ -790,6 +904,9 @@ export type ChannelUpdateWithoutGuildInput = {
 export type ChannelUncheckedUpdateWithoutGuildInput = {
   channelId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  topic?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  icon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  capacity?: Prisma.IntFieldUpdateOperationsInput | number
   type?: Prisma.EnumChannelTypeFieldUpdateOperationsInput | $Enums.ChannelType
   categoryId?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   position?: Prisma.IntFieldUpdateOperationsInput | number
@@ -800,6 +917,9 @@ export type ChannelUncheckedUpdateWithoutGuildInput = {
 export type ChannelUncheckedUpdateManyWithoutGuildInput = {
   channelId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  topic?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  icon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  capacity?: Prisma.IntFieldUpdateOperationsInput | number
   type?: Prisma.EnumChannelTypeFieldUpdateOperationsInput | $Enums.ChannelType
   categoryId?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   position?: Prisma.IntFieldUpdateOperationsInput | number
@@ -809,6 +929,9 @@ export type ChannelCreateManyCategoryInput = {
   channelId?: bigint | number
   guildId: bigint | number
   name: string
+  topic?: string | null
+  icon?: string | null
+  capacity?: number
   type?: $Enums.ChannelType
   position?: number
 }
@@ -816,6 +939,9 @@ export type ChannelCreateManyCategoryInput = {
 export type ChannelUpdateWithoutCategoryInput = {
   channelId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  topic?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  icon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  capacity?: Prisma.IntFieldUpdateOperationsInput | number
   type?: Prisma.EnumChannelTypeFieldUpdateOperationsInput | $Enums.ChannelType
   position?: Prisma.IntFieldUpdateOperationsInput | number
   guild?: Prisma.GuildUpdateOneRequiredWithoutChannelsNestedInput
@@ -827,6 +953,9 @@ export type ChannelUncheckedUpdateWithoutCategoryInput = {
   channelId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   guildId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  topic?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  icon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  capacity?: Prisma.IntFieldUpdateOperationsInput | number
   type?: Prisma.EnumChannelTypeFieldUpdateOperationsInput | $Enums.ChannelType
   position?: Prisma.IntFieldUpdateOperationsInput | number
   children?: Prisma.ChannelUncheckedUpdateManyWithoutCategoryNestedInput
@@ -837,6 +966,9 @@ export type ChannelUncheckedUpdateManyWithoutCategoryInput = {
   channelId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   guildId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  topic?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  icon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  capacity?: Prisma.IntFieldUpdateOperationsInput | number
   type?: Prisma.EnumChannelTypeFieldUpdateOperationsInput | $Enums.ChannelType
   position?: Prisma.IntFieldUpdateOperationsInput | number
 }
@@ -885,6 +1017,9 @@ export type ChannelSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   channelId?: boolean
   guildId?: boolean
   name?: boolean
+  topic?: boolean
+  icon?: boolean
+  capacity?: boolean
   type?: boolean
   categoryId?: boolean
   position?: boolean
@@ -899,6 +1034,9 @@ export type ChannelSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   channelId?: boolean
   guildId?: boolean
   name?: boolean
+  topic?: boolean
+  icon?: boolean
+  capacity?: boolean
   type?: boolean
   categoryId?: boolean
   position?: boolean
@@ -910,6 +1048,9 @@ export type ChannelSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   channelId?: boolean
   guildId?: boolean
   name?: boolean
+  topic?: boolean
+  icon?: boolean
+  capacity?: boolean
   type?: boolean
   categoryId?: boolean
   position?: boolean
@@ -921,12 +1062,15 @@ export type ChannelSelectScalar = {
   channelId?: boolean
   guildId?: boolean
   name?: boolean
+  topic?: boolean
+  icon?: boolean
+  capacity?: boolean
   type?: boolean
   categoryId?: boolean
   position?: boolean
 }
 
-export type ChannelOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"channelId" | "guildId" | "name" | "type" | "categoryId" | "position", ExtArgs["result"]["channel"]>
+export type ChannelOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"channelId" | "guildId" | "name" | "topic" | "icon" | "capacity" | "type" | "categoryId" | "position", ExtArgs["result"]["channel"]>
 export type ChannelInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   guild?: boolean | Prisma.GuildDefaultArgs<ExtArgs>
   category?: boolean | Prisma.Channel$categoryArgs<ExtArgs>
@@ -955,6 +1099,9 @@ export type $ChannelPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     channelId: bigint
     guildId: bigint
     name: string
+    topic: string | null
+    icon: string | null
+    capacity: number
     type: $Enums.ChannelType
     categoryId: bigint | null
     position: number
@@ -1388,6 +1535,9 @@ export interface ChannelFieldRefs {
   readonly channelId: Prisma.FieldRef<"Channel", 'BigInt'>
   readonly guildId: Prisma.FieldRef<"Channel", 'BigInt'>
   readonly name: Prisma.FieldRef<"Channel", 'String'>
+  readonly topic: Prisma.FieldRef<"Channel", 'String'>
+  readonly icon: Prisma.FieldRef<"Channel", 'String'>
+  readonly capacity: Prisma.FieldRef<"Channel", 'Int'>
   readonly type: Prisma.FieldRef<"Channel", 'ChannelType'>
   readonly categoryId: Prisma.FieldRef<"Channel", 'BigInt'>
   readonly position: Prisma.FieldRef<"Channel", 'Int'>

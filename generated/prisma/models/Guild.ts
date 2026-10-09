@@ -228,6 +228,7 @@ export type GuildWhereInput = {
   channels?: Prisma.ChannelListRelationFilter
   members?: Prisma.MemberListRelationFilter
   roles?: Prisma.RoleListRelationFilter
+  invites?: Prisma.InviteListRelationFilter
 }
 
 export type GuildOrderByWithRelationInput = {
@@ -240,6 +241,7 @@ export type GuildOrderByWithRelationInput = {
   channels?: Prisma.ChannelOrderByRelationAggregateInput
   members?: Prisma.MemberOrderByRelationAggregateInput
   roles?: Prisma.RoleOrderByRelationAggregateInput
+  invites?: Prisma.InviteOrderByRelationAggregateInput
 }
 
 export type GuildWhereUniqueInput = Prisma.AtLeast<{
@@ -255,6 +257,7 @@ export type GuildWhereUniqueInput = Prisma.AtLeast<{
   channels?: Prisma.ChannelListRelationFilter
   members?: Prisma.MemberListRelationFilter
   roles?: Prisma.RoleListRelationFilter
+  invites?: Prisma.InviteListRelationFilter
 }, "guildId">
 
 export type GuildOrderByWithAggregationInput = {
@@ -290,6 +293,7 @@ export type GuildCreateInput = {
   channels?: Prisma.ChannelCreateNestedManyWithoutGuildInput
   members?: Prisma.MemberCreateNestedManyWithoutGuildInput
   roles?: Prisma.RoleCreateNestedManyWithoutGuildInput
+  invites?: Prisma.InviteCreateNestedManyWithoutGuildInput
 }
 
 export type GuildUncheckedCreateInput = {
@@ -301,6 +305,7 @@ export type GuildUncheckedCreateInput = {
   channels?: Prisma.ChannelUncheckedCreateNestedManyWithoutGuildInput
   members?: Prisma.MemberUncheckedCreateNestedManyWithoutGuildInput
   roles?: Prisma.RoleUncheckedCreateNestedManyWithoutGuildInput
+  invites?: Prisma.InviteUncheckedCreateNestedManyWithoutGuildInput
 }
 
 export type GuildUpdateInput = {
@@ -312,6 +317,7 @@ export type GuildUpdateInput = {
   channels?: Prisma.ChannelUpdateManyWithoutGuildNestedInput
   members?: Prisma.MemberUpdateManyWithoutGuildNestedInput
   roles?: Prisma.RoleUpdateManyWithoutGuildNestedInput
+  invites?: Prisma.InviteUpdateManyWithoutGuildNestedInput
 }
 
 export type GuildUncheckedUpdateInput = {
@@ -323,6 +329,7 @@ export type GuildUncheckedUpdateInput = {
   channels?: Prisma.ChannelUncheckedUpdateManyWithoutGuildNestedInput
   members?: Prisma.MemberUncheckedUpdateManyWithoutGuildNestedInput
   roles?: Prisma.RoleUncheckedUpdateManyWithoutGuildNestedInput
+  invites?: Prisma.InviteUncheckedUpdateManyWithoutGuildNestedInput
 }
 
 export type GuildCreateManyInput = {
@@ -441,10 +448,6 @@ export type GuildUncheckedUpdateManyWithoutOwnerNestedInput = {
   deleteMany?: Prisma.GuildScalarWhereInput | Prisma.GuildScalarWhereInput[]
 }
 
-export type NullableStringFieldUpdateOperationsInput = {
-  set?: string | null
-}
-
 export type IntFieldUpdateOperationsInput = {
   set?: number
   increment?: number
@@ -495,6 +498,20 @@ export type GuildUpdateOneRequiredWithoutRolesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.GuildUpdateToOneWithWhereWithoutRolesInput, Prisma.GuildUpdateWithoutRolesInput>, Prisma.GuildUncheckedUpdateWithoutRolesInput>
 }
 
+export type GuildCreateNestedOneWithoutInvitesInput = {
+  create?: Prisma.XOR<Prisma.GuildCreateWithoutInvitesInput, Prisma.GuildUncheckedCreateWithoutInvitesInput>
+  connectOrCreate?: Prisma.GuildCreateOrConnectWithoutInvitesInput
+  connect?: Prisma.GuildWhereUniqueInput
+}
+
+export type GuildUpdateOneRequiredWithoutInvitesNestedInput = {
+  create?: Prisma.XOR<Prisma.GuildCreateWithoutInvitesInput, Prisma.GuildUncheckedCreateWithoutInvitesInput>
+  connectOrCreate?: Prisma.GuildCreateOrConnectWithoutInvitesInput
+  upsert?: Prisma.GuildUpsertWithoutInvitesInput
+  connect?: Prisma.GuildWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.GuildUpdateToOneWithWhereWithoutInvitesInput, Prisma.GuildUpdateWithoutInvitesInput>, Prisma.GuildUncheckedUpdateWithoutInvitesInput>
+}
+
 export type GuildCreateWithoutOwnerInput = {
   guildId?: bigint | number
   name: string
@@ -503,6 +520,7 @@ export type GuildCreateWithoutOwnerInput = {
   channels?: Prisma.ChannelCreateNestedManyWithoutGuildInput
   members?: Prisma.MemberCreateNestedManyWithoutGuildInput
   roles?: Prisma.RoleCreateNestedManyWithoutGuildInput
+  invites?: Prisma.InviteCreateNestedManyWithoutGuildInput
 }
 
 export type GuildUncheckedCreateWithoutOwnerInput = {
@@ -513,6 +531,7 @@ export type GuildUncheckedCreateWithoutOwnerInput = {
   channels?: Prisma.ChannelUncheckedCreateNestedManyWithoutGuildInput
   members?: Prisma.MemberUncheckedCreateNestedManyWithoutGuildInput
   roles?: Prisma.RoleUncheckedCreateNestedManyWithoutGuildInput
+  invites?: Prisma.InviteUncheckedCreateNestedManyWithoutGuildInput
 }
 
 export type GuildCreateOrConnectWithoutOwnerInput = {
@@ -560,6 +579,7 @@ export type GuildCreateWithoutChannelsInput = {
   owner: Prisma.UserCreateNestedOneWithoutGuildsInput
   members?: Prisma.MemberCreateNestedManyWithoutGuildInput
   roles?: Prisma.RoleCreateNestedManyWithoutGuildInput
+  invites?: Prisma.InviteCreateNestedManyWithoutGuildInput
 }
 
 export type GuildUncheckedCreateWithoutChannelsInput = {
@@ -570,6 +590,7 @@ export type GuildUncheckedCreateWithoutChannelsInput = {
   memberCount?: number
   members?: Prisma.MemberUncheckedCreateNestedManyWithoutGuildInput
   roles?: Prisma.RoleUncheckedCreateNestedManyWithoutGuildInput
+  invites?: Prisma.InviteUncheckedCreateNestedManyWithoutGuildInput
 }
 
 export type GuildCreateOrConnectWithoutChannelsInput = {
@@ -596,6 +617,7 @@ export type GuildUpdateWithoutChannelsInput = {
   owner?: Prisma.UserUpdateOneRequiredWithoutGuildsNestedInput
   members?: Prisma.MemberUpdateManyWithoutGuildNestedInput
   roles?: Prisma.RoleUpdateManyWithoutGuildNestedInput
+  invites?: Prisma.InviteUpdateManyWithoutGuildNestedInput
 }
 
 export type GuildUncheckedUpdateWithoutChannelsInput = {
@@ -606,6 +628,7 @@ export type GuildUncheckedUpdateWithoutChannelsInput = {
   memberCount?: Prisma.IntFieldUpdateOperationsInput | number
   members?: Prisma.MemberUncheckedUpdateManyWithoutGuildNestedInput
   roles?: Prisma.RoleUncheckedUpdateManyWithoutGuildNestedInput
+  invites?: Prisma.InviteUncheckedUpdateManyWithoutGuildNestedInput
 }
 
 export type GuildCreateWithoutMembersInput = {
@@ -616,6 +639,7 @@ export type GuildCreateWithoutMembersInput = {
   owner: Prisma.UserCreateNestedOneWithoutGuildsInput
   channels?: Prisma.ChannelCreateNestedManyWithoutGuildInput
   roles?: Prisma.RoleCreateNestedManyWithoutGuildInput
+  invites?: Prisma.InviteCreateNestedManyWithoutGuildInput
 }
 
 export type GuildUncheckedCreateWithoutMembersInput = {
@@ -626,6 +650,7 @@ export type GuildUncheckedCreateWithoutMembersInput = {
   memberCount?: number
   channels?: Prisma.ChannelUncheckedCreateNestedManyWithoutGuildInput
   roles?: Prisma.RoleUncheckedCreateNestedManyWithoutGuildInput
+  invites?: Prisma.InviteUncheckedCreateNestedManyWithoutGuildInput
 }
 
 export type GuildCreateOrConnectWithoutMembersInput = {
@@ -652,6 +677,7 @@ export type GuildUpdateWithoutMembersInput = {
   owner?: Prisma.UserUpdateOneRequiredWithoutGuildsNestedInput
   channels?: Prisma.ChannelUpdateManyWithoutGuildNestedInput
   roles?: Prisma.RoleUpdateManyWithoutGuildNestedInput
+  invites?: Prisma.InviteUpdateManyWithoutGuildNestedInput
 }
 
 export type GuildUncheckedUpdateWithoutMembersInput = {
@@ -662,6 +688,7 @@ export type GuildUncheckedUpdateWithoutMembersInput = {
   memberCount?: Prisma.IntFieldUpdateOperationsInput | number
   channels?: Prisma.ChannelUncheckedUpdateManyWithoutGuildNestedInput
   roles?: Prisma.RoleUncheckedUpdateManyWithoutGuildNestedInput
+  invites?: Prisma.InviteUncheckedUpdateManyWithoutGuildNestedInput
 }
 
 export type GuildCreateWithoutRolesInput = {
@@ -672,6 +699,7 @@ export type GuildCreateWithoutRolesInput = {
   owner: Prisma.UserCreateNestedOneWithoutGuildsInput
   channels?: Prisma.ChannelCreateNestedManyWithoutGuildInput
   members?: Prisma.MemberCreateNestedManyWithoutGuildInput
+  invites?: Prisma.InviteCreateNestedManyWithoutGuildInput
 }
 
 export type GuildUncheckedCreateWithoutRolesInput = {
@@ -682,6 +710,7 @@ export type GuildUncheckedCreateWithoutRolesInput = {
   memberCount?: number
   channels?: Prisma.ChannelUncheckedCreateNestedManyWithoutGuildInput
   members?: Prisma.MemberUncheckedCreateNestedManyWithoutGuildInput
+  invites?: Prisma.InviteUncheckedCreateNestedManyWithoutGuildInput
 }
 
 export type GuildCreateOrConnectWithoutRolesInput = {
@@ -708,6 +737,7 @@ export type GuildUpdateWithoutRolesInput = {
   owner?: Prisma.UserUpdateOneRequiredWithoutGuildsNestedInput
   channels?: Prisma.ChannelUpdateManyWithoutGuildNestedInput
   members?: Prisma.MemberUpdateManyWithoutGuildNestedInput
+  invites?: Prisma.InviteUpdateManyWithoutGuildNestedInput
 }
 
 export type GuildUncheckedUpdateWithoutRolesInput = {
@@ -718,6 +748,67 @@ export type GuildUncheckedUpdateWithoutRolesInput = {
   memberCount?: Prisma.IntFieldUpdateOperationsInput | number
   channels?: Prisma.ChannelUncheckedUpdateManyWithoutGuildNestedInput
   members?: Prisma.MemberUncheckedUpdateManyWithoutGuildNestedInput
+  invites?: Prisma.InviteUncheckedUpdateManyWithoutGuildNestedInput
+}
+
+export type GuildCreateWithoutInvitesInput = {
+  guildId?: bigint | number
+  name: string
+  iconUrl?: string | null
+  memberCount?: number
+  owner: Prisma.UserCreateNestedOneWithoutGuildsInput
+  channels?: Prisma.ChannelCreateNestedManyWithoutGuildInput
+  members?: Prisma.MemberCreateNestedManyWithoutGuildInput
+  roles?: Prisma.RoleCreateNestedManyWithoutGuildInput
+}
+
+export type GuildUncheckedCreateWithoutInvitesInput = {
+  guildId?: bigint | number
+  name: string
+  iconUrl?: string | null
+  ownerId: bigint | number
+  memberCount?: number
+  channels?: Prisma.ChannelUncheckedCreateNestedManyWithoutGuildInput
+  members?: Prisma.MemberUncheckedCreateNestedManyWithoutGuildInput
+  roles?: Prisma.RoleUncheckedCreateNestedManyWithoutGuildInput
+}
+
+export type GuildCreateOrConnectWithoutInvitesInput = {
+  where: Prisma.GuildWhereUniqueInput
+  create: Prisma.XOR<Prisma.GuildCreateWithoutInvitesInput, Prisma.GuildUncheckedCreateWithoutInvitesInput>
+}
+
+export type GuildUpsertWithoutInvitesInput = {
+  update: Prisma.XOR<Prisma.GuildUpdateWithoutInvitesInput, Prisma.GuildUncheckedUpdateWithoutInvitesInput>
+  create: Prisma.XOR<Prisma.GuildCreateWithoutInvitesInput, Prisma.GuildUncheckedCreateWithoutInvitesInput>
+  where?: Prisma.GuildWhereInput
+}
+
+export type GuildUpdateToOneWithWhereWithoutInvitesInput = {
+  where?: Prisma.GuildWhereInput
+  data: Prisma.XOR<Prisma.GuildUpdateWithoutInvitesInput, Prisma.GuildUncheckedUpdateWithoutInvitesInput>
+}
+
+export type GuildUpdateWithoutInvitesInput = {
+  guildId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  iconUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  memberCount?: Prisma.IntFieldUpdateOperationsInput | number
+  owner?: Prisma.UserUpdateOneRequiredWithoutGuildsNestedInput
+  channels?: Prisma.ChannelUpdateManyWithoutGuildNestedInput
+  members?: Prisma.MemberUpdateManyWithoutGuildNestedInput
+  roles?: Prisma.RoleUpdateManyWithoutGuildNestedInput
+}
+
+export type GuildUncheckedUpdateWithoutInvitesInput = {
+  guildId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  iconUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ownerId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  memberCount?: Prisma.IntFieldUpdateOperationsInput | number
+  channels?: Prisma.ChannelUncheckedUpdateManyWithoutGuildNestedInput
+  members?: Prisma.MemberUncheckedUpdateManyWithoutGuildNestedInput
+  roles?: Prisma.RoleUncheckedUpdateManyWithoutGuildNestedInput
 }
 
 export type GuildCreateManyOwnerInput = {
@@ -735,6 +826,7 @@ export type GuildUpdateWithoutOwnerInput = {
   channels?: Prisma.ChannelUpdateManyWithoutGuildNestedInput
   members?: Prisma.MemberUpdateManyWithoutGuildNestedInput
   roles?: Prisma.RoleUpdateManyWithoutGuildNestedInput
+  invites?: Prisma.InviteUpdateManyWithoutGuildNestedInput
 }
 
 export type GuildUncheckedUpdateWithoutOwnerInput = {
@@ -745,6 +837,7 @@ export type GuildUncheckedUpdateWithoutOwnerInput = {
   channels?: Prisma.ChannelUncheckedUpdateManyWithoutGuildNestedInput
   members?: Prisma.MemberUncheckedUpdateManyWithoutGuildNestedInput
   roles?: Prisma.RoleUncheckedUpdateManyWithoutGuildNestedInput
+  invites?: Prisma.InviteUncheckedUpdateManyWithoutGuildNestedInput
 }
 
 export type GuildUncheckedUpdateManyWithoutOwnerInput = {
@@ -763,12 +856,14 @@ export type GuildCountOutputType = {
   channels: number
   members: number
   roles: number
+  invites: number
 }
 
 export type GuildCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   channels?: boolean | GuildCountOutputTypeCountChannelsArgs
   members?: boolean | GuildCountOutputTypeCountMembersArgs
   roles?: boolean | GuildCountOutputTypeCountRolesArgs
+  invites?: boolean | GuildCountOutputTypeCountInvitesArgs
 }
 
 /**
@@ -802,6 +897,13 @@ export type GuildCountOutputTypeCountRolesArgs<ExtArgs extends runtime.Types.Ext
   where?: Prisma.RoleWhereInput
 }
 
+/**
+ * GuildCountOutputType without action
+ */
+export type GuildCountOutputTypeCountInvitesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.InviteWhereInput
+}
+
 
 export type GuildSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   guildId?: boolean
@@ -813,6 +915,7 @@ export type GuildSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   channels?: boolean | Prisma.Guild$channelsArgs<ExtArgs>
   members?: boolean | Prisma.Guild$membersArgs<ExtArgs>
   roles?: boolean | Prisma.Guild$rolesArgs<ExtArgs>
+  invites?: boolean | Prisma.Guild$invitesArgs<ExtArgs>
   _count?: boolean | Prisma.GuildCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["guild"]>
 
@@ -848,6 +951,7 @@ export type GuildInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   channels?: boolean | Prisma.Guild$channelsArgs<ExtArgs>
   members?: boolean | Prisma.Guild$membersArgs<ExtArgs>
   roles?: boolean | Prisma.Guild$rolesArgs<ExtArgs>
+  invites?: boolean | Prisma.Guild$invitesArgs<ExtArgs>
   _count?: boolean | Prisma.GuildCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type GuildIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -864,6 +968,7 @@ export type $GuildPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     channels: Prisma.$ChannelPayload<ExtArgs>[]
     members: Prisma.$MemberPayload<ExtArgs>[]
     roles: Prisma.$RolePayload<ExtArgs>[]
+    invites: Prisma.$InvitePayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     guildId: bigint
@@ -1269,6 +1374,7 @@ export interface Prisma__GuildClient<T, Null = never, ExtArgs extends runtime.Ty
   channels<T extends Prisma.Guild$channelsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Guild$channelsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ChannelPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   members<T extends Prisma.Guild$membersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Guild$membersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MemberPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   roles<T extends Prisma.Guild$rolesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Guild$rolesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RolePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  invites<T extends Prisma.Guild$invitesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Guild$invitesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$InvitePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1773,6 +1879,30 @@ export type Guild$rolesArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
   take?: number
   skip?: number
   distinct?: Prisma.RoleScalarFieldEnum | Prisma.RoleScalarFieldEnum[]
+}
+
+/**
+ * Guild.invites
+ */
+export type Guild$invitesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Invite
+   */
+  select?: Prisma.InviteSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Invite
+   */
+  omit?: Prisma.InviteOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.InviteInclude<ExtArgs> | null
+  where?: Prisma.InviteWhereInput
+  orderBy?: Prisma.InviteOrderByWithRelationInput | Prisma.InviteOrderByWithRelationInput[]
+  cursor?: Prisma.InviteWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.InviteScalarFieldEnum | Prisma.InviteScalarFieldEnum[]
 }
 
 /**

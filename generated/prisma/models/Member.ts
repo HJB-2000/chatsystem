@@ -29,11 +29,13 @@ export type AggregateMember = {
 export type MemberAvgAggregateOutputType = {
   guildId: number | null
   userId: number | null
+  voiceChannelId: number | null
 }
 
 export type MemberSumAggregateOutputType = {
   guildId: bigint | null
   userId: bigint | null
+  voiceChannelId: bigint | null
 }
 
 export type MemberMinAggregateOutputType = {
@@ -41,6 +43,7 @@ export type MemberMinAggregateOutputType = {
   userId: bigint | null
   nickname: string | null
   joinedAt: Date | null
+  voiceChannelId: bigint | null
 }
 
 export type MemberMaxAggregateOutputType = {
@@ -48,6 +51,7 @@ export type MemberMaxAggregateOutputType = {
   userId: bigint | null
   nickname: string | null
   joinedAt: Date | null
+  voiceChannelId: bigint | null
 }
 
 export type MemberCountAggregateOutputType = {
@@ -56,6 +60,7 @@ export type MemberCountAggregateOutputType = {
   nickname: number
   roleIds: number
   joinedAt: number
+  voiceChannelId: number
   _all: number
 }
 
@@ -63,11 +68,13 @@ export type MemberCountAggregateOutputType = {
 export type MemberAvgAggregateInputType = {
   guildId?: true
   userId?: true
+  voiceChannelId?: true
 }
 
 export type MemberSumAggregateInputType = {
   guildId?: true
   userId?: true
+  voiceChannelId?: true
 }
 
 export type MemberMinAggregateInputType = {
@@ -75,6 +82,7 @@ export type MemberMinAggregateInputType = {
   userId?: true
   nickname?: true
   joinedAt?: true
+  voiceChannelId?: true
 }
 
 export type MemberMaxAggregateInputType = {
@@ -82,6 +90,7 @@ export type MemberMaxAggregateInputType = {
   userId?: true
   nickname?: true
   joinedAt?: true
+  voiceChannelId?: true
 }
 
 export type MemberCountAggregateInputType = {
@@ -90,6 +99,7 @@ export type MemberCountAggregateInputType = {
   nickname?: true
   roleIds?: true
   joinedAt?: true
+  voiceChannelId?: true
   _all?: true
 }
 
@@ -185,6 +195,7 @@ export type MemberGroupByOutputType = {
   nickname: string | null
   roleIds: runtime.JsonValue
   joinedAt: Date
+  voiceChannelId: bigint | null
   _count: MemberCountAggregateOutputType | null
   _avg: MemberAvgAggregateOutputType | null
   _sum: MemberSumAggregateOutputType | null
@@ -216,6 +227,7 @@ export type MemberWhereInput = {
   nickname?: Prisma.StringNullableFilter<"Member"> | string | null
   roleIds?: Prisma.JsonFilter<"Member">
   joinedAt?: Prisma.DateTimeFilter<"Member"> | Date | string
+  voiceChannelId?: Prisma.BigIntNullableFilter<"Member"> | bigint | number | null
   guild?: Prisma.XOR<Prisma.GuildScalarRelationFilter, Prisma.GuildWhereInput>
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }
@@ -226,6 +238,7 @@ export type MemberOrderByWithRelationInput = {
   nickname?: Prisma.SortOrderInput | Prisma.SortOrder
   roleIds?: Prisma.SortOrder
   joinedAt?: Prisma.SortOrder
+  voiceChannelId?: Prisma.SortOrderInput | Prisma.SortOrder
   guild?: Prisma.GuildOrderByWithRelationInput
   user?: Prisma.UserOrderByWithRelationInput
 }
@@ -240,6 +253,7 @@ export type MemberWhereUniqueInput = Prisma.AtLeast<{
   nickname?: Prisma.StringNullableFilter<"Member"> | string | null
   roleIds?: Prisma.JsonFilter<"Member">
   joinedAt?: Prisma.DateTimeFilter<"Member"> | Date | string
+  voiceChannelId?: Prisma.BigIntNullableFilter<"Member"> | bigint | number | null
   guild?: Prisma.XOR<Prisma.GuildScalarRelationFilter, Prisma.GuildWhereInput>
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }, "guildId_userId">
@@ -250,6 +264,7 @@ export type MemberOrderByWithAggregationInput = {
   nickname?: Prisma.SortOrderInput | Prisma.SortOrder
   roleIds?: Prisma.SortOrder
   joinedAt?: Prisma.SortOrder
+  voiceChannelId?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.MemberCountOrderByAggregateInput
   _avg?: Prisma.MemberAvgOrderByAggregateInput
   _max?: Prisma.MemberMaxOrderByAggregateInput
@@ -266,12 +281,14 @@ export type MemberScalarWhereWithAggregatesInput = {
   nickname?: Prisma.StringNullableWithAggregatesFilter<"Member"> | string | null
   roleIds?: Prisma.JsonWithAggregatesFilter<"Member">
   joinedAt?: Prisma.DateTimeWithAggregatesFilter<"Member"> | Date | string
+  voiceChannelId?: Prisma.BigIntNullableWithAggregatesFilter<"Member"> | bigint | number | null
 }
 
 export type MemberCreateInput = {
   nickname?: string | null
   roleIds?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   joinedAt?: Date | string
+  voiceChannelId?: bigint | number | null
   guild: Prisma.GuildCreateNestedOneWithoutMembersInput
   user: Prisma.UserCreateNestedOneWithoutMembersInput
 }
@@ -282,12 +299,14 @@ export type MemberUncheckedCreateInput = {
   nickname?: string | null
   roleIds?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   joinedAt?: Date | string
+  voiceChannelId?: bigint | number | null
 }
 
 export type MemberUpdateInput = {
   nickname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   roleIds?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  voiceChannelId?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   guild?: Prisma.GuildUpdateOneRequiredWithoutMembersNestedInput
   user?: Prisma.UserUpdateOneRequiredWithoutMembersNestedInput
 }
@@ -298,6 +317,7 @@ export type MemberUncheckedUpdateInput = {
   nickname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   roleIds?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  voiceChannelId?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
 }
 
 export type MemberCreateManyInput = {
@@ -306,12 +326,14 @@ export type MemberCreateManyInput = {
   nickname?: string | null
   roleIds?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   joinedAt?: Date | string
+  voiceChannelId?: bigint | number | null
 }
 
 export type MemberUpdateManyMutationInput = {
   nickname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   roleIds?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  voiceChannelId?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
 }
 
 export type MemberUncheckedUpdateManyInput = {
@@ -320,6 +342,7 @@ export type MemberUncheckedUpdateManyInput = {
   nickname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   roleIds?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  voiceChannelId?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
 }
 
 export type MemberListRelationFilter = {
@@ -343,11 +366,13 @@ export type MemberCountOrderByAggregateInput = {
   nickname?: Prisma.SortOrder
   roleIds?: Prisma.SortOrder
   joinedAt?: Prisma.SortOrder
+  voiceChannelId?: Prisma.SortOrder
 }
 
 export type MemberAvgOrderByAggregateInput = {
   guildId?: Prisma.SortOrder
   userId?: Prisma.SortOrder
+  voiceChannelId?: Prisma.SortOrder
 }
 
 export type MemberMaxOrderByAggregateInput = {
@@ -355,6 +380,7 @@ export type MemberMaxOrderByAggregateInput = {
   userId?: Prisma.SortOrder
   nickname?: Prisma.SortOrder
   joinedAt?: Prisma.SortOrder
+  voiceChannelId?: Prisma.SortOrder
 }
 
 export type MemberMinOrderByAggregateInput = {
@@ -362,11 +388,13 @@ export type MemberMinOrderByAggregateInput = {
   userId?: Prisma.SortOrder
   nickname?: Prisma.SortOrder
   joinedAt?: Prisma.SortOrder
+  voiceChannelId?: Prisma.SortOrder
 }
 
 export type MemberSumOrderByAggregateInput = {
   guildId?: Prisma.SortOrder
   userId?: Prisma.SortOrder
+  voiceChannelId?: Prisma.SortOrder
 }
 
 export type MemberCreateNestedManyWithoutUserInput = {
@@ -461,6 +489,7 @@ export type MemberCreateWithoutUserInput = {
   nickname?: string | null
   roleIds?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   joinedAt?: Date | string
+  voiceChannelId?: bigint | number | null
   guild: Prisma.GuildCreateNestedOneWithoutMembersInput
 }
 
@@ -469,6 +498,7 @@ export type MemberUncheckedCreateWithoutUserInput = {
   nickname?: string | null
   roleIds?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   joinedAt?: Date | string
+  voiceChannelId?: bigint | number | null
 }
 
 export type MemberCreateOrConnectWithoutUserInput = {
@@ -506,12 +536,14 @@ export type MemberScalarWhereInput = {
   nickname?: Prisma.StringNullableFilter<"Member"> | string | null
   roleIds?: Prisma.JsonFilter<"Member">
   joinedAt?: Prisma.DateTimeFilter<"Member"> | Date | string
+  voiceChannelId?: Prisma.BigIntNullableFilter<"Member"> | bigint | number | null
 }
 
 export type MemberCreateWithoutGuildInput = {
   nickname?: string | null
   roleIds?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   joinedAt?: Date | string
+  voiceChannelId?: bigint | number | null
   user: Prisma.UserCreateNestedOneWithoutMembersInput
 }
 
@@ -520,6 +552,7 @@ export type MemberUncheckedCreateWithoutGuildInput = {
   nickname?: string | null
   roleIds?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   joinedAt?: Date | string
+  voiceChannelId?: bigint | number | null
 }
 
 export type MemberCreateOrConnectWithoutGuildInput = {
@@ -553,12 +586,14 @@ export type MemberCreateManyUserInput = {
   nickname?: string | null
   roleIds?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   joinedAt?: Date | string
+  voiceChannelId?: bigint | number | null
 }
 
 export type MemberUpdateWithoutUserInput = {
   nickname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   roleIds?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  voiceChannelId?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   guild?: Prisma.GuildUpdateOneRequiredWithoutMembersNestedInput
 }
 
@@ -567,6 +602,7 @@ export type MemberUncheckedUpdateWithoutUserInput = {
   nickname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   roleIds?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  voiceChannelId?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
 }
 
 export type MemberUncheckedUpdateManyWithoutUserInput = {
@@ -574,6 +610,7 @@ export type MemberUncheckedUpdateManyWithoutUserInput = {
   nickname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   roleIds?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  voiceChannelId?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
 }
 
 export type MemberCreateManyGuildInput = {
@@ -581,12 +618,14 @@ export type MemberCreateManyGuildInput = {
   nickname?: string | null
   roleIds?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   joinedAt?: Date | string
+  voiceChannelId?: bigint | number | null
 }
 
 export type MemberUpdateWithoutGuildInput = {
   nickname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   roleIds?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  voiceChannelId?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   user?: Prisma.UserUpdateOneRequiredWithoutMembersNestedInput
 }
 
@@ -595,6 +634,7 @@ export type MemberUncheckedUpdateWithoutGuildInput = {
   nickname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   roleIds?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  voiceChannelId?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
 }
 
 export type MemberUncheckedUpdateManyWithoutGuildInput = {
@@ -602,6 +642,7 @@ export type MemberUncheckedUpdateManyWithoutGuildInput = {
   nickname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   roleIds?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  voiceChannelId?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
 }
 
 
@@ -612,6 +653,7 @@ export type MemberSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   nickname?: boolean
   roleIds?: boolean
   joinedAt?: boolean
+  voiceChannelId?: boolean
   guild?: boolean | Prisma.GuildDefaultArgs<ExtArgs>
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["member"]>
@@ -622,6 +664,7 @@ export type MemberSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extens
   nickname?: boolean
   roleIds?: boolean
   joinedAt?: boolean
+  voiceChannelId?: boolean
   guild?: boolean | Prisma.GuildDefaultArgs<ExtArgs>
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["member"]>
@@ -632,6 +675,7 @@ export type MemberSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extens
   nickname?: boolean
   roleIds?: boolean
   joinedAt?: boolean
+  voiceChannelId?: boolean
   guild?: boolean | Prisma.GuildDefaultArgs<ExtArgs>
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["member"]>
@@ -642,9 +686,10 @@ export type MemberSelectScalar = {
   nickname?: boolean
   roleIds?: boolean
   joinedAt?: boolean
+  voiceChannelId?: boolean
 }
 
-export type MemberOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"guildId" | "userId" | "nickname" | "roleIds" | "joinedAt", ExtArgs["result"]["member"]>
+export type MemberOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"guildId" | "userId" | "nickname" | "roleIds" | "joinedAt" | "voiceChannelId", ExtArgs["result"]["member"]>
 export type MemberInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   guild?: boolean | Prisma.GuildDefaultArgs<ExtArgs>
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -670,6 +715,7 @@ export type $MemberPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     nickname: string | null
     roleIds: runtime.JsonValue
     joinedAt: Date
+    voiceChannelId: bigint | null
   }, ExtArgs["result"]["member"]>
   composites: {}
 }
@@ -1100,6 +1146,7 @@ export interface MemberFieldRefs {
   readonly nickname: Prisma.FieldRef<"Member", 'String'>
   readonly roleIds: Prisma.FieldRef<"Member", 'Json'>
   readonly joinedAt: Prisma.FieldRef<"Member", 'DateTime'>
+  readonly voiceChannelId: Prisma.FieldRef<"Member", 'BigInt'>
 }
     
 

@@ -11,7 +11,7 @@ export class InfoController {
     return {
       url:
         process.env.GATEWAY_PUBLIC_URL ??
-        `ws://localhost:${process.env.PORT ?? 3001}/gateway`,
+        `ws://localhost:${process.env.GATEWAY_PORT ?? process.env.PORT ?? 3001}/gateway`,
     };
   }
 

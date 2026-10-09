@@ -18,17 +18,17 @@ enum ChannelType {
 
 // Minimal stub. Real user table belongs to the larger project.
 model User {
-  userId          BigInt    @id @default(autoincrement()) @map("user_id")
-  username        String    @unique
-  avatarUrl       String?   @map("avatar_url")
-  roleTitle       String?   @map("role_title")
-  currentActivity String?   @map("current_activity")
-  lastPresence    String?   @map("last_presence") // online | idle | dnd | offline
-  guilds          Guild[]   @relation("GuildOwner")
+  userId          BigInt                @id @default(autoincrement()) @map("user_id")
+  username        String                @unique
+  avatarUrl       String?               @map("avatar_url")
+  roleTitle       String?               @map("role_title")
+  currentActivity String?               @map("current_activity")
+  lastPresence    String?               @map("last_presence") // online | idle | dnd | offline
+  guilds          Guild[]               @relation("GuildOwner")
   members         Member[]
   messages        Message[]
-  friendships     Friendship[] @relation("FriendshipUser")
-  friendOf        Friendship[] @relation("FriendshipFriend")
+  friendships     Friendship[]          @relation("FriendshipUser")
+  friendOf        Friendship[]          @relation("FriendshipFriend")
   dmChannels      DirectChannelMember[]
   invitesCreated  Invite[]
 
@@ -54,7 +54,7 @@ model Guild {
 model Channel {
   // Shared BIGSERIAL sequence with DirectChannel: both tables hand out ids
   // from the same generator so Message.channel_id can reference either one.
-  channelId  BigInt      @id @default(seqNextVal("channel_channel_id_seq")) @map("channel_id")
+  channelId  BigInt      @id @default(autoincrement()) @map("channel_id")
   guildId    BigInt      @map("guild_id")
   name       String
   topic      String?
@@ -73,14 +73,14 @@ model Channel {
 }
 
 model Member {
-  guildId        BigInt    @map("guild_id")
-  userId         BigInt    @map("user_id")
+  guildId        BigInt   @map("guild_id")
+  userId         BigInt   @map("user_id")
   nickname       String?
-  roleIds        Json      @default("[]") @map("role_ids")
-  joinedAt       DateTime  @default(now()) @map("joined_at")
-  voiceChannelId BigInt?   @map("voice_channel_id")
-  guild          Guild     @relation(fields: [guildId], references: [guildId], onDelete: Cascade)
-  user           User      @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  roleIds        Json     @default("[]") @map("role_ids")
+  joinedAt       DateTime @default(now()) @map("joined_at")
+  voiceChannelId BigInt?  @map("voice_channel_id")
+  guild          Guild    @relation(fields: [guildId], references: [guildId], onDelete: Cascade)
+  user           User     @relation(fields: [userId], references: [userId], onDelete: Cascade)
 
   @@id([guildId, userId])
   @@index([userId])
@@ -145,12 +145,12 @@ model Invite {
 // DM channels are just channels with no guild; membership is explicit.
 // Shares the "channel_channel_id_seq" sequence with Channel (see above).
 model DirectChannel {
-  channelId BigInt                    @id @default(seqNextVal("channel_channel_id_seq")) @map("channel_id")
-  userA     BigInt                    @map("user_a")
-  userB     BigInt                    @map("user_b")
-  createdAt DateTime                  @default(now()) @map("created_at")
+  channelId BigInt                @id @default(autoincrement()) @map("channel_id")
+  userA     BigInt                @map("user_a")
+  userB     BigInt                @map("user_b")
+  createdAt DateTime              @default(now()) @map("created_at")
   members   DirectChannelMember[]
-  messages  Message[]                 @relation("DmChannelMessages")
+  messages  Message[]             @relation("DmChannelMessages")
 
   @@unique([userA, userB])
   @@map("direct_channel")

@@ -67,9 +67,11 @@ CREATE UNIQUE INDEX "direct_channel_user_a_user_b_key" ON "direct_channel"("user
 -- CreateIndex
 CREATE INDEX "direct_channel_member_user_id_idx" ON "direct_channel_member"("user_id");
 
--- AddForeignKey
 SET CONSTRAINTS "message_channel_id_fkey" IMMEDIATE;
-ALTER TABLE "message" ADD CONSTRAINT "message_dm_channel_id_fkey" FOREIGN KEY ("channel_id") REFERENCES "direct_channel"("channel_id") ON DELETE CASCADE ON UPDATE CASCADE;
+-- message.channel_id is polymorphic: it points to either channel.channel_id
+-- or direct_channel.channel_id. PostgreSQL cannot enforce that with two
+-- foreign keys, so remove the original guild-only constraint as well.
+ALTER TABLE "message" DROP CONSTRAINT IF EXISTS "message_channel_id_fkey";
 
 -- AddForeignKey
 ALTER TABLE "invite" ADD CONSTRAINT "invite_guild_id_fkey" FOREIGN KEY ("guild_id") REFERENCES "guild"("guild_id") ON DELETE CASCADE ON UPDATE CASCADE;

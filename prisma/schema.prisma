@@ -52,7 +52,9 @@ model Guild {
 }
 
 model Channel {
-  channelId  BigInt      @id @default(autoincrement()) @map("channel_id")
+  // Shared BIGSERIAL sequence with DirectChannel: both tables hand out ids
+  // from the same generator so Message.channel_id can reference either one.
+  channelId  BigInt      @id @default(seqNextVal("channel_channel_id_seq")) @map("channel_id")
   guildId    BigInt      @map("guild_id")
   name       String
   topic      String?
@@ -141,8 +143,9 @@ model Invite {
 }
 
 // DM channels are just channels with no guild; membership is explicit.
+// Shares the "channel_channel_id_seq" sequence with Channel (see above).
 model DirectChannel {
-  channelId BigInt                    @id @default(autoincrement()) @map("channel_id")
+  channelId BigInt                    @id @default(seqNextVal("channel_channel_id_seq")) @map("channel_id")
   userA     BigInt                    @map("user_a")
   userB     BigInt                    @map("user_b")
   createdAt DateTime                  @default(now()) @map("created_at")
@@ -161,5 +164,6 @@ model DirectChannelMember {
 
   @@id([channelId, userId])
   @@index([userId])
+  @@index([channelId])
   @@map("direct_channel_member")
 }

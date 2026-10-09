@@ -24,9 +24,22 @@ CREATE TABLE "invite" (
     CONSTRAINT "invite_pkey" PRIMARY KEY ("invite_id")
 );
 
+-- Make channel ids unique across BOTH channel tables: direct_channel shares
+-- the "channel_channel_id_seq" sequence with "channel". Without this, a DM
+-- could be created with channel_id = 1 while guild channel 1 already exists,
+-- and the message_dm_channel_id_fkey check below would then reject every
+-- existing message row for channel 1 (SQLSTATE 23503 / P3018).
+ALTER TABLE "channel" ALTER COLUMN "channel_id" DROP DEFAULT;
+DROP SEQUENCE IF EXISTS "direct_channel_channel_id_seq";
+
+-- Restore the default for "channel" (same shared sequence) before creating
+-- direct_channel, so that CREATE TABLE ... LIKE does not copy a dangling
+-- DEFAULT nextval('direct_channel_channel_id_seq').
+ALTER TABLE "channel" ALTER COLUMN "channel_id" SET DEFAULT nextval('channel_channel_id_seq');
+
 -- CreateTable
 CREATE TABLE "direct_channel" (
-    "channel_id" BIGSERIAL NOT NULL,
+    "channel_id" BIGINT NOT NULL DEFAULT nextval('channel_channel_id_seq'),
     "user_a" BIGINT NOT NULL,
     "user_b" BIGINT NOT NULL,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -55,6 +68,7 @@ CREATE UNIQUE INDEX "direct_channel_user_a_user_b_key" ON "direct_channel"("user
 CREATE INDEX "direct_channel_member_user_id_idx" ON "direct_channel_member"("user_id");
 
 -- AddForeignKey
+SET CONSTRAINTS "message_channel_id_fkey" IMMEDIATE;
 ALTER TABLE "message" ADD CONSTRAINT "message_dm_channel_id_fkey" FOREIGN KEY ("channel_id") REFERENCES "direct_channel"("channel_id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey

@@ -1,13 +1,115 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
 generator client {
-  provider = "prisma-client"
-  output   = "../generated/prisma"
+  provider            = "prisma-client"
+  output              = "../generated/prisma"
+  moduleFormat        = "cjs"
+  importFileExtension = ""
 }
 
 datasource db {
   provider = "postgresql"
+  // Prisma 7: url lives in prisma config, not here
+}
+
+enum ChannelType {
+  TEXT
+  VOICE
+  CATEGORY
+}
+
+// Minimal stub. Real user table belongs to the larger project.
+model User {
+  userId   BigInt    @id @default(autoincrement()) @map("user_id")
+  username String    @unique
+  guilds   Guild[]   @relation("GuildOwner")
+  members  Member[]
+  messages Message[]
+  friendships Friendship[] @relation("FriendshipUser")
+  friendOf    Friendship[] @relation("FriendshipFriend")
+
+  @@map("user")
+}
+
+model Guild {
+  guildId     BigInt    @id @default(autoincrement()) @map("guild_id")
+  name        String
+  iconUrl     String?   @map("icon_url")
+  ownerId     BigInt    @map("owner_id")
+  memberCount Int       @default(0) @map("member_count")
+  owner       User      @relation("GuildOwner", fields: [ownerId], references: [userId])
+  channels    Channel[]
+  members     Member[]
+  roles       Role[]
+
+  @@index([ownerId])
+  @@map("guild")
+}
+
+model Channel {
+  channelId  BigInt      @id @default(autoincrement()) @map("channel_id")
+  guildId    BigInt      @map("guild_id")
+  name       String
+  type       ChannelType @default(TEXT)
+  categoryId BigInt?     @map("category_id")
+  position   Int         @default(0)
+  guild      Guild       @relation(fields: [guildId], references: [guildId], onDelete: Cascade)
+  category   Channel?    @relation("Category", fields: [categoryId], references: [channelId], onDelete: SetNull)
+  children   Channel[]   @relation("Category")
+  messages   Message[]
+
+  @@index([guildId, position])
+  @@map("channel")
+}
+
+model Member {
+  guildId  BigInt   @map("guild_id")
+  userId   BigInt   @map("user_id")
+  nickname String?
+  roleIds  Json     @default("[]") @map("role_ids")
+  joinedAt DateTime @default(now()) @map("joined_at")
+  guild    Guild    @relation(fields: [guildId], references: [guildId], onDelete: Cascade)
+  user     User     @relation(fields: [userId], references: [userId], onDelete: Cascade)
+
+  @@id([guildId, userId])
+  @@index([userId])
+  @@map("member")
+}
+
+model Role {
+  roleId      BigInt @id @default(autoincrement()) @map("role_id")
+  guildId     BigInt @map("guild_id")
+  name        String
+  permissions BigInt @default(0)
+  position    Int    @default(0)
+  guild       Guild  @relation(fields: [guildId], references: [guildId], onDelete: Cascade)
+
+  @@index([guildId])
+  @@map("role")
+}
+
+model Message {
+  messageId   BigInt    @id @default(autoincrement()) @map("message_id")
+  channelId   BigInt    @map("channel_id")
+  authorId    BigInt    @map("author_id")
+  content     String
+  embeds      Json?
+  attachments Json?
+  createdAt   DateTime  @default(now()) @map("created_at")
+  editedAt    DateTime? @map("edited_at")
+  channel     Channel   @relation(fields: [channelId], references: [channelId], onDelete: Cascade)
+  author      User      @relation(fields: [authorId], references: [userId])
+
+  @@index([channelId, messageId])
+  @@map("message")
+}
+
+model Friendship {
+  userId    BigInt   @map("user_id")
+  friendId  BigInt   @map("friend_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  user      User     @relation("FriendshipUser", fields: [userId], references: [userId], onDelete: Cascade)
+  friend    User     @relation("FriendshipFriend", fields: [friendId], references: [userId], onDelete: Cascade)
+
+  @@id([userId, friendId])
+  @@index([friendId])
+  @@map("friendship")
 }

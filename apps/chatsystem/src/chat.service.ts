@@ -244,9 +244,36 @@ export class ChatService {
   }
 
   // ---------- messages ----------
+  /**
+   * Resolve a room id against BOTH channel tables. Guild channels and DM
+   * channels now share one id sequence, but an id can only live in one of them.
+   */
+  private async resolveChannel(cid: bigint) {
+    const guildChannel = await this.prisma.channel.findUnique({ where: { channelId: cid } });
+    if (guildChannel) return { kind: 'guild' as const, channel: guildChannel };
+    const dmChannel = await this.prisma.directChannel.findUnique({ where: { channelId: cid } });
+    if (dmChannel) return { kind: 'dm' as const, channel: dmChannel };
+    throw new NotFoundException('Room not found');
+  }
+
+  /** Membership check that works for guild channels and DM channels alike. */
+  private async assertCanReadChannel(channelId: bigint, userId: bigint) {
+    const resolved = await this.resolveChannel(channelId);
+    if (resolved.kind === 'guild') {
+      await this.assertMember(resolved.channel.guildId, userId);
+    } else {
+      const isMember = await this.prisma.directChannelMember.findFirst({
+        where: { channelId, userId },
+        select: { channelId: true },
+      });
+      if (!isMember) throw new ForbiddenException('Not a member of this conversation');
+    }
+    return resolved;
+  }
+
   async getRoomMessages(roomId: string, userId: string, limit = 50, before?: string) {
     const cid = BigInt(roomId);
-    await this.assertMemberChannel(cid, BigInt(userId));
+    await this.assertCanReadChannel(cid, BigInt(userId));
     const take = Math.min(Math.max(Number(limit) || 50, 1), 100);
     const messages = await this.prisma.message.findMany({
       where: {
@@ -264,11 +291,12 @@ export class ChatService {
     };
   }
 
-  private async assertMemberChannel(channelId: bigint, userId: bigint) {
-    const channel = await this.prisma.channel.findUnique({ where: { channelId } });
-    if (!channel) throw new NotFoundException('Channel not found');
-    await this.assertMember(channel.guildId, userId);
-    return channel;
+  /** Guild channels only (used by the roster endpoint). */
+  private async assertGuildChannel(channelId: bigint, userId: bigint) {
+    const resolved = await this.resolveChannel(channelId);
+    if (resolved.kind !== 'guild') throw new NotFoundException('Room not found');
+    await this.assertMember(resolved.channel.guildId, userId);
+    return resolved.channel;
   }
 
   /** Spec flow: validate -> persist -> publish to Kafka (key = channel_id) */
@@ -278,7 +306,8 @@ export class ChatService {
     const text = String(content ?? '').trim();
     if (!text) throw new BadRequestException('Empty message');
     if (text.length > 4000) throw new BadRequestException('Message too long');
-    const channel = await this.assertMemberChannel(cid, uid);
+    // Works for guild channels AND DM channels (the old code rejected every DM).
+    const resolved = await this.assertCanReadChannel(cid, uid);
 
     const message = await this.prisma.message.create({
       data: { channelId: cid, authorId: uid, content: text },
@@ -286,8 +315,8 @@ export class ChatService {
     });
 
     const payload = {
-      channel_id: String(channel.channelId),
-      guild_id: String(channel.guildId),
+      channel_id: String(cid),
+      ...(resolved.kind === 'guild' ? { guild_id: String(resolved.channel.guildId) } : {}),
       message_id: String(message.messageId),
       author_id: String(message.authorId),
       author: { id: String(message.authorId), username: message.author.username },
@@ -295,7 +324,7 @@ export class ChatService {
       timestamp: message.createdAt.toISOString(),
     };
     // fire-and-forget; ordering guaranteed by partition key = channel_id
-    void this.kafka.publish(TOPICS.messages, `channel:${channel.channelId}`, payload);
+    void this.kafka.publish(TOPICS.messages, `channel:${cid}`, payload);
 
     return shapeMessage(message);
   }
@@ -340,9 +369,7 @@ export class ChatService {
   // ---------- roster / presence ----------
   async getRoomMembers(roomId: string, userId: string) {
     const cid = BigInt(roomId);
-    const channel = await this.prisma.channel.findUnique({ where: { channelId: cid } });
-    if (!channel) throw new NotFoundException('Room not found');
-    await this.assertMember(channel.guildId, BigInt(userId));
+    const channel = await this.assertGuildChannel(cid, BigInt(userId));
     const members = await this.prisma.member.findMany({
       where: { guildId: channel.guildId },
       include: { user: true },

@@ -36,7 +36,37 @@
         }
       }
       ::-webkit-scrollbar {
-        display: none;
+        width: 8px;
+        height: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #2e3545;
+        border-radius: 9999px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #464554;
+      }
+      ::-webkit-scrollbar-corner {
+        background: transparent;
+      }
+      * {
+        scrollbar-width: thin;
+        scrollbar-color: #2e3545 transparent;
+      }
+      /* Discord-style chat scroll container */
+      #chat-messages-container {
+        overflow-x: hidden;
+        overscroll-behavior: contain;
+        scroll-behavior: smooth;
+      }
+      /* Sticky input above mobile software keyboards */
+      @supports (height: 100dvh) {
+        #chat-shell {
+          height: calc(100dvh - 5.5rem);
+        }
       }
       .material-symbols-outlined {
         font-variation-settings:
@@ -95,7 +125,11 @@
         #member-list-panel:not(.mobile-open),
         #channel-rail:not(.mobile-open) { pointer-events: none; }
         #channel-rail > #collective-rail { width: 3.5rem; }
-        #active-stage-desc { display: none; }
+        /* Keep the channel topic visible on tablet/mobile: hide less critical header items instead */
+        #header-search-box { display: none; }
+        #pins-btn { display: none; }
+        #stage-header { padding-left: 0.75rem; padding-right: 0.75rem; }
+        #chat-messages-container { padding-left: 0.75rem; padding-right: 0.75rem; }
       }
 
       @media (max-width: 639px) {
@@ -105,10 +139,14 @@
           min-height: 30rem;
           border-radius: 0.75rem;
         }
-        #active-stage-title { max-width: 8rem; }
+        #active-stage-title { max-width: 7.5rem; }
+        #room-seats-pill { display: none; }
+        #header-divider { display: none; }
         #huddle-btn span:last-child,
+        #send-btn span:first-child,
         #test-user-switcher span:last-child { display: none; }
         #huddle-btn { padding: 0.375rem; }
+        #send-btn { padding-left: 0.5rem; padding-right: 0.5rem; }
         #test-user-switcher { right: 0.75rem; bottom: 5.25rem; }
         #message-actions { flex-wrap: wrap; gap: 0.5rem; }
         #message-actions > div:first-child { flex-wrap: wrap; }
@@ -624,7 +662,7 @@
                     <div class="flex items-center gap-1.5">
                       <span
                         class="font-headline-sm text-body-md text-text-main font-semibold truncate"
-                        ><span data-collective-name></span
+                        ><span data-collective-name></span></span
                       >
                       <span
                         class="material-symbols-outlined text-label-md text-primary shrink-0"
@@ -643,11 +681,11 @@
                       </span>
                       <span
                         class="font-label-sm text-label-sm text-secondary font-code-sm"
-                        ><span data-collective-online-count></span
+                        ><span data-collective-online-count></span></span
                       >
                       <span class="text-text-muted text-label-sm">•</span>
                       <span class="font-label-sm text-label-sm text-text-muted"
-                        ><span data-collective-labs-count></span
+                        ><span data-collective-labs-count></span></span
                       >
                     </div>
                   </div>
@@ -797,83 +835,75 @@
                 </div>
               </div>
             </div>
-            <!-- MAIN ACTIVE CHAT STAGE -->
-            <div class="flex-1 flex flex-col h-full bg-bg-main min-w-0">
-              <!-- Top Channel Bar -->
+            <!-- ============================================================ -->
+            <!-- MAIN ACTIVE CHAT STAGE (Discord core chat experience)        -->
+            <div class="flex-1 flex flex-col h-full bg-bg-surface min-w-0 overflow-hidden">
+              <!-- Top Channel Bar: fixed 56px, bottom border, title + topic + utilities -->
               <div
-                class="h-14 px-space-md flex items-center justify-between bg-surface-container-low shadow-sm shrink-0 z-10"
+                class="h-14 shrink-0 z-10 flex items-center justify-between gap-3 bg-bg-surface border-b border-border-subtle shadow-[0_1px_4px_rgba(0,0,0,0.25)] px-3 sm:px-4"
+                id="stage-header"
               >
-                <div class="flex items-center gap-space-sm min-w-0">
+                <div class="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
                   <button
-                    class="p-1.5 text-text-muted hover:text-text-main hover:bg-surface-container rounded-lg transition-colors lg:hidden"
+                    class="p-1.5 -ml-1 text-text-muted hover:text-text-main hover:bg-surface-container rounded-lg transition-colors lg:hidden shrink-0"
                     onclick="toggleChannelRail()"
                     title="Toggle Channel List"
                     type="button"
                   >
-                    <span class="material-symbols-outlined text-headline-sm"
-                      >menu</span
-                    >
+                    <span class="material-symbols-outlined text-headline-sm">menu</span>
                   </button>
                   <div
-                    class="w-8 h-8 rounded-lg bg-primary/20 text-primary flex items-center justify-center shrink-0"
+                    class="w-8 h-8 rounded-lg bg-primary/15 text-primary flex items-center justify-center shrink-0"
                   >
-                    <span class="material-symbols-outlined text-headline-sm"
-                      >dataset</span
-                    >
+                    <span class="material-symbols-outlined text-headline-sm">tag</span>
                   </div>
-                  <div class="flex items-center gap-2 min-w-0">
-                    <span
-                      class="font-headline-md text-headline-sm text-text-main font-bold truncate"
-                      id="active-stage-title"
-                      ></span
-                    ><span
-                      class="px-2.5 py-0.5 rounded-full bg-secondary/15 text-secondary font-code-sm text-label-sm font-semibold flex items-center gap-1.5"
-                      ><span
-                        class="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse"
-                      ></span>
-                      <span data-room-seats></span
+                  <div class="flex flex-col min-w-0 leading-tight">
+                    <div class="flex items-center gap-2 min-w-0">
+                      <span
+                        class="font-headline-sm text-body-md text-text-main font-bold truncate"
+                        id="active-stage-title"
+                        >Select a room</span
+                      >
+                      <span
+                        class="hidden sm:inline-flex shrink-0 items-center gap-1.5 px-2 py-0.5 rounded-full bg-secondary/15 text-secondary font-code-sm text-label-sm font-semibold"
+                        id="room-seats-pill"
+                      >
+                        <span class="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse"></span>
+                        <span data-room-seats></span>
+                      </span>
+                    </div>
+                    <p
+                      class="font-body-sm text-body-sm text-text-muted truncate max-w-[22rem]"
+                      id="active-stage-desc"
                     >
+                      Pick a public room or DM to open the conversation stage
+                    </p>
                   </div>
-                  <div
-                    class="hidden md:block w-px h-5 bg-surface-container-highest mx-1"
-                  ></div>
-                  <p
-                    class="hidden xl:block font-body-sm text-body-sm text-text-muted truncate max-w-md"
-                    id="active-stage-desc"
-                  >
-                    Formal verification of leader election &amp; log compaction
-                    invariants
-                  </p>
                 </div>
-                <div class="flex items-center gap-space-xs shrink-0">
+                <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
                   <button
-                    class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-secondary/15 text-secondary hover:bg-secondary hover:text-on-secondary transition-all"
+                    class="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg bg-secondary/15 text-secondary hover:bg-secondary hover:text-on-secondary transition-all"
                     id="huddle-btn"
                     onclick="toggleHuddle()"
                     type="button"
                   >
-                    <span class="material-symbols-outlined text-headline-sm"
-                      >headset_mic</span
-                    ><span class="font-label-md text-label-md font-semibold"
-                      >Start Huddle</span
-                    ></button
-                  ><button
+                    <span class="material-symbols-outlined text-headline-sm">headset_mic</span>
+                    <span class="font-label-md text-label-md font-semibold">Start Huddle</span>
+                  </button>
+                  <button
                     class="p-1.5 text-text-muted hover:text-text-main hover:bg-surface-container rounded-lg transition-colors"
                     title="Channel Pins"
+                    id="pins-btn"
                     type="button"
                   >
-                    <span class="material-symbols-outlined text-headline-sm"
-                      >push_pin</span
-                    >
+                    <span class="material-symbols-outlined text-headline-sm">push_pin</span>
                   </button>
-                  <div
-                    class="relative hidden sm:flex items-center w-36 md:w-44"
-                  >
+                  <div class="relative hidden sm:flex items-center w-36 md:w-44" id="header-search-box">
                     <span
                       class="material-symbols-outlined absolute left-2.5 text-text-muted text-label-md pointer-events-none"
                       >search</span
                     ><input
-                      class="w-full h-8 pl-8 pr-2 rounded-lg bg-surface-container-high text-on-surface placeholder:text-text-muted font-body-sm text-body-sm outline-none ring-1 ring-white/5"
+                      class="w-full h-8 pl-8 pr-2 rounded-lg bg-surface-container-high text-on-surface placeholder:text-text-muted font-body-sm text-body-sm outline-none ring-1 ring-white/5 focus:ring-1 focus:ring-primary-container transition-all"
                       placeholder="Search messages"
                       type="text"
                     />
@@ -884,15 +914,13 @@
                     title="Toggle Member Panel"
                     type="button"
                   >
-                    <span class="material-symbols-outlined text-headline-sm"
-                      >group</span
-                    >
+                    <span class="material-symbols-outlined text-headline-sm">group</span>
                   </button>
                 </div>
               </div>
               <!-- Live Voice Huddle Floating Overlay (Hidden by default) -->
               <div
-                class="hidden bg-surface-container px-space-md py-2 flex items-center justify-between transition-all shadow-md"
+                class="hidden bg-surface-container px-3 sm:px-4 py-2 flex items-center justify-between gap-2 transition-all shadow-md border-b border-border-subtle shrink-0"
                 id="huddle-bar"
               >
                 <div class="flex items-center gap-3">
@@ -948,85 +976,102 @@
                   </button>
                 </div>
               </div>
-              <!-- Chat Stream Area -->
+              <!-- Chat Stream Area: flex-grow scroll container with Discord-style welcome header -->
               <div
-                class="flex-1 overflow-y-auto p-space-md space-y-5"
+                class="flex-1 overflow-y-auto overflow-x-hidden min-h-0"
                 id="chat-messages-container"
-              ><div class="h-full flex items-center justify-center text-text-muted">Choose a room to load its messages.</div></div>
-              <!-- Rich Message Input Box -->
-              <div class="p-space-md bg-surface-container-low shrink-0">
-                <div
-                  class="bg-surface-container-lowest rounded-xl p-2.5 shadow-lg relative"
-                >
-                  <!-- Textarea -->
-                  <textarea
-                    class="w-full bg-transparent text-on-surface placeholder:text-text-muted font-body-md text-body-md resize-none outline-none px-1"
-                    id="channel-message-input"
-                    placeholder="Message the room"
-                    rows="2"
-                  ></textarea>
-                  <!-- Input Action Bar -->
-                  <div class="flex items-center justify-between pt-1 mt-1" id="message-actions">
-                    <div class="flex items-center gap-1 text-text-muted">
-                      <button
-                        class="p-1.5 rounded-lg hover:text-text-main hover:bg-surface-container-high transition-colors"
-                        title="Attach file or code file"
-                        type="button"
-                      >
-                        <span class="material-symbols-outlined text-headline-sm"
-                          >add_circle</span
-                        >
-                      </button>
-                      <button
-                        class="p-1.5 rounded-lg hover:text-text-main hover:bg-surface-container-high transition-colors"
-                        onclick="insertCodeBlock()"
-                        title="Insert Code Block"
-                        type="button"
-                      >
-                        <span class="material-symbols-outlined text-headline-sm"
-                          >code_blocks</span
-                        >
-                      </button>
-                      <button
-                        class="p-1.5 rounded-lg hover:text-text-main hover:bg-surface-container-high transition-colors"
-                        title="Emoji Picker"
-                        type="button"
-                      >
-                        <span class="material-symbols-outlined text-headline-sm"
-                          >sentiment_satisfied</span
-                        >
-                      </button>
-                      <button
-                        class="p-1.5 rounded-lg hover:text-text-main hover:bg-surface-container-high transition-colors"
-                        title="Record Voice Note"
-                        type="button"
-                      >
-                        <span class="material-symbols-outlined text-headline-sm"
-                          >mic</span
-                        >
-                      </button>
-                      <div
-                        class="hidden sm:block w-px h-4 bg-surface-container-high mx-1"
-                      ></div>
-                      <span
-                        class="hidden sm:inline font-code-sm text-label-sm text-text-muted"
-                        >Markdown enabled</span
-                      >
+              >
+                <div class="py-space-md pr-2 pl-3 sm:pl-4">
+                  <!-- Channel Welcome Header (Discord style) -->
+                  <div class="mb-6 pt-4 pb-2 border-b border-border-subtle" id="stage-welcome">
+                    <div
+                      class="w-16 h-16 rounded-full bg-primary/15 text-primary flex items-center justify-center mb-3"
+                    >
+                      <span class="material-symbols-outlined text-[36px]">tag</span>
                     </div>
-                    <div class="flex items-center gap-2">
-                      <button
-                        class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary-container text-on-primary-container hover:bg-primary hover:text-on-primary transition-colors font-label-md text-label-md font-semibold"
-                        onclick="sendMessage()"
-                        type="button"
-                      >
-                        <span>Send</span>
-                        <span class="material-symbols-outlined text-body-md"
-                          >send</span
-                        >
-                      </button>
-                    </div>
+                    <h2 class="font-headline-lg text-headline-md text-text-main font-bold">
+                      Welcome to <span id="welcome-channel-name">#the-room</span>
+                    </h2>
+                    <p class="font-body-md text-body-md text-text-muted mt-1 max-w-xl">
+                      This is the start of the channel. <span data-welcome-topic>Pick a public room or DM to open the conversation stage.</span>
+                    </p>
+                  </div>
+                  <!-- Message blocks render here via render.js -->
+                  <div class="h-24 flex items-center justify-center text-text-muted font-body-md" id="stage-empty-placeholder">
+                    Choose a room to load its messages.
                   </div>
                 </div>
+              </div>
+              <!-- Rich Message Input Box: fixed to bottom, nested dark rounded container -->
+              <div class="px-3 sm:px-4 pb-3 sm:pb-5 shrink-0 bg-bg-surface">
+                <form id="message-form" class="relative">
+                  <div
+                    class="bg-surface-container rounded-lg shadow-lg ring-1 ring-white/5 focus-within:ring-2 focus-within:ring-primary-container/60 transition-all"
+                  >
+                    <!-- Textarea (auto-resizing up to 8 lines) -->
+                    <textarea
+                      class="w-full bg-transparent text-on-surface placeholder:text-text-muted font-body-md text-body-md leading-6 resize-none outline-none px-3.5 pt-3 pb-1 max-h-[12rem] overflow-y-auto"
+                      id="channel-message-input"
+                      placeholder="Message the room"
+                      rows="1"
+                    ></textarea>
+                    <!-- Input Action Bar -->
+                    <div class="flex items-center justify-between gap-2 px-2 pb-2" id="message-actions">
+                      <div class="flex items-center gap-0.5 text-text-muted min-w-0">
+                        <label
+                          class="p-1.5 rounded-lg hover:text-text-main hover:bg-surface-container-high transition-colors cursor-pointer shrink-0"
+                          title="Attach file or code file"
+                        >
+                          <span class="material-symbols-outlined text-headline-sm block">add_circle</span>
+                          <input type="file" class="hidden" id="attachment-input" />
+                        </label>
+                        <button
+                          class="p-1.5 rounded-lg hover:text-text-main hover:bg-surface-container-high transition-colors shrink-0"
+                          onclick="insertCodeBlock()"
+                          title="Insert Code Block"
+                          type="button"
+                        >
+                          <span class="material-symbols-outlined text-headline-sm">code_blocks</span>
+                        </button>
+                        <button
+                          class="p-1.5 rounded-lg hover:text-text-main hover:bg-surface-container-high transition-colors shrink-0"
+                          id="emoji-btn"
+                          title="Emoji Picker"
+                          type="button"
+                        >
+                          <span class="material-symbols-outlined text-headline-sm">sentiment_satisfied</span>
+                        </button>
+                        <button
+                          class="hidden sm:inline-flex p-1.5 rounded-lg hover:text-text-main hover:bg-surface-container-high transition-colors shrink-0"
+                          title="Record Voice Note"
+                          type="button"
+                        >
+                          <span class="material-symbols-outlined text-headline-sm">mic</span>
+                        </button>
+                        <div class="hidden md:block w-px h-4 bg-surface-container-high mx-1.5 shrink-0"></div>
+                        <span
+                          class="hidden md:inline font-code-sm text-label-sm text-text-muted truncate"
+                          >**bold** · `code` · ```block``` · Markdown enabled</span
+                        >
+                      </div>
+                      <div class="flex items-center gap-2 shrink-0 ml-auto">
+                        <button
+                          class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary-container text-on-primary-container hover:bg-primary hover:text-on-primary disabled:opacity-40 disabled:hover:bg-primary-container transition-colors font-label-md text-label-md font-semibold"
+                          onclick="sendMessage()"
+                          id="send-btn"
+                          type="button"
+                        >
+                          <span>Send</span>
+                          <span class="material-symbols-outlined text-body-md">send</span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  <p class="hidden sm:flex mt-1.5 px-1 font-body-sm text-[11px] text-text-muted items-center gap-1">
+                    <kbd class="font-code-sm bg-surface-container px-1.5 py-0.5 rounded border border-border-subtle">Enter</kbd> to send ·
+                    <kbd class="font-code-sm bg-surface-container px-1.5 py-0.5 rounded border border-border-subtle">Shift + Enter</kbd> for a new line
+                  </p>
+                </form>
               </div>
             </div>
             <!-- RIGHT COLUMN: Member List & Contact Inspector Panel -->
@@ -1058,7 +1103,10 @@
                   >
                 </button>
               </div>
-              <!-- Member Categories --><div id="room-roster" class="flex-1 overflow-y-auto px-space-sm py-space-sm"><div class="p-3 text-sm text-text-muted">Room members will be loaded from the active room.</div></div></div>
+              <!-- Member Categories -->
+              <div id="room-roster" class="flex-1 overflow-y-auto px-space-sm py-space-sm"><div class="p-3 text-sm text-text-muted">Room members will be loaded from the active room.</div></div>
+            </div>
+          </div>
           <!-- MODAL: Direct Message / Start Private DM Popover -->
           <div
             class="fixed inset-0 z-50 flex items-center justify-center bg-bg-main/70 backdrop-blur-md hidden"
@@ -1161,103 +1209,45 @@
             </div>
           </div>
           <script>
+            // NOTE: Chat stage runtime behavior (auto-resize, emoji picker, code-block
+            // inserter, toggles) lives in render.js so it works consistently with the
+            // message renderer. These inline stubs only prevent onclick errors before
+            // the module loads.
             function toggleChannelRail() {
-              const col = document.getElementById("sub-channel-column");
-              const reopen = document.getElementById("channel-reopen-button");
-              if (window.innerWidth < 1024) {
-                document.getElementById("channel-rail")?.classList.toggle("mobile-open");
-                return;
-              }
-              const collapsed = col.classList.toggle("hidden");
-                            window.refreshCollectiveRail?.();
-              reopen?.classList.toggle("hidden", !collapsed);
-              reopen?.classList.toggle("flex", collapsed);
+              window.toggleChannelRail?.();
             }
 
             function toggleMemberList() {
-              const panel = document.getElementById("member-list-panel");
-              if (panel.classList.contains("hidden")) {
-                panel.classList.remove("hidden");
-              } else {
-                panel.classList.add("hidden");
-              }
+              window.toggleMemberList?.();
             }
 
             function toggleHuddle() {
-              const bar = document.getElementById("huddle-bar");
-              const btn = document.getElementById("huddle-btn");
-              if (bar.classList.contains("hidden")) {
-                bar.classList.remove("hidden");
-                btn.classList.remove("bg-secondary/15", "text-secondary");
-                btn.classList.add("bg-secondary", "text-on-secondary");
-                btn.innerHTML =
-                  '<span class="material-symbols-outlined text-headline-sm">mic</span><span class="font-label-md text-label-md font-semibold">In Huddle</span>';
-              } else {
-                bar.classList.add("hidden");
-                btn.classList.remove("bg-secondary", "text-on-secondary");
-                btn.classList.add("bg-secondary/15", "text-secondary");
-                btn.innerHTML =
-                  '<span class="material-symbols-outlined text-headline-sm">headset_mic</span><span class="font-label-md text-label-md font-semibold">Start Huddle</span>';
-              }
+              window.toggleHuddle?.();
             }
 
             function openDirectMessageModal() {
-              document.getElementById("dm-modal").classList.remove("hidden");
+              window.openDirectMessageModal?.();
             }
 
             function closeDmModal() {
-              document.getElementById("dm-modal").classList.add("hidden");
-            }
-
-            function openDmWith(name, role, status) {
-              document.getElementById("dm-modal-name").textContent = name;
-              document.getElementById("dm-modal-role").textContent = role;
-              document.getElementById("dm-modal-status").textContent =
-                "Focus: " + status;
-
-              const initials = name
-                .split(" ")
-                .map((n) => n[0])
-                .join("");
-              document.getElementById("dm-modal-avatar").textContent = initials;
-
-              openDirectMessageModal();
+              window.closeDmModal?.();
             }
 
             function sendDirectMessage() {
-              closeDmModal();
+              window.sendDirectMessage?.();
             }
 
             function insertCodeBlock() {
-              const textarea = document.getElementById("channel-message-input");
-              const sample =
-                "rust\n// Insert invariant test here\nfn verify_cluster() -> bool {\n    true\n}\n";
-              textarea.value += (textarea.value ? "\n" : "") + sample;
-              textarea.focus();
+              window.insertCodeBlock?.();
             }
 
             function copySnippet(btn) {
-              const originalText = btn.innerHTML;
-              btn.innerHTML =
-                '<span class="material-symbols-outlined text-body-sm text-secondary">check</span> Copied!';
-              setTimeout(() => {
-                btn.innerHTML = originalText;
-              }, 1800);
+              window.copySnippet?.(btn);
             }
 
             function sendMessage() {
               document.getElementById("message-form")?.requestSubmit();
             }
-
-            // Allow Enter key to trigger send
-            document
-              .getElementById("channel-message-input")
-              .addEventListener("keydown", function (e) {
-                if (e.key === "Enter" && !e.shiftKey) {
-                  e.preventDefault();
-                  sendMessage();
-                }
-              });
           </script>
         </div>
       </main>

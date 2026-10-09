@@ -11,6 +11,7 @@ let activeUserTab = null;
 
 document.addEventListener('DOMContentLoaded', () => {
   prepareBlueprint();
+  setupComposer();
   loadCurrentUser();
   loadCollectives();
   loadDirectMessages();
@@ -311,10 +312,82 @@ function clearActiveRoom() {
   setText('#active-stage-desc', 'Create or join a room to begin');
   setText('[data-room-seats]', '');
   setText('[data-roster-count]', '0 / 0 Active');
+  setWelcomeHeader(null);
   const messages = document.getElementById('chat-messages-container');
-  if (messages) messages.innerHTML = '<div class="h-full flex items-center justify-center text-text-muted">Create or join a room to load its messages.</div>';
+  if (messages) renderStageInner(messages, '<div class="py-10 text-center text-text-muted font-body-md">Create or join a room to load its messages.</div>');
   const roster = document.getElementById('room-roster');
   if (roster) roster.innerHTML = '<div class="p-3 text-sm text-text-muted">Join a room to see its roster.</div>';
+}
+
+// ---- Chat stage helpers ----
+function setWelcomeHeader(room) {
+  setText('#welcome-channel-name', room ? `#${room.name}` : '#the-room');
+  setText('[data-welcome-topic]', room?.topic || 'Share code snippets, runbooks, and invariant proofs with your lab.');
+}
+
+function renderStageInner(container, innerHtml) {
+  container.innerHTML = `<div class="py-space-md pr-2 pl-3 sm:pl-4"><div id="stage-welcome" class="mb-6 pt-4 pb-2 border-b border-border-subtle"><div class="w-16 h-16 rounded-full bg-primary/15 text-primary flex items-center justify-center mb-3"><span class="material-symbols-outlined text-[36px]">tag</span></div><h2 class="font-headline-lg text-headline-md text-text-main font-bold">Welcome to <span id="welcome-channel-name">#the-room</span></h2><p class="font-body-md text-body-md text-text-muted mt-1 max-w-xl">This is the start of the channel. <span data-welcome-topic>Pick a public room or DM to open the conversation stage.</span></p></div>${innerHtml}</div>`;
+}
+
+window.insertCodeBlock = function insertCodeBlock() {
+  const textarea = document.getElementById('channel-message-input');
+  if (!textarea) return;
+  const sample = '```rust\n// Insert invariant test here\nfn verify_cluster() -> bool {\n    true\n}\n```';
+  const start = textarea.selectionStart ?? textarea.value.length;
+  const before = textarea.value.slice(0, start);
+  const after = textarea.value.slice(start);
+  const glue = before && !before.endsWith('\n') ? '\n' : '';
+  textarea.value = before + glue + sample + '\n' + after;
+  textarea.focus();
+  const caret = start + glue.length + sample.length + 1;
+  textarea.setSelectionRange(caret, caret);
+  textarea.dispatchEvent(new Event('input', { bubbles: true }));
+};
+
+window.copySnippet = function copySnippet(btn) {
+  const block = btn.closest('.chat-codeblock');
+  const code = block?.querySelector('code')?.textContent ?? '';
+  navigator.clipboard?.writeText(code).catch(() => {});
+  const originalText = btn.innerHTML;
+  btn.innerHTML = '<span class="material-symbols-outlined text-body-sm text-secondary">check</span> Copied!';
+  setTimeout(() => { btn.innerHTML = originalText; }, 1800);
+};
+
+function setupComposer() {
+  const textarea = document.getElementById('channel-message-input');
+  if (!textarea) return;
+
+  // Auto-resize: grow with content up to max-height (set in CSS/Tailwind).
+  const autoResize = () => {
+    textarea.style.height = 'auto';
+    textarea.style.height = `${Math.min(textarea.scrollHeight, 192)}px`;
+  };
+  textarea.addEventListener('input', autoResize);
+  autoResize();
+
+  // Lightweight emoji picker popover.
+  const emojiBtn = document.getElementById('emoji-btn');
+  if (emojiBtn) {
+    const emojis = ['😀', '😂', '👍', '❤️', '🔥', '🎉', '🤔', '😅', '🙌', '👀', '✅', '🚀', '💡', '⚠️', '🧪', '🦀'];
+    const popover = document.createElement('div');
+    popover.className = 'hidden absolute bottom-full mb-2 left-0 z-30 grid grid-cols-8 gap-1 rounded-lg bg-surface-container-highest p-2 shadow-2xl ring-1 ring-white/10 w-max max-w-[calc(100vw-2rem)]';
+    popover.innerHTML = emojis.map(e => `<button type="button" class="p-1.5 rounded hover:bg-surface-bright text-lg leading-none">${e}</button>`).join('');
+    emojiBtn.parentElement.appendChild(popover);
+    emojiBtn.addEventListener('click', event => {
+      event.stopPropagation();
+      popover.classList.toggle('hidden');
+    });
+    popover.addEventListener('click', event => {
+      const emoji = event.target.textContent;
+      if (!emojis.includes(emoji)) return;
+      const start = textarea.selectionStart ?? textarea.value.length;
+      textarea.value = textarea.value.slice(0, start) + emoji + textarea.value.slice(textarea.selectionEnd ?? start);
+      textarea.focus();
+      textarea.setSelectionRange(start + emoji.length, start + emoji.length);
+      textarea.dispatchEvent(new Event('input', { bubbles: true }));
+    });
+    document.addEventListener('click', () => popover.classList.add('hidden'));
+  }
 }
 
 window.toggleChannelRail = function toggleChannelRail() {
@@ -430,11 +503,15 @@ async function loadRoom(room) {
   setText('#active-stage-title', `#${room.name}`);
   setText('#active-stage-desc', room.topic || 'Live room messages');
   setText('[data-room-seats]', `${room.memberCount ?? 0} / ${room.capacity ?? 0} seats filled`);
+  setWelcomeHeader(room);
   const input = document.getElementById('channel-message-input');
-  if (input) input.placeholder = `Message #${room.name}`;
+  if (input) {
+    input.placeholder = `Message #${room.name}`;
+    input.disabled = false;
+  }
   setText('#room-connection-status', 'Loading');
   const container = document.getElementById('chat-messages-container');
-  container.innerHTML = '<div class="p-4 text-text-muted font-body-md">Loading messages...</div>';
+  renderStageInner(container, '<div class="p-4 text-text-muted font-body-md">Loading messages...</div>');
 
   try {
     const [messages, members] = await Promise.all([
@@ -446,7 +523,7 @@ async function loadRoom(room) {
     setText('#room-connection-status', 'Ready');
   } catch (err) {
     console.error('Failed to load room messages:', err);
-    container.innerHTML = '<div class="p-4 text-tertiary font-body-md">Unable to load messages. Check the API and database connection.</div>';
+    renderStageInner(container, '<div class="p-4 text-tertiary font-body-md">Unable to load messages. Check the API and database connection.</div>');
     setText('#room-connection-status', 'Offline');
   }
 }
@@ -467,27 +544,115 @@ function renderRoster(members, capacity = 0) {
   }
 }
 
+// ---- Markdown-ish formatter for chat content (escaped first, then styled) ----
+function formatMessageContent(text) {
+  const fences = [];
+  let src = escapeHtml(String(text ?? '')).replace(/```(\w*)\n?([\s\S]*?)```/g, (_m, lang, code) => {
+    const token = `\u0000FENCE${fences.length}\u0000`;
+    fences.push({ lang: lang || 'text', code });
+    return token;
+  });
+
+  src = src.replace(/`([^`\n]+)`/g, '<code class="bg-surface-container-highest text-text-main font-code-md text-code-md px-1.5 py-0.5 rounded border border-border-subtle">$1</code>');
+  src = src.replace(/\*\*([^*\n]+)\*\*/g, '<strong class="font-semibold text-text-main">$1</strong>');
+  src = src.replace(/(^|\s)\*([^*\n]+)\*(?=\s|$|[.,!?])/g, '$1<em>$2</em>');
+  src = src.replace(/__([^_\n]+)__/g, '<u>$1</u>');
+  src = src.replace(/~~([^~\n]+)~~/g, '<del>$1</del>');
+  src = src.replace(/(^|[\s(])((?:https?:\/\/|www\.)[^\s<)]+)/g, '$1<a href="$2" target="_blank" rel="noopener noreferrer" class="text-primary hover:underline">$2</a>');
+  src = src.replace(/@([A-Za-z0-9_.]{2,32})/g, '<span class="rounded bg-primary-container/25 text-primary px-1 font-medium">@$1</span>');
+
+  src = src.replace(/\u0000FENCE(\d+)\u0000/g, (_m, index) => {
+    const fence = fences[Number(index)];
+    return `<div class="chat-codeblock my-2 rounded-lg border border-border-subtle overflow-hidden max-w-full">
+      <div class="flex items-center justify-between gap-2 bg-surface-container-high px-3 py-1.5">
+        <span class="font-code-sm text-label-sm uppercase tracking-wide text-text-muted">${escapeHtml(fence.lang)}</span>
+        <button type="button" onclick="copySnippet(this)" class="flex items-center gap-1 font-label-sm text-label-sm text-text-muted hover:text-text-main transition-colors"><span class="material-symbols-outlined text-body-sm">content_copy</span> Copy</button>
+      </div>
+      <pre class="bg-surface-container-lowest p-3 overflow-x-auto m-0"><code class="font-code-md text-code-md leading-relaxed text-on-surface whitespace-pre">${fence.code}</code></pre>
+    </div>`;
+  });
+
+  return src;
+}
+
+function avatarFor(user, sizeClass = 'w-[40px] h-[40px]') {
+  if (user.avatarUrl) {
+    return `<img class="${sizeClass} rounded-full object-cover shrink-0 cursor-pointer hover:opacity-90 transition-opacity" src="${escapeHtml(user.avatarUrl)}" alt="${escapeHtml(user.name)}" />`;
+  }
+  return `<div class="${sizeClass} rounded-full flex items-center justify-center font-bold text-[15px] shrink-0 cursor-pointer hover:opacity-90 transition-opacity ${user.colorClass}" title="${escapeHtml(user.name)}">${escapeHtml(initials(user.name))}</div>`;
+}
+
+function shortTime(value) {
+  if (!value) return '';
+  const date = new Date(value);
+  const today = new Date();
+  const sameDay = date.toDateString() === today.toDateString();
+  const yesterday = new Date(today);
+  yesterday.setDate(today.getDate() - 1);
+  if (sameDay) return `Today at ${date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}`;
+  if (date.toDateString() === yesterday.toDateString()) return `Yesterday at ${date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}`;
+  return date.toLocaleString([], { month: 'short', day: 'numeric', year: date.getFullYear() !== today.getFullYear() ? 'numeric' : undefined, hour: 'numeric', minute: '2-digit' });
+}
+
 function renderMessages(container, messages) {
-  container.innerHTML = '';
   if (!messages.length) {
-    container.innerHTML = '<div class="h-full flex items-center justify-center text-text-muted font-body-md">No messages yet. Start the conversation.</div>';
+    renderStageInner(container, '<div class="py-10 text-center text-text-muted font-body-md">No messages yet. Start the conversation — press <kbd class="font-code-sm bg-surface-container px-1.5 py-0.5 rounded border border-border-subtle">Enter</kbd> to send.</div>');
     return;
   }
-  for (const message of messages) {
-    const item = document.createElement('article');
-    item.className = 'flex items-start gap-3 p-2 rounded-xl hover:bg-surface-container-low/40';
-    item.innerHTML = `
-      <div class="w-10 h-10 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center font-bold shrink-0">${escapeHtml(initials(message.senderName))}</div>
-      <div class="flex-1 min-w-0">
-        <div class="flex items-center gap-2 flex-wrap">
-          <strong class="font-headline-sm text-body-md text-text-main">${escapeHtml(message.senderName)}</strong>
-          <span class="font-code-sm text-label-sm text-text-muted">${formatDate(message.createdAt)}</span>
+
+  const palette = ['bg-indigo-500 text-white', 'bg-emerald-600 text-white', 'bg-rose-500 text-white', 'bg-amber-500 text-black', 'bg-sky-600 text-white', 'bg-violet-600 text-white', 'bg-teal-600 text-white', 'bg-fuchsia-600 text-white'];
+  const colorBySender = new Map();
+  const rows = messages.map(message => {
+    if (!colorBySender.has(message.senderName)) {
+      colorBySender.set(message.senderName, palette[colorBySender.size % palette.length]);
+    }
+    return {
+      name: message.senderName || 'Unknown',
+      time: shortTime(message.createdAt),
+      fullTime: message.createdAt ? new Date(message.createdAt).toLocaleString() : '',
+      content: formatMessageContent(message.message),
+      avatarUrl: message.avatarUrl,
+      colorClass: colorBySender.get(message.senderName),
+    };
+  });
+
+  let blocks = '';
+  for (let i = 0; i < rows.length; i += 1) {
+    const row = rows[i];
+    const prev = rows[i - 1];
+    // Group with previous message when same sender within 10 minutes (Discord rule)
+    const grouped = prev && prev.name === row.name &&
+      Math.abs(new Date(messages[i].createdAt) - new Date(messages[i - 1].createdAt)) < 10 * 60 * 1000;
+
+    if (!grouped) {
+      blocks += `<article class="group flex items-start gap-4 pl-12 sm:pl-16 pr-3 pt-[3px] pb-1 relative rounded hover:bg-surface-container-low/50 transition-colors">
+        <div class="absolute -left-0 top-0 w-10 flex justify-center">
+          ${avatarFor(row)}
         </div>
-        <p class="font-body-md text-on-surface mt-1 whitespace-pre-wrap break-words">${escapeHtml(message.message)}</p>
-      </div>`;
-    container.appendChild(item);
+        <div class="flex-1 min-w-0">
+          <div class="flex items-baseline gap-2 flex-wrap">
+            <span class="font-headline-sm text-body-md font-semibold text-text-main hover:underline cursor-pointer">${escapeHtml(row.name)}</span>
+            <time class="font-code-sm text-[11px] text-text-muted select-none" title="${escapeHtml(row.fullTime)}">${escapeHtml(row.time)}</time>
+          </div>
+          <div class="message-content mt-0.5 font-body-md text-body-md leading-[1.375] text-on-surface break-words break-all">${row.content}</div>
+        </div>
+      </article>`;
+    } else {
+      blocks += `<article class="group flex items-start gap-4 pl-12 sm:pl-16 pr-3 py-px relative rounded hover:bg-surface-container-low/50 transition-colors">
+        <time class="hidden group-hover:flex absolute left-0 top-1 w-11 text-right font-code-sm text-[10px] leading-4 text-text-muted select-none pr-1" title="${escapeHtml(row.fullTime)}">${escapeHtml(row.time.replace(/^(Today|Yesterday) at /, ''))}</time>
+        <div class="flex-1 min-w-0">
+          <div class="message-content font-body-md text-body-md leading-[1.375] text-on-surface break-words break-all">${row.content}</div>
+        </div>
+      </article>`;
+    }
   }
-  container.scrollTop = container.scrollHeight;
+
+  renderStageInner(container, `<div id="stage-messages" class="space-y-px">${blocks}</div>`);
+
+  // Smooth autoscroll to newest message
+  requestAnimationFrame(() => {
+    container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
+  });
 }
 
 async function sendRoomMessage(event) {
@@ -495,16 +660,20 @@ async function sendRoomMessage(event) {
   const input = document.getElementById('channel-message-input');
   const message = input.value.trim();
   if (!activeRoomId || !message) return;
+  const sendBtn = document.getElementById('send-btn');
   input.disabled = true;
+  sendBtn?.setAttribute('disabled', 'true');
   try {
     await createRoomMessage(activeRoomId, { senderId: currentUserId, message });
     input.value = '';
+    input.dispatchEvent(new Event('input', { bubbles: true })); // reset auto-resize height
     await loadRoom({ id: activeRoomId, name: document.getElementById('active-stage-title').textContent.replace(/^#/, ''), topic: document.getElementById('active-stage-desc').textContent });
   } catch (err) {
     console.error('Failed to send room message:', err);
     setText('#room-connection-status', 'Send failed');
   } finally {
     input.disabled = false;
+    sendBtn?.removeAttribute('disabled');
     input.focus();
   }
 }

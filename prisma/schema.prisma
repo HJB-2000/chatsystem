@@ -18,13 +18,19 @@ enum ChannelType {
 
 // Minimal stub. Real user table belongs to the larger project.
 model User {
-  userId   BigInt    @id @default(autoincrement()) @map("user_id")
-  username String    @unique
-  guilds   Guild[]   @relation("GuildOwner")
-  members  Member[]
-  messages Message[]
-  friendships Friendship[] @relation("FriendshipUser")
-  friendOf    Friendship[] @relation("FriendshipFriend")
+  userId          BigInt                @id @default(autoincrement()) @map("user_id")
+  username        String                @unique
+  avatarUrl       String?               @map("avatar_url")
+  roleTitle       String?               @map("role_title")
+  currentActivity String?               @map("current_activity")
+  lastPresence    String?               @map("last_presence") // online | idle | dnd | offline
+  guilds          Guild[]               @relation("GuildOwner")
+  members         Member[]
+  messages        Message[]
+  friendships     Friendship[]          @relation("FriendshipUser")
+  friendOf        Friendship[]          @relation("FriendshipFriend")
+  dmChannels      DirectChannelMember[]
+  invitesCreated  Invite[]
 
   @@map("user")
 }
@@ -39,35 +45,42 @@ model Guild {
   channels    Channel[]
   members     Member[]
   roles       Role[]
+  invites     Invite[]
 
   @@index([ownerId])
   @@map("guild")
 }
 
 model Channel {
+  // Shared BIGSERIAL sequence with DirectChannel: both tables hand out ids
+  // from the same generator so Message.channel_id can reference either one.
   channelId  BigInt      @id @default(autoincrement()) @map("channel_id")
   guildId    BigInt      @map("guild_id")
   name       String
+  topic      String?
+  icon       String?
+  capacity   Int         @default(100)
   type       ChannelType @default(TEXT)
   categoryId BigInt?     @map("category_id")
   position   Int         @default(0)
   guild      Guild       @relation(fields: [guildId], references: [guildId], onDelete: Cascade)
   category   Channel?    @relation("Category", fields: [categoryId], references: [channelId], onDelete: SetNull)
   children   Channel[]   @relation("Category")
-  messages   Message[]
+  messages   Message[]   @relation("ChannelMessages")
 
   @@index([guildId, position])
   @@map("channel")
 }
 
 model Member {
-  guildId  BigInt   @map("guild_id")
-  userId   BigInt   @map("user_id")
-  nickname String?
-  roleIds  Json     @default("[]") @map("role_ids")
-  joinedAt DateTime @default(now()) @map("joined_at")
-  guild    Guild    @relation(fields: [guildId], references: [guildId], onDelete: Cascade)
-  user     User     @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  guildId        BigInt   @map("guild_id")
+  userId         BigInt   @map("user_id")
+  nickname       String?
+  roleIds        Json     @default("[]") @map("role_ids")
+  joinedAt       DateTime @default(now()) @map("joined_at")
+  voiceChannelId BigInt?  @map("voice_channel_id")
+  guild          Guild    @relation(fields: [guildId], references: [guildId], onDelete: Cascade)
+  user           User     @relation(fields: [userId], references: [userId], onDelete: Cascade)
 
   @@id([guildId, userId])
   @@index([userId])
@@ -87,16 +100,17 @@ model Role {
 }
 
 model Message {
-  messageId   BigInt    @id @default(autoincrement()) @map("message_id")
-  channelId   BigInt    @map("channel_id")
-  authorId    BigInt    @map("author_id")
+  messageId   BigInt         @id @default(autoincrement()) @map("message_id")
+  channelId   BigInt         @map("channel_id")
+  authorId    BigInt         @map("author_id")
   content     String
   embeds      Json?
   attachments Json?
-  createdAt   DateTime  @default(now()) @map("created_at")
-  editedAt    DateTime? @map("edited_at")
-  channel     Channel   @relation(fields: [channelId], references: [channelId], onDelete: Cascade)
-  author      User      @relation(fields: [authorId], references: [userId])
+  createdAt   DateTime       @default(now()) @map("created_at")
+  editedAt    DateTime?      @map("edited_at")
+  channel     Channel?       @relation("ChannelMessages", fields: [channelId], references: [channelId], onDelete: Cascade, map: "message_channel_id_fkey")
+  dmChannel   DirectChannel? @relation("DmChannelMessages", fields: [channelId], references: [channelId], onDelete: Cascade, map: "message_dm_channel_id_fkey")
+  author      User           @relation(fields: [authorId], references: [userId])
 
   @@index([channelId, messageId])
   @@map("message")
@@ -112,4 +126,44 @@ model Friendship {
   @@id([userId, friendId])
   @@index([friendId])
   @@map("friendship")
+}
+
+model Invite {
+  inviteId    BigInt    @id @default(autoincrement()) @map("invite_id")
+  guildId     BigInt    @map("guild_id")
+  code        String    @unique
+  createdById BigInt    @map("created_by_id")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  expiresAt   DateTime? @map("expires_at")
+  guild       Guild     @relation(fields: [guildId], references: [guildId], onDelete: Cascade)
+  createdBy   User      @relation(fields: [createdById], references: [userId])
+
+  @@index([guildId])
+  @@map("invite")
+}
+
+// DM channels are just channels with no guild; membership is explicit.
+// Shares the "channel_channel_id_seq" sequence with Channel (see above).
+model DirectChannel {
+  channelId BigInt                @id @default(autoincrement()) @map("channel_id")
+  userA     BigInt                @map("user_a")
+  userB     BigInt                @map("user_b")
+  createdAt DateTime              @default(now()) @map("created_at")
+  members   DirectChannelMember[]
+  messages  Message[]             @relation("DmChannelMessages")
+
+  @@unique([userA, userB])
+  @@map("direct_channel")
+}
+
+model DirectChannelMember {
+  channelId BigInt        @map("channel_id")
+  userId    BigInt        @map("user_id")
+  channel   DirectChannel @relation(fields: [channelId], references: [channelId], onDelete: Cascade)
+  user      User          @relation(fields: [userId], references: [userId], onDelete: Cascade)
+
+  @@id([channelId, userId])
+  @@index([userId])
+  @@index([channelId])
+  @@map("direct_channel_member")
 }

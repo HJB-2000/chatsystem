@@ -37,16 +37,28 @@ export type UserSumAggregateOutputType = {
 export type UserMinAggregateOutputType = {
   userId: bigint | null
   username: string | null
+  avatarUrl: string | null
+  roleTitle: string | null
+  currentActivity: string | null
+  lastPresence: string | null
 }
 
 export type UserMaxAggregateOutputType = {
   userId: bigint | null
   username: string | null
+  avatarUrl: string | null
+  roleTitle: string | null
+  currentActivity: string | null
+  lastPresence: string | null
 }
 
 export type UserCountAggregateOutputType = {
   userId: number
   username: number
+  avatarUrl: number
+  roleTitle: number
+  currentActivity: number
+  lastPresence: number
   _all: number
 }
 
@@ -62,16 +74,28 @@ export type UserSumAggregateInputType = {
 export type UserMinAggregateInputType = {
   userId?: true
   username?: true
+  avatarUrl?: true
+  roleTitle?: true
+  currentActivity?: true
+  lastPresence?: true
 }
 
 export type UserMaxAggregateInputType = {
   userId?: true
   username?: true
+  avatarUrl?: true
+  roleTitle?: true
+  currentActivity?: true
+  lastPresence?: true
 }
 
 export type UserCountAggregateInputType = {
   userId?: true
   username?: true
+  avatarUrl?: true
+  roleTitle?: true
+  currentActivity?: true
+  lastPresence?: true
   _all?: true
 }
 
@@ -164,6 +188,10 @@ export type UserGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
 export type UserGroupByOutputType = {
   userId: bigint
   username: string
+  avatarUrl: string | null
+  roleTitle: string | null
+  currentActivity: string | null
+  lastPresence: string | null
   _count: UserCountAggregateOutputType | null
   _avg: UserAvgAggregateOutputType | null
   _sum: UserSumAggregateOutputType | null
@@ -192,21 +220,33 @@ export type UserWhereInput = {
   NOT?: Prisma.UserWhereInput | Prisma.UserWhereInput[]
   userId?: Prisma.BigIntFilter<"User"> | bigint | number
   username?: Prisma.StringFilter<"User"> | string
+  avatarUrl?: Prisma.StringNullableFilter<"User"> | string | null
+  roleTitle?: Prisma.StringNullableFilter<"User"> | string | null
+  currentActivity?: Prisma.StringNullableFilter<"User"> | string | null
+  lastPresence?: Prisma.StringNullableFilter<"User"> | string | null
   guilds?: Prisma.GuildListRelationFilter
   members?: Prisma.MemberListRelationFilter
   messages?: Prisma.MessageListRelationFilter
   friendships?: Prisma.FriendshipListRelationFilter
   friendOf?: Prisma.FriendshipListRelationFilter
+  dmChannels?: Prisma.DirectChannelMemberListRelationFilter
+  invitesCreated?: Prisma.InviteListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
   userId?: Prisma.SortOrder
   username?: Prisma.SortOrder
+  avatarUrl?: Prisma.SortOrderInput | Prisma.SortOrder
+  roleTitle?: Prisma.SortOrderInput | Prisma.SortOrder
+  currentActivity?: Prisma.SortOrderInput | Prisma.SortOrder
+  lastPresence?: Prisma.SortOrderInput | Prisma.SortOrder
   guilds?: Prisma.GuildOrderByRelationAggregateInput
   members?: Prisma.MemberOrderByRelationAggregateInput
   messages?: Prisma.MessageOrderByRelationAggregateInput
   friendships?: Prisma.FriendshipOrderByRelationAggregateInput
   friendOf?: Prisma.FriendshipOrderByRelationAggregateInput
+  dmChannels?: Prisma.DirectChannelMemberOrderByRelationAggregateInput
+  invitesCreated?: Prisma.InviteOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -215,16 +255,26 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   AND?: Prisma.UserWhereInput | Prisma.UserWhereInput[]
   OR?: Prisma.UserWhereInput[]
   NOT?: Prisma.UserWhereInput | Prisma.UserWhereInput[]
+  avatarUrl?: Prisma.StringNullableFilter<"User"> | string | null
+  roleTitle?: Prisma.StringNullableFilter<"User"> | string | null
+  currentActivity?: Prisma.StringNullableFilter<"User"> | string | null
+  lastPresence?: Prisma.StringNullableFilter<"User"> | string | null
   guilds?: Prisma.GuildListRelationFilter
   members?: Prisma.MemberListRelationFilter
   messages?: Prisma.MessageListRelationFilter
   friendships?: Prisma.FriendshipListRelationFilter
   friendOf?: Prisma.FriendshipListRelationFilter
+  dmChannels?: Prisma.DirectChannelMemberListRelationFilter
+  invitesCreated?: Prisma.InviteListRelationFilter
 }, "userId" | "username">
 
 export type UserOrderByWithAggregationInput = {
   userId?: Prisma.SortOrder
   username?: Prisma.SortOrder
+  avatarUrl?: Prisma.SortOrderInput | Prisma.SortOrder
+  roleTitle?: Prisma.SortOrderInput | Prisma.SortOrder
+  currentActivity?: Prisma.SortOrderInput | Prisma.SortOrder
+  lastPresence?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.UserCountOrderByAggregateInput
   _avg?: Prisma.UserAvgOrderByAggregateInput
   _max?: Prisma.UserMaxOrderByAggregateInput
@@ -238,66 +288,110 @@ export type UserScalarWhereWithAggregatesInput = {
   NOT?: Prisma.UserScalarWhereWithAggregatesInput | Prisma.UserScalarWhereWithAggregatesInput[]
   userId?: Prisma.BigIntWithAggregatesFilter<"User"> | bigint | number
   username?: Prisma.StringWithAggregatesFilter<"User"> | string
+  avatarUrl?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  roleTitle?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  currentActivity?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  lastPresence?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
 }
 
 export type UserCreateInput = {
   userId?: bigint | number
   username: string
+  avatarUrl?: string | null
+  roleTitle?: string | null
+  currentActivity?: string | null
+  lastPresence?: string | null
   guilds?: Prisma.GuildCreateNestedManyWithoutOwnerInput
   members?: Prisma.MemberCreateNestedManyWithoutUserInput
   messages?: Prisma.MessageCreateNestedManyWithoutAuthorInput
   friendships?: Prisma.FriendshipCreateNestedManyWithoutUserInput
   friendOf?: Prisma.FriendshipCreateNestedManyWithoutFriendInput
+  dmChannels?: Prisma.DirectChannelMemberCreateNestedManyWithoutUserInput
+  invitesCreated?: Prisma.InviteCreateNestedManyWithoutCreatedByInput
 }
 
 export type UserUncheckedCreateInput = {
   userId?: bigint | number
   username: string
+  avatarUrl?: string | null
+  roleTitle?: string | null
+  currentActivity?: string | null
+  lastPresence?: string | null
   guilds?: Prisma.GuildUncheckedCreateNestedManyWithoutOwnerInput
   members?: Prisma.MemberUncheckedCreateNestedManyWithoutUserInput
   messages?: Prisma.MessageUncheckedCreateNestedManyWithoutAuthorInput
   friendships?: Prisma.FriendshipUncheckedCreateNestedManyWithoutUserInput
   friendOf?: Prisma.FriendshipUncheckedCreateNestedManyWithoutFriendInput
+  dmChannels?: Prisma.DirectChannelMemberUncheckedCreateNestedManyWithoutUserInput
+  invitesCreated?: Prisma.InviteUncheckedCreateNestedManyWithoutCreatedByInput
 }
 
 export type UserUpdateInput = {
   userId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   username?: Prisma.StringFieldUpdateOperationsInput | string
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  roleTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  currentActivity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastPresence?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   guilds?: Prisma.GuildUpdateManyWithoutOwnerNestedInput
   members?: Prisma.MemberUpdateManyWithoutUserNestedInput
   messages?: Prisma.MessageUpdateManyWithoutAuthorNestedInput
   friendships?: Prisma.FriendshipUpdateManyWithoutUserNestedInput
   friendOf?: Prisma.FriendshipUpdateManyWithoutFriendNestedInput
+  dmChannels?: Prisma.DirectChannelMemberUpdateManyWithoutUserNestedInput
+  invitesCreated?: Prisma.InviteUpdateManyWithoutCreatedByNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
   userId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   username?: Prisma.StringFieldUpdateOperationsInput | string
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  roleTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  currentActivity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastPresence?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   guilds?: Prisma.GuildUncheckedUpdateManyWithoutOwnerNestedInput
   members?: Prisma.MemberUncheckedUpdateManyWithoutUserNestedInput
   messages?: Prisma.MessageUncheckedUpdateManyWithoutAuthorNestedInput
   friendships?: Prisma.FriendshipUncheckedUpdateManyWithoutUserNestedInput
   friendOf?: Prisma.FriendshipUncheckedUpdateManyWithoutFriendNestedInput
+  dmChannels?: Prisma.DirectChannelMemberUncheckedUpdateManyWithoutUserNestedInput
+  invitesCreated?: Prisma.InviteUncheckedUpdateManyWithoutCreatedByNestedInput
 }
 
 export type UserCreateManyInput = {
   userId?: bigint | number
   username: string
+  avatarUrl?: string | null
+  roleTitle?: string | null
+  currentActivity?: string | null
+  lastPresence?: string | null
 }
 
 export type UserUpdateManyMutationInput = {
   userId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   username?: Prisma.StringFieldUpdateOperationsInput | string
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  roleTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  currentActivity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastPresence?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type UserUncheckedUpdateManyInput = {
   userId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   username?: Prisma.StringFieldUpdateOperationsInput | string
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  roleTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  currentActivity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastPresence?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type UserCountOrderByAggregateInput = {
   userId?: Prisma.SortOrder
   username?: Prisma.SortOrder
+  avatarUrl?: Prisma.SortOrder
+  roleTitle?: Prisma.SortOrder
+  currentActivity?: Prisma.SortOrder
+  lastPresence?: Prisma.SortOrder
 }
 
 export type UserAvgOrderByAggregateInput = {
@@ -307,11 +401,19 @@ export type UserAvgOrderByAggregateInput = {
 export type UserMaxOrderByAggregateInput = {
   userId?: Prisma.SortOrder
   username?: Prisma.SortOrder
+  avatarUrl?: Prisma.SortOrder
+  roleTitle?: Prisma.SortOrder
+  currentActivity?: Prisma.SortOrder
+  lastPresence?: Prisma.SortOrder
 }
 
 export type UserMinOrderByAggregateInput = {
   userId?: Prisma.SortOrder
   username?: Prisma.SortOrder
+  avatarUrl?: Prisma.SortOrder
+  roleTitle?: Prisma.SortOrder
+  currentActivity?: Prisma.SortOrder
+  lastPresence?: Prisma.SortOrder
 }
 
 export type UserSumOrderByAggregateInput = {
@@ -333,6 +435,10 @@ export type BigIntFieldUpdateOperationsInput = {
 
 export type StringFieldUpdateOperationsInput = {
   set?: string
+}
+
+export type NullableStringFieldUpdateOperationsInput = {
+  set?: string | null
 }
 
 export type UserCreateNestedOneWithoutGuildsInput = {
@@ -405,22 +511,62 @@ export type UserUpdateOneRequiredWithoutFriendOfNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutFriendOfInput, Prisma.UserUpdateWithoutFriendOfInput>, Prisma.UserUncheckedUpdateWithoutFriendOfInput>
 }
 
+export type UserCreateNestedOneWithoutInvitesCreatedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutInvitesCreatedInput, Prisma.UserUncheckedCreateWithoutInvitesCreatedInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutInvitesCreatedInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutInvitesCreatedNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutInvitesCreatedInput, Prisma.UserUncheckedCreateWithoutInvitesCreatedInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutInvitesCreatedInput
+  upsert?: Prisma.UserUpsertWithoutInvitesCreatedInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutInvitesCreatedInput, Prisma.UserUpdateWithoutInvitesCreatedInput>, Prisma.UserUncheckedUpdateWithoutInvitesCreatedInput>
+}
+
+export type UserCreateNestedOneWithoutDmChannelsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutDmChannelsInput, Prisma.UserUncheckedCreateWithoutDmChannelsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutDmChannelsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutDmChannelsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutDmChannelsInput, Prisma.UserUncheckedCreateWithoutDmChannelsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutDmChannelsInput
+  upsert?: Prisma.UserUpsertWithoutDmChannelsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutDmChannelsInput, Prisma.UserUpdateWithoutDmChannelsInput>, Prisma.UserUncheckedUpdateWithoutDmChannelsInput>
+}
+
 export type UserCreateWithoutGuildsInput = {
   userId?: bigint | number
   username: string
+  avatarUrl?: string | null
+  roleTitle?: string | null
+  currentActivity?: string | null
+  lastPresence?: string | null
   members?: Prisma.MemberCreateNestedManyWithoutUserInput
   messages?: Prisma.MessageCreateNestedManyWithoutAuthorInput
   friendships?: Prisma.FriendshipCreateNestedManyWithoutUserInput
   friendOf?: Prisma.FriendshipCreateNestedManyWithoutFriendInput
+  dmChannels?: Prisma.DirectChannelMemberCreateNestedManyWithoutUserInput
+  invitesCreated?: Prisma.InviteCreateNestedManyWithoutCreatedByInput
 }
 
 export type UserUncheckedCreateWithoutGuildsInput = {
   userId?: bigint | number
   username: string
+  avatarUrl?: string | null
+  roleTitle?: string | null
+  currentActivity?: string | null
+  lastPresence?: string | null
   members?: Prisma.MemberUncheckedCreateNestedManyWithoutUserInput
   messages?: Prisma.MessageUncheckedCreateNestedManyWithoutAuthorInput
   friendships?: Prisma.FriendshipUncheckedCreateNestedManyWithoutUserInput
   friendOf?: Prisma.FriendshipUncheckedCreateNestedManyWithoutFriendInput
+  dmChannels?: Prisma.DirectChannelMemberUncheckedCreateNestedManyWithoutUserInput
+  invitesCreated?: Prisma.InviteUncheckedCreateNestedManyWithoutCreatedByInput
 }
 
 export type UserCreateOrConnectWithoutGuildsInput = {
@@ -442,37 +588,61 @@ export type UserUpdateToOneWithWhereWithoutGuildsInput = {
 export type UserUpdateWithoutGuildsInput = {
   userId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   username?: Prisma.StringFieldUpdateOperationsInput | string
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  roleTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  currentActivity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastPresence?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   members?: Prisma.MemberUpdateManyWithoutUserNestedInput
   messages?: Prisma.MessageUpdateManyWithoutAuthorNestedInput
   friendships?: Prisma.FriendshipUpdateManyWithoutUserNestedInput
   friendOf?: Prisma.FriendshipUpdateManyWithoutFriendNestedInput
+  dmChannels?: Prisma.DirectChannelMemberUpdateManyWithoutUserNestedInput
+  invitesCreated?: Prisma.InviteUpdateManyWithoutCreatedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutGuildsInput = {
   userId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   username?: Prisma.StringFieldUpdateOperationsInput | string
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  roleTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  currentActivity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastPresence?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   members?: Prisma.MemberUncheckedUpdateManyWithoutUserNestedInput
   messages?: Prisma.MessageUncheckedUpdateManyWithoutAuthorNestedInput
   friendships?: Prisma.FriendshipUncheckedUpdateManyWithoutUserNestedInput
   friendOf?: Prisma.FriendshipUncheckedUpdateManyWithoutFriendNestedInput
+  dmChannels?: Prisma.DirectChannelMemberUncheckedUpdateManyWithoutUserNestedInput
+  invitesCreated?: Prisma.InviteUncheckedUpdateManyWithoutCreatedByNestedInput
 }
 
 export type UserCreateWithoutMembersInput = {
   userId?: bigint | number
   username: string
+  avatarUrl?: string | null
+  roleTitle?: string | null
+  currentActivity?: string | null
+  lastPresence?: string | null
   guilds?: Prisma.GuildCreateNestedManyWithoutOwnerInput
   messages?: Prisma.MessageCreateNestedManyWithoutAuthorInput
   friendships?: Prisma.FriendshipCreateNestedManyWithoutUserInput
   friendOf?: Prisma.FriendshipCreateNestedManyWithoutFriendInput
+  dmChannels?: Prisma.DirectChannelMemberCreateNestedManyWithoutUserInput
+  invitesCreated?: Prisma.InviteCreateNestedManyWithoutCreatedByInput
 }
 
 export type UserUncheckedCreateWithoutMembersInput = {
   userId?: bigint | number
   username: string
+  avatarUrl?: string | null
+  roleTitle?: string | null
+  currentActivity?: string | null
+  lastPresence?: string | null
   guilds?: Prisma.GuildUncheckedCreateNestedManyWithoutOwnerInput
   messages?: Prisma.MessageUncheckedCreateNestedManyWithoutAuthorInput
   friendships?: Prisma.FriendshipUncheckedCreateNestedManyWithoutUserInput
   friendOf?: Prisma.FriendshipUncheckedCreateNestedManyWithoutFriendInput
+  dmChannels?: Prisma.DirectChannelMemberUncheckedCreateNestedManyWithoutUserInput
+  invitesCreated?: Prisma.InviteUncheckedCreateNestedManyWithoutCreatedByInput
 }
 
 export type UserCreateOrConnectWithoutMembersInput = {
@@ -494,37 +664,61 @@ export type UserUpdateToOneWithWhereWithoutMembersInput = {
 export type UserUpdateWithoutMembersInput = {
   userId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   username?: Prisma.StringFieldUpdateOperationsInput | string
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  roleTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  currentActivity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastPresence?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   guilds?: Prisma.GuildUpdateManyWithoutOwnerNestedInput
   messages?: Prisma.MessageUpdateManyWithoutAuthorNestedInput
   friendships?: Prisma.FriendshipUpdateManyWithoutUserNestedInput
   friendOf?: Prisma.FriendshipUpdateManyWithoutFriendNestedInput
+  dmChannels?: Prisma.DirectChannelMemberUpdateManyWithoutUserNestedInput
+  invitesCreated?: Prisma.InviteUpdateManyWithoutCreatedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutMembersInput = {
   userId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   username?: Prisma.StringFieldUpdateOperationsInput | string
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  roleTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  currentActivity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastPresence?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   guilds?: Prisma.GuildUncheckedUpdateManyWithoutOwnerNestedInput
   messages?: Prisma.MessageUncheckedUpdateManyWithoutAuthorNestedInput
   friendships?: Prisma.FriendshipUncheckedUpdateManyWithoutUserNestedInput
   friendOf?: Prisma.FriendshipUncheckedUpdateManyWithoutFriendNestedInput
+  dmChannels?: Prisma.DirectChannelMemberUncheckedUpdateManyWithoutUserNestedInput
+  invitesCreated?: Prisma.InviteUncheckedUpdateManyWithoutCreatedByNestedInput
 }
 
 export type UserCreateWithoutMessagesInput = {
   userId?: bigint | number
   username: string
+  avatarUrl?: string | null
+  roleTitle?: string | null
+  currentActivity?: string | null
+  lastPresence?: string | null
   guilds?: Prisma.GuildCreateNestedManyWithoutOwnerInput
   members?: Prisma.MemberCreateNestedManyWithoutUserInput
   friendships?: Prisma.FriendshipCreateNestedManyWithoutUserInput
   friendOf?: Prisma.FriendshipCreateNestedManyWithoutFriendInput
+  dmChannels?: Prisma.DirectChannelMemberCreateNestedManyWithoutUserInput
+  invitesCreated?: Prisma.InviteCreateNestedManyWithoutCreatedByInput
 }
 
 export type UserUncheckedCreateWithoutMessagesInput = {
   userId?: bigint | number
   username: string
+  avatarUrl?: string | null
+  roleTitle?: string | null
+  currentActivity?: string | null
+  lastPresence?: string | null
   guilds?: Prisma.GuildUncheckedCreateNestedManyWithoutOwnerInput
   members?: Prisma.MemberUncheckedCreateNestedManyWithoutUserInput
   friendships?: Prisma.FriendshipUncheckedCreateNestedManyWithoutUserInput
   friendOf?: Prisma.FriendshipUncheckedCreateNestedManyWithoutFriendInput
+  dmChannels?: Prisma.DirectChannelMemberUncheckedCreateNestedManyWithoutUserInput
+  invitesCreated?: Prisma.InviteUncheckedCreateNestedManyWithoutCreatedByInput
 }
 
 export type UserCreateOrConnectWithoutMessagesInput = {
@@ -546,37 +740,61 @@ export type UserUpdateToOneWithWhereWithoutMessagesInput = {
 export type UserUpdateWithoutMessagesInput = {
   userId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   username?: Prisma.StringFieldUpdateOperationsInput | string
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  roleTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  currentActivity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastPresence?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   guilds?: Prisma.GuildUpdateManyWithoutOwnerNestedInput
   members?: Prisma.MemberUpdateManyWithoutUserNestedInput
   friendships?: Prisma.FriendshipUpdateManyWithoutUserNestedInput
   friendOf?: Prisma.FriendshipUpdateManyWithoutFriendNestedInput
+  dmChannels?: Prisma.DirectChannelMemberUpdateManyWithoutUserNestedInput
+  invitesCreated?: Prisma.InviteUpdateManyWithoutCreatedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutMessagesInput = {
   userId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   username?: Prisma.StringFieldUpdateOperationsInput | string
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  roleTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  currentActivity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastPresence?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   guilds?: Prisma.GuildUncheckedUpdateManyWithoutOwnerNestedInput
   members?: Prisma.MemberUncheckedUpdateManyWithoutUserNestedInput
   friendships?: Prisma.FriendshipUncheckedUpdateManyWithoutUserNestedInput
   friendOf?: Prisma.FriendshipUncheckedUpdateManyWithoutFriendNestedInput
+  dmChannels?: Prisma.DirectChannelMemberUncheckedUpdateManyWithoutUserNestedInput
+  invitesCreated?: Prisma.InviteUncheckedUpdateManyWithoutCreatedByNestedInput
 }
 
 export type UserCreateWithoutFriendshipsInput = {
   userId?: bigint | number
   username: string
+  avatarUrl?: string | null
+  roleTitle?: string | null
+  currentActivity?: string | null
+  lastPresence?: string | null
   guilds?: Prisma.GuildCreateNestedManyWithoutOwnerInput
   members?: Prisma.MemberCreateNestedManyWithoutUserInput
   messages?: Prisma.MessageCreateNestedManyWithoutAuthorInput
   friendOf?: Prisma.FriendshipCreateNestedManyWithoutFriendInput
+  dmChannels?: Prisma.DirectChannelMemberCreateNestedManyWithoutUserInput
+  invitesCreated?: Prisma.InviteCreateNestedManyWithoutCreatedByInput
 }
 
 export type UserUncheckedCreateWithoutFriendshipsInput = {
   userId?: bigint | number
   username: string
+  avatarUrl?: string | null
+  roleTitle?: string | null
+  currentActivity?: string | null
+  lastPresence?: string | null
   guilds?: Prisma.GuildUncheckedCreateNestedManyWithoutOwnerInput
   members?: Prisma.MemberUncheckedCreateNestedManyWithoutUserInput
   messages?: Prisma.MessageUncheckedCreateNestedManyWithoutAuthorInput
   friendOf?: Prisma.FriendshipUncheckedCreateNestedManyWithoutFriendInput
+  dmChannels?: Prisma.DirectChannelMemberUncheckedCreateNestedManyWithoutUserInput
+  invitesCreated?: Prisma.InviteUncheckedCreateNestedManyWithoutCreatedByInput
 }
 
 export type UserCreateOrConnectWithoutFriendshipsInput = {
@@ -587,19 +805,31 @@ export type UserCreateOrConnectWithoutFriendshipsInput = {
 export type UserCreateWithoutFriendOfInput = {
   userId?: bigint | number
   username: string
+  avatarUrl?: string | null
+  roleTitle?: string | null
+  currentActivity?: string | null
+  lastPresence?: string | null
   guilds?: Prisma.GuildCreateNestedManyWithoutOwnerInput
   members?: Prisma.MemberCreateNestedManyWithoutUserInput
   messages?: Prisma.MessageCreateNestedManyWithoutAuthorInput
   friendships?: Prisma.FriendshipCreateNestedManyWithoutUserInput
+  dmChannels?: Prisma.DirectChannelMemberCreateNestedManyWithoutUserInput
+  invitesCreated?: Prisma.InviteCreateNestedManyWithoutCreatedByInput
 }
 
 export type UserUncheckedCreateWithoutFriendOfInput = {
   userId?: bigint | number
   username: string
+  avatarUrl?: string | null
+  roleTitle?: string | null
+  currentActivity?: string | null
+  lastPresence?: string | null
   guilds?: Prisma.GuildUncheckedCreateNestedManyWithoutOwnerInput
   members?: Prisma.MemberUncheckedCreateNestedManyWithoutUserInput
   messages?: Prisma.MessageUncheckedCreateNestedManyWithoutAuthorInput
   friendships?: Prisma.FriendshipUncheckedCreateNestedManyWithoutUserInput
+  dmChannels?: Prisma.DirectChannelMemberUncheckedCreateNestedManyWithoutUserInput
+  invitesCreated?: Prisma.InviteUncheckedCreateNestedManyWithoutCreatedByInput
 }
 
 export type UserCreateOrConnectWithoutFriendOfInput = {
@@ -621,19 +851,31 @@ export type UserUpdateToOneWithWhereWithoutFriendshipsInput = {
 export type UserUpdateWithoutFriendshipsInput = {
   userId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   username?: Prisma.StringFieldUpdateOperationsInput | string
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  roleTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  currentActivity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastPresence?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   guilds?: Prisma.GuildUpdateManyWithoutOwnerNestedInput
   members?: Prisma.MemberUpdateManyWithoutUserNestedInput
   messages?: Prisma.MessageUpdateManyWithoutAuthorNestedInput
   friendOf?: Prisma.FriendshipUpdateManyWithoutFriendNestedInput
+  dmChannels?: Prisma.DirectChannelMemberUpdateManyWithoutUserNestedInput
+  invitesCreated?: Prisma.InviteUpdateManyWithoutCreatedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutFriendshipsInput = {
   userId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   username?: Prisma.StringFieldUpdateOperationsInput | string
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  roleTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  currentActivity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastPresence?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   guilds?: Prisma.GuildUncheckedUpdateManyWithoutOwnerNestedInput
   members?: Prisma.MemberUncheckedUpdateManyWithoutUserNestedInput
   messages?: Prisma.MessageUncheckedUpdateManyWithoutAuthorNestedInput
   friendOf?: Prisma.FriendshipUncheckedUpdateManyWithoutFriendNestedInput
+  dmChannels?: Prisma.DirectChannelMemberUncheckedUpdateManyWithoutUserNestedInput
+  invitesCreated?: Prisma.InviteUncheckedUpdateManyWithoutCreatedByNestedInput
 }
 
 export type UserUpsertWithoutFriendOfInput = {
@@ -650,19 +892,183 @@ export type UserUpdateToOneWithWhereWithoutFriendOfInput = {
 export type UserUpdateWithoutFriendOfInput = {
   userId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   username?: Prisma.StringFieldUpdateOperationsInput | string
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  roleTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  currentActivity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastPresence?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   guilds?: Prisma.GuildUpdateManyWithoutOwnerNestedInput
   members?: Prisma.MemberUpdateManyWithoutUserNestedInput
   messages?: Prisma.MessageUpdateManyWithoutAuthorNestedInput
   friendships?: Prisma.FriendshipUpdateManyWithoutUserNestedInput
+  dmChannels?: Prisma.DirectChannelMemberUpdateManyWithoutUserNestedInput
+  invitesCreated?: Prisma.InviteUpdateManyWithoutCreatedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutFriendOfInput = {
   userId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   username?: Prisma.StringFieldUpdateOperationsInput | string
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  roleTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  currentActivity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastPresence?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   guilds?: Prisma.GuildUncheckedUpdateManyWithoutOwnerNestedInput
   members?: Prisma.MemberUncheckedUpdateManyWithoutUserNestedInput
   messages?: Prisma.MessageUncheckedUpdateManyWithoutAuthorNestedInput
   friendships?: Prisma.FriendshipUncheckedUpdateManyWithoutUserNestedInput
+  dmChannels?: Prisma.DirectChannelMemberUncheckedUpdateManyWithoutUserNestedInput
+  invitesCreated?: Prisma.InviteUncheckedUpdateManyWithoutCreatedByNestedInput
+}
+
+export type UserCreateWithoutInvitesCreatedInput = {
+  userId?: bigint | number
+  username: string
+  avatarUrl?: string | null
+  roleTitle?: string | null
+  currentActivity?: string | null
+  lastPresence?: string | null
+  guilds?: Prisma.GuildCreateNestedManyWithoutOwnerInput
+  members?: Prisma.MemberCreateNestedManyWithoutUserInput
+  messages?: Prisma.MessageCreateNestedManyWithoutAuthorInput
+  friendships?: Prisma.FriendshipCreateNestedManyWithoutUserInput
+  friendOf?: Prisma.FriendshipCreateNestedManyWithoutFriendInput
+  dmChannels?: Prisma.DirectChannelMemberCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutInvitesCreatedInput = {
+  userId?: bigint | number
+  username: string
+  avatarUrl?: string | null
+  roleTitle?: string | null
+  currentActivity?: string | null
+  lastPresence?: string | null
+  guilds?: Prisma.GuildUncheckedCreateNestedManyWithoutOwnerInput
+  members?: Prisma.MemberUncheckedCreateNestedManyWithoutUserInput
+  messages?: Prisma.MessageUncheckedCreateNestedManyWithoutAuthorInput
+  friendships?: Prisma.FriendshipUncheckedCreateNestedManyWithoutUserInput
+  friendOf?: Prisma.FriendshipUncheckedCreateNestedManyWithoutFriendInput
+  dmChannels?: Prisma.DirectChannelMemberUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutInvitesCreatedInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutInvitesCreatedInput, Prisma.UserUncheckedCreateWithoutInvitesCreatedInput>
+}
+
+export type UserUpsertWithoutInvitesCreatedInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutInvitesCreatedInput, Prisma.UserUncheckedUpdateWithoutInvitesCreatedInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutInvitesCreatedInput, Prisma.UserUncheckedCreateWithoutInvitesCreatedInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutInvitesCreatedInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutInvitesCreatedInput, Prisma.UserUncheckedUpdateWithoutInvitesCreatedInput>
+}
+
+export type UserUpdateWithoutInvitesCreatedInput = {
+  userId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  roleTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  currentActivity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastPresence?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  guilds?: Prisma.GuildUpdateManyWithoutOwnerNestedInput
+  members?: Prisma.MemberUpdateManyWithoutUserNestedInput
+  messages?: Prisma.MessageUpdateManyWithoutAuthorNestedInput
+  friendships?: Prisma.FriendshipUpdateManyWithoutUserNestedInput
+  friendOf?: Prisma.FriendshipUpdateManyWithoutFriendNestedInput
+  dmChannels?: Prisma.DirectChannelMemberUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutInvitesCreatedInput = {
+  userId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  roleTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  currentActivity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastPresence?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  guilds?: Prisma.GuildUncheckedUpdateManyWithoutOwnerNestedInput
+  members?: Prisma.MemberUncheckedUpdateManyWithoutUserNestedInput
+  messages?: Prisma.MessageUncheckedUpdateManyWithoutAuthorNestedInput
+  friendships?: Prisma.FriendshipUncheckedUpdateManyWithoutUserNestedInput
+  friendOf?: Prisma.FriendshipUncheckedUpdateManyWithoutFriendNestedInput
+  dmChannels?: Prisma.DirectChannelMemberUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutDmChannelsInput = {
+  userId?: bigint | number
+  username: string
+  avatarUrl?: string | null
+  roleTitle?: string | null
+  currentActivity?: string | null
+  lastPresence?: string | null
+  guilds?: Prisma.GuildCreateNestedManyWithoutOwnerInput
+  members?: Prisma.MemberCreateNestedManyWithoutUserInput
+  messages?: Prisma.MessageCreateNestedManyWithoutAuthorInput
+  friendships?: Prisma.FriendshipCreateNestedManyWithoutUserInput
+  friendOf?: Prisma.FriendshipCreateNestedManyWithoutFriendInput
+  invitesCreated?: Prisma.InviteCreateNestedManyWithoutCreatedByInput
+}
+
+export type UserUncheckedCreateWithoutDmChannelsInput = {
+  userId?: bigint | number
+  username: string
+  avatarUrl?: string | null
+  roleTitle?: string | null
+  currentActivity?: string | null
+  lastPresence?: string | null
+  guilds?: Prisma.GuildUncheckedCreateNestedManyWithoutOwnerInput
+  members?: Prisma.MemberUncheckedCreateNestedManyWithoutUserInput
+  messages?: Prisma.MessageUncheckedCreateNestedManyWithoutAuthorInput
+  friendships?: Prisma.FriendshipUncheckedCreateNestedManyWithoutUserInput
+  friendOf?: Prisma.FriendshipUncheckedCreateNestedManyWithoutFriendInput
+  invitesCreated?: Prisma.InviteUncheckedCreateNestedManyWithoutCreatedByInput
+}
+
+export type UserCreateOrConnectWithoutDmChannelsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutDmChannelsInput, Prisma.UserUncheckedCreateWithoutDmChannelsInput>
+}
+
+export type UserUpsertWithoutDmChannelsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutDmChannelsInput, Prisma.UserUncheckedUpdateWithoutDmChannelsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutDmChannelsInput, Prisma.UserUncheckedCreateWithoutDmChannelsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutDmChannelsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutDmChannelsInput, Prisma.UserUncheckedUpdateWithoutDmChannelsInput>
+}
+
+export type UserUpdateWithoutDmChannelsInput = {
+  userId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  roleTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  currentActivity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastPresence?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  guilds?: Prisma.GuildUpdateManyWithoutOwnerNestedInput
+  members?: Prisma.MemberUpdateManyWithoutUserNestedInput
+  messages?: Prisma.MessageUpdateManyWithoutAuthorNestedInput
+  friendships?: Prisma.FriendshipUpdateManyWithoutUserNestedInput
+  friendOf?: Prisma.FriendshipUpdateManyWithoutFriendNestedInput
+  invitesCreated?: Prisma.InviteUpdateManyWithoutCreatedByNestedInput
+}
+
+export type UserUncheckedUpdateWithoutDmChannelsInput = {
+  userId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  roleTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  currentActivity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastPresence?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  guilds?: Prisma.GuildUncheckedUpdateManyWithoutOwnerNestedInput
+  members?: Prisma.MemberUncheckedUpdateManyWithoutUserNestedInput
+  messages?: Prisma.MessageUncheckedUpdateManyWithoutAuthorNestedInput
+  friendships?: Prisma.FriendshipUncheckedUpdateManyWithoutUserNestedInput
+  friendOf?: Prisma.FriendshipUncheckedUpdateManyWithoutFriendNestedInput
+  invitesCreated?: Prisma.InviteUncheckedUpdateManyWithoutCreatedByNestedInput
 }
 
 
@@ -676,6 +1082,8 @@ export type UserCountOutputType = {
   messages: number
   friendships: number
   friendOf: number
+  dmChannels: number
+  invitesCreated: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -684,6 +1092,8 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   messages?: boolean | UserCountOutputTypeCountMessagesArgs
   friendships?: boolean | UserCountOutputTypeCountFriendshipsArgs
   friendOf?: boolean | UserCountOutputTypeCountFriendOfArgs
+  dmChannels?: boolean | UserCountOutputTypeCountDmChannelsArgs
+  invitesCreated?: boolean | UserCountOutputTypeCountInvitesCreatedArgs
 }
 
 /**
@@ -731,40 +1141,74 @@ export type UserCountOutputTypeCountFriendOfArgs<ExtArgs extends runtime.Types.E
   where?: Prisma.FriendshipWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountDmChannelsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.DirectChannelMemberWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountInvitesCreatedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.InviteWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   userId?: boolean
   username?: boolean
+  avatarUrl?: boolean
+  roleTitle?: boolean
+  currentActivity?: boolean
+  lastPresence?: boolean
   guilds?: boolean | Prisma.User$guildsArgs<ExtArgs>
   members?: boolean | Prisma.User$membersArgs<ExtArgs>
   messages?: boolean | Prisma.User$messagesArgs<ExtArgs>
   friendships?: boolean | Prisma.User$friendshipsArgs<ExtArgs>
   friendOf?: boolean | Prisma.User$friendOfArgs<ExtArgs>
+  dmChannels?: boolean | Prisma.User$dmChannelsArgs<ExtArgs>
+  invitesCreated?: boolean | Prisma.User$invitesCreatedArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
 export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   userId?: boolean
   username?: boolean
+  avatarUrl?: boolean
+  roleTitle?: boolean
+  currentActivity?: boolean
+  lastPresence?: boolean
 }, ExtArgs["result"]["user"]>
 
 export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   userId?: boolean
   username?: boolean
+  avatarUrl?: boolean
+  roleTitle?: boolean
+  currentActivity?: boolean
+  lastPresence?: boolean
 }, ExtArgs["result"]["user"]>
 
 export type UserSelectScalar = {
   userId?: boolean
   username?: boolean
+  avatarUrl?: boolean
+  roleTitle?: boolean
+  currentActivity?: boolean
+  lastPresence?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"userId" | "username", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"userId" | "username" | "avatarUrl" | "roleTitle" | "currentActivity" | "lastPresence", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   guilds?: boolean | Prisma.User$guildsArgs<ExtArgs>
   members?: boolean | Prisma.User$membersArgs<ExtArgs>
   messages?: boolean | Prisma.User$messagesArgs<ExtArgs>
   friendships?: boolean | Prisma.User$friendshipsArgs<ExtArgs>
   friendOf?: boolean | Prisma.User$friendOfArgs<ExtArgs>
+  dmChannels?: boolean | Prisma.User$dmChannelsArgs<ExtArgs>
+  invitesCreated?: boolean | Prisma.User$invitesCreatedArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -778,10 +1222,16 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     messages: Prisma.$MessagePayload<ExtArgs>[]
     friendships: Prisma.$FriendshipPayload<ExtArgs>[]
     friendOf: Prisma.$FriendshipPayload<ExtArgs>[]
+    dmChannels: Prisma.$DirectChannelMemberPayload<ExtArgs>[]
+    invitesCreated: Prisma.$InvitePayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     userId: bigint
     username: string
+    avatarUrl: string | null
+    roleTitle: string | null
+    currentActivity: string | null
+    lastPresence: string | null
   }, ExtArgs["result"]["user"]>
   composites: {}
 }
@@ -1181,6 +1631,8 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   messages<T extends Prisma.User$messagesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$messagesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   friendships<T extends Prisma.User$friendshipsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$friendshipsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FriendshipPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   friendOf<T extends Prisma.User$friendOfArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$friendOfArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FriendshipPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  dmChannels<T extends Prisma.User$dmChannelsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$dmChannelsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DirectChannelMemberPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  invitesCreated<T extends Prisma.User$invitesCreatedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$invitesCreatedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$InvitePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1212,6 +1664,10 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
 export interface UserFieldRefs {
   readonly userId: Prisma.FieldRef<"User", 'BigInt'>
   readonly username: Prisma.FieldRef<"User", 'String'>
+  readonly avatarUrl: Prisma.FieldRef<"User", 'String'>
+  readonly roleTitle: Prisma.FieldRef<"User", 'String'>
+  readonly currentActivity: Prisma.FieldRef<"User", 'String'>
+  readonly lastPresence: Prisma.FieldRef<"User", 'String'>
 }
     
 
@@ -1722,6 +2178,54 @@ export type User$friendOfArgs<ExtArgs extends runtime.Types.Extensions.InternalA
   take?: number
   skip?: number
   distinct?: Prisma.FriendshipScalarFieldEnum | Prisma.FriendshipScalarFieldEnum[]
+}
+
+/**
+ * User.dmChannels
+ */
+export type User$dmChannelsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the DirectChannelMember
+   */
+  select?: Prisma.DirectChannelMemberSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the DirectChannelMember
+   */
+  omit?: Prisma.DirectChannelMemberOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.DirectChannelMemberInclude<ExtArgs> | null
+  where?: Prisma.DirectChannelMemberWhereInput
+  orderBy?: Prisma.DirectChannelMemberOrderByWithRelationInput | Prisma.DirectChannelMemberOrderByWithRelationInput[]
+  cursor?: Prisma.DirectChannelMemberWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.DirectChannelMemberScalarFieldEnum | Prisma.DirectChannelMemberScalarFieldEnum[]
+}
+
+/**
+ * User.invitesCreated
+ */
+export type User$invitesCreatedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Invite
+   */
+  select?: Prisma.InviteSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Invite
+   */
+  omit?: Prisma.InviteOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.InviteInclude<ExtArgs> | null
+  where?: Prisma.InviteWhereInput
+  orderBy?: Prisma.InviteOrderByWithRelationInput | Prisma.InviteOrderByWithRelationInput[]
+  cursor?: Prisma.InviteWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.InviteScalarFieldEnum | Prisma.InviteScalarFieldEnum[]
 }
 
 /**

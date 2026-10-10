@@ -11,6 +11,8 @@ let activeUserTab = null;
 
 document.addEventListener('DOMContentLoaded', () => {
   prepareBlueprint();
+  setupNavigationEvents();
+  setupComposer();
   loadCurrentUser();
   loadCollectives();
   loadDirectMessages();
@@ -74,6 +76,86 @@ function prepareBlueprint() {
     const input = document.getElementById('channel-message-input');
     if (input) input.form?.requestSubmit();
   };
+}
+
+function setupNavigationEvents() {
+  document.querySelectorAll('.channel-container').forEach((header) => {
+    const category = header.closest('section');
+    const list = category?.querySelector('.channel-list');
+    const toggle = header.querySelector('.material-symbols-outlined');
+    if (!category || !list || !toggle) return;
+    header.setAttribute('role', 'button');
+    header.tabIndex = 0;
+    const toggleCategory = () => {
+      const collapsed = list.classList.toggle('hidden');
+      toggle.textContent = collapsed ? 'chevron_right' : 'expand_more';
+      header.setAttribute('aria-expanded', String(!collapsed));
+    };
+    header.addEventListener('click', toggleCategory);
+    header.addEventListener('keydown', event => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        toggleCategory();
+      }
+    });
+  });
+
+  document.querySelectorAll('.channel-button').forEach(button => {
+    button.addEventListener('click', () => {
+      document.querySelectorAll('.channel-button').forEach(item => {
+        item.classList.remove('bg-primary-container/20', 'text-primary');
+        item.classList.add('text-text-muted');
+      });
+      button.classList.remove('text-text-muted');
+      button.classList.add('bg-primary-container/20', 'text-primary');
+      setText('#active-stage-title', `#${button.querySelector('span:last-child')?.textContent.trim() || 'channel'}`);
+      setText('#active-stage-desc', 'This channel is not connected to a room yet. Choose a public room below to start chatting.');
+      showToast('Channel selected', 'Connect a public room to load live messages.');
+    });
+  });
+
+  document.querySelector('#header-search-box input')?.addEventListener('input', event => {
+    const query = event.target.value.trim().toLowerCase();
+    document.querySelectorAll('#stage-messages .message-content')?.forEach(message => {
+      const visible = !query || message.textContent.toLowerCase().includes(query);
+      message.closest('article')?.classList.toggle('hidden', !visible);
+    });
+  });
+
+  document.getElementById('pins-btn')?.addEventListener('click', () => showToast('Pinned messages', 'Pinned-message view is ready when this room has pins.'));
+  document.querySelector('[title="Open threads"]')?.addEventListener('click', () => showToast('Threads', 'Thread activity will appear here for the active channel.'));
+  document.querySelector('[title="Notification settings"]')?.addEventListener('click', event => {
+    const button = event.currentTarget;
+    const muted = button.dataset.muted === 'true';
+    button.dataset.muted = String(!muted);
+    button.title = muted ? 'Mute notifications' : 'Unmute notifications';
+    button.querySelector('.material-symbols-outlined').textContent = muted ? 'notifications' : 'notifications_off';
+    showToast(muted ? 'Notifications enabled' : 'Notifications muted', 'Your preference was updated for this channel.');
+  });
+  document.querySelector('[title="Inbox"]')?.addEventListener('click', () => showToast('Inbox', 'You have no new mentions or requests.'));
+  document.querySelector('[title="Help"]')?.addEventListener('click', () => showToast('Help', 'Use Enter to send, Shift + Enter for a new line, and the channel list to navigate.'));
+  document.getElementById('attachment-input')?.addEventListener('change', event => {
+    const file = event.target.files?.[0];
+    if (file) showToast('Attachment ready', file.name);
+  });
+  document.querySelector('[title="GIF picker"]')?.addEventListener('click', () => showToast('GIF picker', 'GIF search is ready for a media provider connection.'));
+  document.querySelector('[title="Sticker picker"]')?.addEventListener('click', () => showToast('Sticker picker', 'Sticker search is ready for a media provider connection.'));
+}
+
+function showToast(title, message) {
+  let toast = document.getElementById('client-toast');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'client-toast';
+    toast.className = 'fixed bottom-6 left-1/2 z-[60] hidden -translate-x-1/2 rounded-xl bg-surface-container-highest px-4 py-3 text-left shadow-2xl ring-1 ring-white/10';
+    document.body.appendChild(toast);
+  }
+  toast.innerHTML = `<p class="font-label-md text-label-md font-semibold text-text-main"></p><p class="mt-0.5 font-body-sm text-body-sm text-text-muted"></p>`;
+  toast.children[0].textContent = title;
+  toast.children[1].textContent = message;
+  toast.classList.remove('hidden');
+  clearTimeout(showToast.timer);
+  showToast.timer = setTimeout(() => toast.classList.add('hidden'), 3200);
 }
 
 function prepareUserSwitcher() {
@@ -231,7 +313,7 @@ async function createNewCollective() {
   const name = window.prompt('Collective name');
   if (!name?.trim()) return;
   try {
-    const collective = await createCollective({ userId: currentUserId, name });
+    const collective = await createCollective(currentUserId, name);
     await loadCollectives(collective.id);
   } catch (err) {
     window.alert(err.message);
@@ -256,8 +338,8 @@ async function createNewRoom() {
 async function createCollectiveInvite() {
   if (!activeCollectiveId) return window.alert('Select a collective first.');
   try {
-    const result = await createInvite(activeCollectiveId, { userId: currentUserId });
-    window.prompt('Copy this invite link', result.invite);
+    const result = await createInvite(activeCollectiveId, currentUserId);
+    window.prompt('Copy this invite token', result.token);
   } catch (err) {
     window.alert(err.message);
   }
@@ -288,8 +370,8 @@ function renderRooms(container, rooms) {
   // Update header stats from room list (active room = first, or one flagged current)
   const current = rooms.find(r => r.isMember) || rooms[0];
   if (current) {
-    setText('[data-collective-name]', current.collectiveName);
-    setText('[data-collective-name-tooltip]', current.collectiveName);
+    setText('[data-collective-name]', current.collectiveName || activeCollective?.name);
+    setText('[data-collective-name-tooltip]', current.collectiveName || activeCollective?.name);
     setText('[data-collective-online-count]', `${current.onlineCount ?? 0} Online`);
     setText('[data-collective-labs-count]', `${rooms.filter(r => r.status === 'active').length} Labs Active`);
     setText('[data-room-name]', current.name);
@@ -311,10 +393,82 @@ function clearActiveRoom() {
   setText('#active-stage-desc', 'Create or join a room to begin');
   setText('[data-room-seats]', '');
   setText('[data-roster-count]', '0 / 0 Active');
+  setWelcomeHeader(null);
   const messages = document.getElementById('chat-messages-container');
-  if (messages) messages.innerHTML = '<div class="h-full flex items-center justify-center text-text-muted">Create or join a room to load its messages.</div>';
+  if (messages) renderStageInner(messages, '<div class="py-10 text-center text-text-muted font-body-md">Create or join a room to load its messages.</div>');
   const roster = document.getElementById('room-roster');
   if (roster) roster.innerHTML = '<div class="p-3 text-sm text-text-muted">Join a room to see its roster.</div>';
+}
+
+// ---- Chat stage helpers ----
+function setWelcomeHeader(room) {
+  setText('#welcome-channel-name', room ? `#${room.name}` : '#the-room');
+  setText('[data-welcome-topic]', room?.topic || 'Share code snippets, runbooks, and invariant proofs with your lab.');
+}
+
+function renderStageInner(container, innerHtml) {
+  container.innerHTML = `<div class="py-space-md pr-2 pl-3 sm:pl-4"><div id="stage-welcome" class="mb-6 pt-4 pb-2 border-b border-border-subtle"><div class="w-16 h-16 rounded-full bg-primary/15 text-primary flex items-center justify-center mb-3"><span class="material-symbols-outlined text-[36px]">tag</span></div><h2 class="font-headline-lg text-headline-md text-text-main font-bold">Welcome to <span id="welcome-channel-name">#the-room</span></h2><p class="font-body-md text-body-md text-text-muted mt-1 max-w-xl">This is the start of the channel. <span data-welcome-topic>Pick a public room or DM to open the conversation stage.</span></p></div><div class="separator flex items-center gap-2 text-text-muted" aria-label="Message date"><span class="h-px flex-1 bg-border-subtle"></span><time class="font-label-sm text-label-sm">Today</time><span class="h-px flex-1 bg-border-subtle"></span></div>${innerHtml}</div>`;
+}
+
+window.insertCodeBlock = function insertCodeBlock() {
+  const textarea = document.getElementById('channel-message-input');
+  if (!textarea) return;
+  const sample = '```rust\n// Insert invariant test here\nfn verify_cluster() -> bool {\n    true\n}\n```';
+  const start = textarea.selectionStart ?? textarea.value.length;
+  const before = textarea.value.slice(0, start);
+  const after = textarea.value.slice(start);
+  const glue = before && !before.endsWith('\n') ? '\n' : '';
+  textarea.value = before + glue + sample + '\n' + after;
+  textarea.focus();
+  const caret = start + glue.length + sample.length + 1;
+  textarea.setSelectionRange(caret, caret);
+  textarea.dispatchEvent(new Event('input', { bubbles: true }));
+};
+
+window.copySnippet = function copySnippet(btn) {
+  const block = btn.closest('.chat-codeblock');
+  const code = block?.querySelector('code')?.textContent ?? '';
+  navigator.clipboard?.writeText(code).catch(() => {});
+  const originalText = btn.innerHTML;
+  btn.innerHTML = '<span class="material-symbols-outlined text-body-sm text-secondary">check</span> Copied!';
+  setTimeout(() => { btn.innerHTML = originalText; }, 1800);
+};
+
+function setupComposer() {
+  const textarea = document.getElementById('channel-message-input');
+  if (!textarea) return;
+
+  // Auto-resize: grow with content up to max-height (set in CSS/Tailwind).
+  const autoResize = () => {
+    textarea.style.height = 'auto';
+    textarea.style.height = `${Math.min(textarea.scrollHeight, 192)}px`;
+  };
+  textarea.addEventListener('input', autoResize);
+  autoResize();
+
+  // Lightweight emoji picker popover.
+  const emojiBtn = document.getElementById('emoji-btn');
+  if (emojiBtn) {
+    const emojis = ['😀', '😂', '👍', '❤️', '🔥', '🎉', '🤔', '😅', '🙌', '👀', '✅', '🚀', '💡', '⚠️', '🧪', '🦀'];
+    const popover = document.createElement('div');
+    popover.className = 'hidden absolute bottom-full mb-2 left-0 z-30 grid grid-cols-8 gap-1 rounded-lg bg-surface-container-highest p-2 shadow-2xl ring-1 ring-white/10 w-max max-w-[calc(100vw-2rem)]';
+    popover.innerHTML = emojis.map(e => `<button type="button" class="p-1.5 rounded hover:bg-surface-bright text-lg leading-none">${e}</button>`).join('');
+    emojiBtn.parentElement.appendChild(popover);
+    emojiBtn.addEventListener('click', event => {
+      event.stopPropagation();
+      popover.classList.toggle('hidden');
+    });
+    popover.addEventListener('click', event => {
+      const emoji = event.target.textContent;
+      if (!emojis.includes(emoji)) return;
+      const start = textarea.selectionStart ?? textarea.value.length;
+      textarea.value = textarea.value.slice(0, start) + emoji + textarea.value.slice(textarea.selectionEnd ?? start);
+      textarea.focus();
+      textarea.setSelectionRange(start + emoji.length, start + emoji.length);
+      textarea.dispatchEvent(new Event('input', { bubbles: true }));
+    });
+    document.addEventListener('click', () => popover.classList.add('hidden'));
+  }
 }
 
 window.toggleChannelRail = function toggleChannelRail() {
@@ -430,11 +584,15 @@ async function loadRoom(room) {
   setText('#active-stage-title', `#${room.name}`);
   setText('#active-stage-desc', room.topic || 'Live room messages');
   setText('[data-room-seats]', `${room.memberCount ?? 0} / ${room.capacity ?? 0} seats filled`);
+  setWelcomeHeader(room);
   const input = document.getElementById('channel-message-input');
-  if (input) input.placeholder = `Message #${room.name}`;
+  if (input) {
+    input.placeholder = `Message #${room.name}`;
+    input.disabled = false;
+  }
   setText('#room-connection-status', 'Loading');
   const container = document.getElementById('chat-messages-container');
-  container.innerHTML = '<div class="p-4 text-text-muted font-body-md">Loading messages...</div>';
+  renderStageInner(container, '<div class="p-4 text-text-muted font-body-md">Loading messages...</div>');
 
   try {
     const [messages, members] = await Promise.all([
@@ -442,11 +600,12 @@ async function loadRoom(room) {
       getRoomMembers(room.id, currentUserId),
     ]);
     renderMessages(container, messages || []);
+    setWelcomeHeader(room);
     renderRoster(members || [], room.capacity);
     setText('#room-connection-status', 'Ready');
   } catch (err) {
     console.error('Failed to load room messages:', err);
-    container.innerHTML = '<div class="p-4 text-tertiary font-body-md">Unable to load messages. Check the API and database connection.</div>';
+    renderStageInner(container, '<div class="p-4 text-tertiary font-body-md">Unable to load messages. Check the API and database connection.</div>');
     setText('#room-connection-status', 'Offline');
   }
 }
@@ -459,35 +618,130 @@ function renderRoster(members, capacity = 0) {
   for (const member of members) {
     const row = document.createElement('div');
     row.className = 'flex items-center gap-2.5 px-2 py-2 rounded-lg hover:bg-surface-container-high';
+    const presenceClass = member.status === 'online'
+      ? 'bg-secondary'
+      : member.status === 'dnd'
+        ? 'bg-tertiary-container'
+        : member.status === 'idle'
+          ? 'bg-amber-400'
+          : 'bg-text-muted';
     const avatar = member.avatarUrl
       ? `<img class="w-8 h-8 rounded-full object-cover" src="${escapeHtml(member.avatarUrl)}" alt="${escapeHtml(member.username)}" />`
       : `<div class="w-8 h-8 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center font-semibold">${escapeHtml(initials(member.username))}</div>`;
-    row.innerHTML = `${avatar}<div class="min-w-0 flex-1"><div class="flex items-center gap-1.5"><span class="text-sm font-semibold text-text-main truncate">${escapeHtml(member.username)}</span><span class="w-2 h-2 rounded-full ${member.status === 'online' ? 'bg-secondary' : 'bg-text-muted'}"></span></div><p class="text-[11px] text-text-muted truncate">${escapeHtml(member.roleTitle || member.currentActivity || 'Member')}</p></div>`;
+    row.innerHTML = `${avatar}<div class="min-w-0 flex-1"><div class="flex items-center gap-1.5"><span class="text-sm font-semibold text-text-main truncate">${escapeHtml(member.username)}</span><span class="w-2 h-2 rounded-full ${presenceClass}" title="${escapeHtml(member.status || 'offline')}"></span></div><p class="text-[11px] text-text-muted truncate">${escapeHtml(member.roleTitle || member.currentActivity || 'Member')}</p></div>`;
     container.appendChild(row);
   }
 }
 
+// ---- Markdown-ish formatter for chat content (escaped first, then styled) ----
+function formatMessageContent(text) {
+  const fences = [];
+  let src = escapeHtml(String(text ?? '')).replace(/```(\w*)\n?([\s\S]*?)```/g, (_m, lang, code) => {
+    const token = `\u0000FENCE${fences.length}\u0000`;
+    fences.push({ lang: lang || 'text', code });
+    return token;
+  });
+
+  src = src.replace(/`([^`\n]+)`/g, '<code class="bg-surface-container-highest text-text-main font-code-md text-code-md px-1.5 py-0.5 rounded border border-border-subtle">$1</code>');
+  src = src.replace(/\*\*([^*\n]+)\*\*/g, '<strong class="font-semibold text-text-main">$1</strong>');
+  src = src.replace(/(^|\s)\*([^*\n]+)\*(?=\s|$|[.,!?])/g, '$1<em>$2</em>');
+  src = src.replace(/__([^_\n]+)__/g, '<u>$1</u>');
+  src = src.replace(/~~([^~\n]+)~~/g, '<del>$1</del>');
+  src = src.replace(/(^|[\s(])((?:https?:\/\/|www\.)[^\s<)]+)/g, '$1<a href="$2" target="_blank" rel="noopener noreferrer" class="text-primary hover:underline">$2</a>');
+  src = src.replace(/@([A-Za-z0-9_.]{2,32})/g, '<span class="rounded bg-primary-container/25 text-primary px-1 font-medium">@$1</span>');
+
+  src = src.replace(/\u0000FENCE(\d+)\u0000/g, (_m, index) => {
+    const fence = fences[Number(index)];
+    return `<div class="chat-codeblock my-2 rounded-lg border border-border-subtle overflow-hidden max-w-full">
+      <div class="flex items-center justify-between gap-2 bg-surface-container-high px-3 py-1.5">
+        <span class="font-code-sm text-label-sm uppercase tracking-wide text-text-muted">${escapeHtml(fence.lang)}</span>
+        <button type="button" onclick="copySnippet(this)" class="flex items-center gap-1 font-label-sm text-label-sm text-text-muted hover:text-text-main transition-colors"><span class="material-symbols-outlined text-body-sm">content_copy</span> Copy</button>
+      </div>
+      <pre class="bg-surface-container-lowest p-3 overflow-x-auto m-0"><code class="font-code-md text-code-md leading-relaxed text-on-surface whitespace-pre">${fence.code}</code></pre>
+    </div>`;
+  });
+
+  return src;
+}
+
+function avatarFor(user, sizeClass = 'w-[40px] h-[40px]') {
+  if (user.avatarUrl) {
+    return `<img class="${sizeClass} rounded-full object-cover shrink-0 cursor-pointer hover:opacity-90 transition-opacity" src="${escapeHtml(user.avatarUrl)}" alt="${escapeHtml(user.name)}" />`;
+  }
+  return `<div class="${sizeClass} rounded-full flex items-center justify-center font-bold text-[15px] shrink-0 cursor-pointer hover:opacity-90 transition-opacity ${user.colorClass}" title="${escapeHtml(user.name)}">${escapeHtml(initials(user.name))}</div>`;
+}
+
+function shortTime(value) {
+  if (!value) return '';
+  const date = new Date(value);
+  const today = new Date();
+  const sameDay = date.toDateString() === today.toDateString();
+  const yesterday = new Date(today);
+  yesterday.setDate(today.getDate() - 1);
+  if (sameDay) return `Today at ${date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}`;
+  if (date.toDateString() === yesterday.toDateString()) return `Yesterday at ${date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}`;
+  return date.toLocaleString([], { month: 'short', day: 'numeric', year: date.getFullYear() !== today.getFullYear() ? 'numeric' : undefined, hour: 'numeric', minute: '2-digit' });
+}
+
 function renderMessages(container, messages) {
-  container.innerHTML = '';
   if (!messages.length) {
-    container.innerHTML = '<div class="h-full flex items-center justify-center text-text-muted font-body-md">No messages yet. Start the conversation.</div>';
+    renderStageInner(container, '<div class="py-10 text-center text-text-muted font-body-md">No messages yet. Start the conversation — press <kbd class="font-code-sm bg-surface-container px-1.5 py-0.5 rounded border border-border-subtle">Enter</kbd> to send.</div>');
     return;
   }
-  for (const message of messages) {
-    const item = document.createElement('article');
-    item.className = 'flex items-start gap-3 p-2 rounded-xl hover:bg-surface-container-low/40';
-    item.innerHTML = `
-      <div class="w-10 h-10 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center font-bold shrink-0">${escapeHtml(initials(message.senderName))}</div>
-      <div class="flex-1 min-w-0">
-        <div class="flex items-center gap-2 flex-wrap">
-          <strong class="font-headline-sm text-body-md text-text-main">${escapeHtml(message.senderName)}</strong>
-          <span class="font-code-sm text-label-sm text-text-muted">${formatDate(message.createdAt)}</span>
+
+  const palette = ['bg-indigo-500 text-white', 'bg-emerald-600 text-white', 'bg-rose-500 text-white', 'bg-amber-500 text-black', 'bg-sky-600 text-white', 'bg-violet-600 text-white', 'bg-teal-600 text-white', 'bg-fuchsia-600 text-white'];
+  const colorBySender = new Map();
+  const rows = messages.map(message => {
+    if (!colorBySender.has(message.senderName)) {
+      colorBySender.set(message.senderName, palette[colorBySender.size % palette.length]);
+    }
+    return {
+      name: message.senderName || 'Unknown',
+      time: shortTime(message.createdAt),
+      fullTime: message.createdAt ? new Date(message.createdAt).toLocaleString() : '',
+      content: formatMessageContent(message.message),
+      avatarUrl: message.avatarUrl,
+      colorClass: colorBySender.get(message.senderName),
+    };
+  });
+
+  let blocks = '';
+  for (let i = 0; i < rows.length; i += 1) {
+    const row = rows[i];
+    const prev = rows[i - 1];
+    // Group with previous message when same sender within 10 minutes (Discord rule)
+    const grouped = prev && prev.name === row.name &&
+      Math.abs(new Date(messages[i].createdAt) - new Date(messages[i - 1].createdAt)) < 10 * 60 * 1000;
+
+    if (!grouped) {
+      blocks += `<article class="group flex items-start gap-4 pl-12 sm:pl-16 pr-3 pt-[3px] pb-1 relative rounded hover:bg-surface-container-low/50 transition-colors">
+        <div class="absolute -left-0 top-0 w-10 flex justify-center">
+          ${avatarFor(row)}
         </div>
-        <p class="font-body-md text-on-surface mt-1 whitespace-pre-wrap break-words">${escapeHtml(message.message)}</p>
-      </div>`;
-    container.appendChild(item);
+        <div class="flex-1 min-w-0">
+          <div class="flex items-baseline gap-2 flex-wrap">
+            <span class="font-headline-sm text-body-md font-semibold text-text-main hover:underline cursor-pointer">${escapeHtml(row.name)}</span>
+            <time class="font-code-sm text-[11px] text-text-muted select-none" title="${escapeHtml(row.fullTime)}">${escapeHtml(row.time)}</time>
+          </div>
+          <div class="message-content mt-0.5 font-body-md text-body-md leading-[1.375] text-on-surface break-words break-all">${row.content}</div>
+        </div>
+      </article>`;
+    } else {
+      blocks += `<article class="group flex items-start gap-4 pl-12 sm:pl-16 pr-3 py-px relative rounded hover:bg-surface-container-low/50 transition-colors">
+        <time class="hidden group-hover:flex absolute left-0 top-1 w-11 text-right font-code-sm text-[10px] leading-4 text-text-muted select-none pr-1" title="${escapeHtml(row.fullTime)}">${escapeHtml(row.time.replace(/^(Today|Yesterday) at /, ''))}</time>
+        <div class="flex-1 min-w-0">
+          <div class="message-content font-body-md text-body-md leading-[1.375] text-on-surface break-words break-all">${row.content}</div>
+        </div>
+      </article>`;
+    }
   }
-  container.scrollTop = container.scrollHeight;
+
+  renderStageInner(container, `<div id="stage-messages" class="space-y-px">${blocks}</div>`);
+
+  // Smooth autoscroll to newest message
+  requestAnimationFrame(() => {
+    container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
+  });
 }
 
 async function sendRoomMessage(event) {
@@ -495,16 +749,20 @@ async function sendRoomMessage(event) {
   const input = document.getElementById('channel-message-input');
   const message = input.value.trim();
   if (!activeRoomId || !message) return;
+  const sendBtn = document.getElementById('send-btn');
   input.disabled = true;
+  sendBtn?.setAttribute('disabled', 'true');
   try {
-    await createRoomMessage(activeRoomId, { senderId: currentUserId, message });
+    await createRoomMessage(activeRoomId, currentUserId, message);
     input.value = '';
+    input.dispatchEvent(new Event('input', { bubbles: true })); // reset auto-resize height
     await loadRoom({ id: activeRoomId, name: document.getElementById('active-stage-title').textContent.replace(/^#/, ''), topic: document.getElementById('active-stage-desc').textContent });
   } catch (err) {
     console.error('Failed to send room message:', err);
     setText('#room-connection-status', 'Send failed');
   } finally {
     input.disabled = false;
+    sendBtn?.removeAttribute('disabled');
     input.focus();
   }
 }
@@ -615,7 +873,16 @@ function setText(selector, value) {
 
 function setSrc(selector, value) {
   const el = document.querySelector(selector);
-  if (el) el.src = value || '';
+  if (!el) return;
+  const fallback = el.dataset.fallback;
+  if (!el.dataset.fallbackBound) {
+    el.addEventListener('error', () => {
+      if (fallback && el.src !== new URL(fallback, document.baseURI).href) el.src = fallback;
+    });
+    el.dataset.fallbackBound = 'true';
+  }
+  if (value) el.src = value;
+  else if (fallback) el.src = fallback;
 }
 
 function initials(name) {

@@ -52,3 +52,18 @@ export type Message = Prisma.MessageModel
  * 
  */
 export type Friendship = Prisma.FriendshipModel
+/**
+ * Model Invite
+ * 
+ */
+export type Invite = Prisma.InviteModel
+/**
+ * Model DirectChannel
+ * 
+ */
+export type DirectChannel = Prisma.DirectChannelModel
+/**
+ * Model DirectChannelMember
+ * 
+ */
+export type DirectChannelMember = Prisma.DirectChannelMemberModel

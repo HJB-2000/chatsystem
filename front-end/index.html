@@ -1,0 +1,274 @@
+<!doctype html>
+<html class="dark" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>NexusCampus</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="./tailwind.config.js"></script>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body class="bg-bg-main text-on-surface font-body-md text-body-md antialiased selection:bg-primary-container selection:text-on-primary-container">
+    <!-- ===== top bar (not the focus; kept) ===== -->
+    <header id="topbar" class="fixed inset-x-0 top-0 z-40 flex h-topbar-height items-center justify-between gap-3 bg-bg-surface/80 px-3 backdrop-blur-md sm:px-gutter-desktop">
+      <div class="flex shrink-0 items-center gap-space-sm">
+        <button type="button" id="sidebar-toggle" class="icon-btn" aria-label="Toggle sidebar" onclick="document.body.classList.toggle('sidebar-collapsed')">
+          <span class="material-symbols-outlined">menu_open</span>
+        </button>
+        <a href="#" class="flex items-center gap-2">
+          <img alt="" class="h-8 w-auto" src="../discord-replica/img/discord-icon.png" onerror="this.style.display='none'" />
+          <span class="font-headline-sm text-headline-sm text-text-main">NexusCampus</span>
+        </a>
+      </div>
+      <div id="topbar-search" class="min-w-0 max-w-2xl flex-1 px-space-md">
+        <div class="relative flex w-full items-center">
+          <span class="material-symbols-outlined pointer-events-none absolute left-3 text-text-muted">search</span>
+          <input type="text" class="h-10 w-full rounded-lg bg-bg-input pl-10 pr-4 text-on-surface outline-none ring-1 ring-white/10 placeholder:text-text-muted focus:ring-2 focus:ring-primary-container" placeholder="Search roadmaps, rooms, security logs..." aria-label="Search" />
+        </div>
+      </div>
+      <div class="flex shrink-0 items-center gap-2">
+        <button type="button" class="hidden items-center gap-1.5 rounded-lg bg-primary-container px-3 py-1.5 text-on-primary-container hover:bg-primary sm:flex">
+          <span class="material-symbols-outlined">auto_awesome</span><span class="font-label-md text-label-md">Copilot</span>
+        </button>
+        <button type="button" class="icon-btn" aria-label="Notifications"><span class="material-symbols-outlined">notifications</span></button>
+        <div class="flex items-center gap-2">
+          <span id="top-avatar" class="relative inline-flex"></span>
+          <div class="hidden flex-col md:flex">
+            <span class="font-label-md text-label-md leading-tight text-text-main" data-user-name></span>
+            <span class="font-label-sm text-label-sm text-text-muted" data-user-role></span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- ===== sidebar (not the focus; kept) ===== -->
+    <aside id="app-sidebar" class="fixed bottom-0 left-0 top-topbar-height z-30 w-sidebar-width flex-col justify-between overflow-y-auto bg-bg-surface/90 px-space-sm py-space-md backdrop-blur-md transition-all duration-200">
+      <nav class="flex flex-col gap-1" aria-label="Primary">
+        <p class="nav-heading px-space-sm pb-1 font-label-sm text-label-sm text-text-muted">Navigation</p>
+        <a href="#" class="rounded-lg px-space-sm py-2 text-on-surface-variant hover:bg-surface-container-high"><span class="nav-text">Dashboard</span></a>
+        <a href="#" class="rounded-lg px-space-sm py-2 text-on-surface-variant hover:bg-surface-container-high"><span class="nav-text">AI Roadmap &amp; Tracks</span></a>
+        <a href="#" class="rounded-lg px-space-sm py-2 text-on-surface-variant hover:bg-surface-container-high"><span class="nav-text">Notes &amp; AI Studio</span></a>
+        <a href="#" aria-current="page" class="rounded-lg bg-primary-container px-space-sm py-2 font-semibold text-on-primary-container"><span class="nav-text">Live Study Rooms</span></a>
+        <a href="#" class="rounded-lg px-space-sm py-2 text-on-surface-variant hover:bg-surface-container-high"><span class="nav-text">Schedule Planner</span></a>
+        <a href="#" class="rounded-lg px-space-sm py-2 text-on-surface-variant hover:bg-surface-container-high"><span class="nav-text">SOC &amp; Fail2ban</span></a>
+        <a href="#" class="rounded-lg px-space-sm py-2 text-on-surface-variant hover:bg-surface-container-high"><span class="nav-text">IP Blacklist &amp; Access</span></a>
+        <a href="#" class="rounded-lg px-space-sm py-2 text-on-surface-variant hover:bg-surface-container-high"><span class="nav-text">About</span></a>
+      </nav>
+      <nav class="flex flex-col gap-1" aria-label="Secondary">
+        <a href="#" class="rounded-lg px-space-sm py-2 text-on-surface-variant hover:bg-surface-container-high"><span class="nav-text">Settings</span></a>
+        <a href="#" class="rounded-lg px-space-sm py-2 text-on-surface-variant hover:bg-surface-container-high"><span class="nav-text">Help &amp; Docs</span></a>
+      </nav>
+    </aside>
+
+    <!-- ===== chat ===== -->
+    <div id="main-wrapper">
+      <main id="app-main">
+        <div id="chat-shell" data-mode="wide" data-channels="open" data-members="open" data-scrim="off">
+
+          <!-- left: collectives + rooms + DMs -->
+          <div id="channel-rail">
+            <ul id="collective-rail" aria-label="Collectives"></ul>
+            <aside id="sub-channel-column" aria-label="Rooms and direct messages">
+              <div class="col-head">
+                <div class="min-w-0">
+                  <strong class="truncate block text-text-main" data-collective-name>No collective</strong>
+                  <div class="stats"><span data-collective-online-count>0 online</span><span aria-hidden="true">/</span><span data-collective-labs-count>0 labs active</span></div>
+                </div>
+                <button type="button" class="icon-btn" id="btn-collapse-channels" title="Collapse channels" aria-label="Collapse channels"><span class="material-symbols-outlined">dock_to_left</span></button>
+              </div>
+              <div class="col-scroll">
+                <section aria-labelledby="rooms-heading">
+                  <div class="col-title">
+                    <span id="rooms-heading">Public rooms</span>
+                    <span class="col-title__btns">
+                      <button type="button" class="icon-btn" id="create-room-button" title="Create room" aria-label="Create room"><span class="material-symbols-outlined">add</span></button>
+                      <button type="button" class="icon-btn" id="create-invite-button" title="Create invite" aria-label="Create invite"><span class="material-symbols-outlined">person_add</span></button>
+                    </span>
+                  </div>
+                  <div id="rooms-list"></div>
+                </section>
+                <section aria-labelledby="dm-heading">
+                  <div class="col-title">
+                    <span id="dm-heading">Direct messages <span class="ml-1 rounded-full bg-primary-container px-1.5 text-on-primary-container" data-dm-unread-count>0</span></span>
+                    <button type="button" class="icon-btn" id="btn-new-dm" title="New message" aria-label="New direct message"><span class="material-symbols-outlined">add_comment</span></button>
+                  </div>
+                  <input id="dm-filter" type="search" placeholder="Filter contacts" aria-label="Filter contacts" class="mb-2 h-8 w-full rounded-lg bg-bg-input px-3 text-xs text-on-surface outline-none ring-1 ring-white/5 placeholder:text-text-muted focus:ring-primary-container" />
+                  <div id="dm-list"></div>
+                </section>
+              </div>
+              <div class="col-foot">
+                <div class="flex min-w-0 items-center gap-2">
+                  <button type="button" id="user-profile-button" class="relative shrink-0" title="Profile and status" aria-label="Edit profile and status"><span id="rail-avatar" class="inline-flex"></span></button>
+                  <div class="min-w-0">
+                    <p class="truncate text-sm font-medium text-text-main" data-user-name></p>
+                    <p class="truncate text-[11px] text-text-muted" data-user-tag></p>
+                  </div>
+                </div>
+                <div class="flex items-center">
+                  <button type="button" class="icon-btn" id="mute-microphone-button" title="Mute microphone" aria-label="Mute microphone" aria-pressed="false"><span class="material-symbols-outlined">mic</span></button>
+                  <button type="button" class="icon-btn" id="user-settings-button" title="Settings" aria-label="Settings"><span class="material-symbols-outlined">settings</span></button>
+                </div>
+              </div>
+            </aside>
+          </div>
+
+          <!-- center: THE STAGE -->
+          <section id="stage" aria-label="Conversation">
+            <header id="stage-header">
+              <button type="button" class="icon-btn" id="btn-channels" title="Channels" aria-label="Toggle channel list" aria-expanded="true"><span class="material-symbols-outlined">menu</span></button>
+              <div class="stage-title">
+                <span class="stage-title__icon"><span class="material-symbols-outlined">tag</span></span>
+                <div class="stage-title__text">
+                  <div class="stage-title__row">
+                    <h1 id="active-stage-title">Select a room</h1>
+                    <span id="room-seats-pill" class="pill pill--live hide-sm" hidden><span data-room-seats></span></span>
+                    <span id="room-connection-status" class="pill hide-md" role="status">Idle</span>
+                  </div>
+                  <p id="active-stage-desc" class="hide-xs">Pick or create a room to start chatting</p>
+                </div>
+              </div>
+              <div class="stage-actions">
+                <button type="button" class="icon-btn" id="btn-search" title="Search messages" aria-label="Search messages" aria-expanded="false"><span class="material-symbols-outlined">search</span></button>
+                <button type="button" class="icon-btn hide-xs" id="pins-btn" title="Pinned messages" aria-label="Pinned messages" aria-expanded="false" data-pop><span class="material-symbols-outlined">push_pin</span></button>
+                <button type="button" class="huddle-btn" id="huddle-btn" aria-pressed="false"><span class="material-symbols-outlined">headset_mic</span><span class="hide-sm" id="huddle-label">Start huddle</span></button>
+                <button type="button" class="icon-btn" id="btn-members" title="Members" aria-label="Toggle member list" aria-expanded="true"><span class="material-symbols-outlined">group</span></button>
+                <div class="relative">
+                  <button type="button" class="icon-btn" id="btn-more" title="More" aria-label="More actions" aria-haspopup="menu" aria-expanded="false" data-pop><span class="material-symbols-outlined">more_vert</span></button>
+                  <div id="more-menu" class="pop" role="menu" hidden>
+                    <button type="button" role="menuitem" class="only-xs" data-menu="pins"><span class="material-symbols-outlined">push_pin</span>Pinned messages</button>
+                    <button type="button" role="menuitem" data-menu="threads"><span class="material-symbols-outlined">forum</span>Threads</button>
+                    <button type="button" role="menuitem" data-menu="notifications"><span class="material-symbols-outlined" id="notif-icon">notifications</span><span id="notif-label">Mute notifications</span></button>
+                    <button type="button" role="menuitem" data-menu="inbox"><span class="material-symbols-outlined">inbox</span>Inbox</button>
+                    <button type="button" role="menuitem" data-menu="help"><span class="material-symbols-outlined">help</span>Help</button>
+                  </div>
+                </div>
+              </div>
+              <div id="pins-panel" class="pop" hidden></div>
+            </header>
+
+            <div id="search-bar" hidden>
+              <span class="material-symbols-outlined text-text-muted">search</span>
+              <input id="search-input" type="search" placeholder="Search this room" aria-label="Search this room" autocomplete="off" />
+              <span id="search-count" aria-live="polite"></span>
+              <button type="button" class="icon-btn" id="search-close" aria-label="Close search"><span class="material-symbols-outlined">close</span></button>
+            </div>
+
+            <div id="huddle-bar" hidden>
+              <div class="grp"><span class="live-dot"></span><span class="truncate">Huddle <span id="huddle-timer" class="font-code-sm">00:00</span></span></div>
+              <div class="grp">
+                <button type="button" class="chip hide-sm" id="huddle-mute"><span class="material-symbols-outlined" style="font-size:16px">mic</span><span>Mute</span></button>
+                <button type="button" class="chip chip--danger" id="huddle-leave"><span class="material-symbols-outlined" style="font-size:16px">call_end</span><span>Leave</span></button>
+              </div>
+            </div>
+
+            <div id="messages-wrap">
+              <div id="chat-messages-container" tabindex="-1">
+                <div id="msg-list" role="log" aria-live="polite" aria-relevant="additions" aria-label="Messages"></div>
+              </div>
+              <button type="button" id="jump-btn" hidden><span class="material-symbols-outlined">arrow_downward</span><span id="jump-label">Jump to present</span></button>
+              <div id="drop-hint" hidden>Drop files to attach</div>
+            </div>
+
+            <footer id="composer">
+              <div id="reply-bar" hidden>
+                <span class="material-symbols-outlined" style="font-size:16px">reply</span>
+                <span class="truncate">Replying to <b id="reply-name"></b></span>
+                <span id="reply-snippet"></span>
+                <button type="button" class="icon-btn" id="reply-cancel" aria-label="Cancel reply" style="width:1.5rem;height:1.5rem"><span class="material-symbols-outlined" style="font-size:16px">close</span></button>
+              </div>
+              <form id="message-form" class="composer__box" autocomplete="off">
+                <div id="attach-chips" class="chips" hidden></div>
+                <textarea id="channel-message-input" rows="1" placeholder="Select a room to start chatting" aria-label="Message" disabled></textarea>
+                <div class="composer__bar">
+                  <div class="composer__tools">
+                    <label class="icon-btn" for="attachment-input" title="Attach files" aria-label="Attach files"><span class="material-symbols-outlined">add_circle</span></label>
+                    <input type="file" id="attachment-input" multiple hidden />
+                    <button type="button" class="icon-btn" id="code-btn" title="Insert code block" aria-label="Insert code block"><span class="material-symbols-outlined">code_blocks</span></button>
+                    <button type="button" class="icon-btn" id="emoji-btn" title="Emoji" aria-label="Emoji" data-pop><span class="material-symbols-outlined">sentiment_satisfied</span></button>
+                    <button type="button" class="icon-btn hide-sm" id="gif-btn" title="GIF" aria-label="GIF"><span class="material-symbols-outlined">gif_box</span></button>
+                    <button type="button" class="icon-btn hide-sm" id="sticker-btn" title="Sticker" aria-label="Sticker"><span class="material-symbols-outlined">note</span></button>
+                    <span class="hint hide-md">**bold** `code` ```block``` ||spoiler||</span>
+                  </div>
+                  <div class="composer__send">
+                    <span id="char-count" hidden></span>
+                    <button type="submit" id="send-btn" disabled aria-label="Send message"><span class="hide-xs">Send</span><span class="material-symbols-outlined">send</span></button>
+                  </div>
+                </div>
+                <div id="mention-popup" class="pop mention-pop" role="listbox" hidden></div>
+              </form>
+              <p class="kbd-hint hide-md"><kbd>Enter</kbd> send · <kbd>Shift</kbd>+<kbd>Enter</kbd> new line · <kbd>↑</kbd> edit last</p>
+            </footer>
+          </section>
+
+          <!-- right: roster -->
+          <aside id="member-list-panel" aria-label="Room roster">
+            <div class="col-head">
+              <div class="flex min-w-0 items-center gap-2">
+                <strong class="text-text-main">Roster</strong>
+                <span class="pill pill--live" data-roster-count>0 online</span>
+              </div>
+              <button type="button" class="icon-btn" id="btn-close-members" title="Hide roster" aria-label="Hide roster"><span class="material-symbols-outlined">dock_to_right</span></button>
+            </div>
+            <div id="room-roster" class="flex-1 overflow-y-auto px-2 pb-3"></div>
+          </aside>
+
+          <div id="scrim" aria-hidden="true"></div>
+        </div>
+      </main>
+    </div>
+
+    <!-- emoji popover (fixed; positioned in JS) -->
+    <div id="emoji-pop" class="pop" hidden><div class="grid" id="emoji-grid"></div></div>
+
+    <!-- DM modal -->
+    <div id="dm-modal" class="modal" hidden role="dialog" aria-modal="true" aria-labelledby="dm-modal-title">
+      <div class="modal__card">
+        <div class="modal__head">
+          <h3 id="dm-modal-title">Direct message</h3>
+          <button type="button" class="icon-btn" id="dm-close" aria-label="Close"><span class="material-symbols-outlined">close</span></button>
+        </div>
+        <input id="dm-search-input" type="text" placeholder="Search people by name or role" aria-label="Search people" />
+        <div id="dm-contact-results" class="mt-1"></div>
+        <div id="dm-partner" class="mt-3 flex items-center gap-3 rounded-lg bg-surface-container-low p-2" hidden>
+          <span id="dm-modal-avatar" class="inline-flex"></span>
+          <div class="min-w-0">
+            <p class="truncate text-sm font-semibold text-text-main" id="dm-modal-name"></p>
+            <p class="truncate text-xs text-secondary" id="dm-modal-role"></p>
+            <p class="truncate text-[11px] text-text-muted" id="dm-modal-status"></p>
+          </div>
+        </div>
+        <div id="dm-history"><p class="empty">Search for a person to start a conversation.</p></div>
+        <textarea id="dm-quick-message" rows="3" placeholder="Write a message" aria-label="Direct message text"></textarea>
+        <div class="modal__foot">
+          <button type="button" class="btn" id="dm-cancel">Close</button>
+          <button type="button" class="btn btn--primary" id="dm-send">Send</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- generic form dialog (replaces prompt/alert) -->
+    <dialog id="form-dialog" aria-labelledby="form-dialog-title">
+      <form id="form-dialog-form" class="modal__card" style="margin:auto">
+        <div class="modal__head"><h3 id="form-dialog-title"></h3></div>
+        <div id="form-dialog-fields"></div>
+        <p id="form-dialog-error" class="field__help" style="color:#ffb4ab" hidden></p>
+        <div class="modal__foot">
+          <button type="button" class="btn" id="form-dialog-cancel">Cancel</button>
+          <button type="submit" class="btn btn--primary" id="form-dialog-submit">Save</button>
+        </div>
+      </form>
+    </dialog>
+
+    <div id="toast" class="toast" role="status" hidden><p class="toast__title"></p><p class="toast__msg"></p></div>
+
+    <button type="button" id="test-user-switcher" title="Switch test user">
+      <span class="material-symbols-outlined">switch_account</span><span id="switch-label">Switch user</span>
+    </button>
+
+    <script type="module" src="./script.js"></script>
+  </body>
+</html>

@@ -240,7 +240,8 @@ export type MessageWhereInput = {
   attachments?: Prisma.JsonNullableFilter<"Message">
   createdAt?: Prisma.DateTimeFilter<"Message"> | Date | string
   editedAt?: Prisma.DateTimeNullableFilter<"Message"> | Date | string | null
-  channel?: Prisma.XOR<Prisma.ChannelScalarRelationFilter, Prisma.ChannelWhereInput>
+  channel?: Prisma.XOR<Prisma.ChannelNullableScalarRelationFilter, Prisma.ChannelWhereInput> | null
+  dmChannel?: Prisma.XOR<Prisma.DirectChannelNullableScalarRelationFilter, Prisma.DirectChannelWhereInput> | null
   author?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }
 
@@ -254,6 +255,7 @@ export type MessageOrderByWithRelationInput = {
   createdAt?: Prisma.SortOrder
   editedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   channel?: Prisma.ChannelOrderByWithRelationInput
+  dmChannel?: Prisma.DirectChannelOrderByWithRelationInput
   author?: Prisma.UserOrderByWithRelationInput
 }
 
@@ -269,7 +271,8 @@ export type MessageWhereUniqueInput = Prisma.AtLeast<{
   attachments?: Prisma.JsonNullableFilter<"Message">
   createdAt?: Prisma.DateTimeFilter<"Message"> | Date | string
   editedAt?: Prisma.DateTimeNullableFilter<"Message"> | Date | string | null
-  channel?: Prisma.XOR<Prisma.ChannelScalarRelationFilter, Prisma.ChannelWhereInput>
+  channel?: Prisma.XOR<Prisma.ChannelNullableScalarRelationFilter, Prisma.ChannelWhereInput> | null
+  dmChannel?: Prisma.XOR<Prisma.DirectChannelNullableScalarRelationFilter, Prisma.DirectChannelWhereInput> | null
   author?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }, "messageId">
 
@@ -310,7 +313,8 @@ export type MessageCreateInput = {
   attachments?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   editedAt?: Date | string | null
-  channel: Prisma.ChannelCreateNestedOneWithoutMessagesInput
+  channel?: Prisma.ChannelCreateNestedOneWithoutMessagesInput
+  dmChannel?: Prisma.DirectChannelCreateNestedOneWithoutMessagesInput
   author: Prisma.UserCreateNestedOneWithoutMessagesInput
 }
 
@@ -332,7 +336,8 @@ export type MessageUpdateInput = {
   attachments?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   editedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  channel?: Prisma.ChannelUpdateOneRequiredWithoutMessagesNestedInput
+  channel?: Prisma.ChannelUpdateOneWithoutMessagesNestedInput
+  dmChannel?: Prisma.DirectChannelUpdateOneWithoutMessagesNestedInput
   author?: Prisma.UserUpdateOneRequiredWithoutMessagesNestedInput
 }
 
@@ -517,6 +522,48 @@ export type NullableDateTimeFieldUpdateOperationsInput = {
   set?: Date | string | null
 }
 
+export type MessageCreateNestedManyWithoutDmChannelInput = {
+  create?: Prisma.XOR<Prisma.MessageCreateWithoutDmChannelInput, Prisma.MessageUncheckedCreateWithoutDmChannelInput> | Prisma.MessageCreateWithoutDmChannelInput[] | Prisma.MessageUncheckedCreateWithoutDmChannelInput[]
+  connectOrCreate?: Prisma.MessageCreateOrConnectWithoutDmChannelInput | Prisma.MessageCreateOrConnectWithoutDmChannelInput[]
+  createMany?: Prisma.MessageCreateManyDmChannelInputEnvelope
+  connect?: Prisma.MessageWhereUniqueInput | Prisma.MessageWhereUniqueInput[]
+}
+
+export type MessageUncheckedCreateNestedManyWithoutDmChannelInput = {
+  create?: Prisma.XOR<Prisma.MessageCreateWithoutDmChannelInput, Prisma.MessageUncheckedCreateWithoutDmChannelInput> | Prisma.MessageCreateWithoutDmChannelInput[] | Prisma.MessageUncheckedCreateWithoutDmChannelInput[]
+  connectOrCreate?: Prisma.MessageCreateOrConnectWithoutDmChannelInput | Prisma.MessageCreateOrConnectWithoutDmChannelInput[]
+  createMany?: Prisma.MessageCreateManyDmChannelInputEnvelope
+  connect?: Prisma.MessageWhereUniqueInput | Prisma.MessageWhereUniqueInput[]
+}
+
+export type MessageUpdateManyWithoutDmChannelNestedInput = {
+  create?: Prisma.XOR<Prisma.MessageCreateWithoutDmChannelInput, Prisma.MessageUncheckedCreateWithoutDmChannelInput> | Prisma.MessageCreateWithoutDmChannelInput[] | Prisma.MessageUncheckedCreateWithoutDmChannelInput[]
+  connectOrCreate?: Prisma.MessageCreateOrConnectWithoutDmChannelInput | Prisma.MessageCreateOrConnectWithoutDmChannelInput[]
+  upsert?: Prisma.MessageUpsertWithWhereUniqueWithoutDmChannelInput | Prisma.MessageUpsertWithWhereUniqueWithoutDmChannelInput[]
+  createMany?: Prisma.MessageCreateManyDmChannelInputEnvelope
+  set?: Prisma.MessageWhereUniqueInput | Prisma.MessageWhereUniqueInput[]
+  disconnect?: Prisma.MessageWhereUniqueInput | Prisma.MessageWhereUniqueInput[]
+  delete?: Prisma.MessageWhereUniqueInput | Prisma.MessageWhereUniqueInput[]
+  connect?: Prisma.MessageWhereUniqueInput | Prisma.MessageWhereUniqueInput[]
+  update?: Prisma.MessageUpdateWithWhereUniqueWithoutDmChannelInput | Prisma.MessageUpdateWithWhereUniqueWithoutDmChannelInput[]
+  updateMany?: Prisma.MessageUpdateManyWithWhereWithoutDmChannelInput | Prisma.MessageUpdateManyWithWhereWithoutDmChannelInput[]
+  deleteMany?: Prisma.MessageScalarWhereInput | Prisma.MessageScalarWhereInput[]
+}
+
+export type MessageUncheckedUpdateManyWithoutDmChannelNestedInput = {
+  create?: Prisma.XOR<Prisma.MessageCreateWithoutDmChannelInput, Prisma.MessageUncheckedCreateWithoutDmChannelInput> | Prisma.MessageCreateWithoutDmChannelInput[] | Prisma.MessageUncheckedCreateWithoutDmChannelInput[]
+  connectOrCreate?: Prisma.MessageCreateOrConnectWithoutDmChannelInput | Prisma.MessageCreateOrConnectWithoutDmChannelInput[]
+  upsert?: Prisma.MessageUpsertWithWhereUniqueWithoutDmChannelInput | Prisma.MessageUpsertWithWhereUniqueWithoutDmChannelInput[]
+  createMany?: Prisma.MessageCreateManyDmChannelInputEnvelope
+  set?: Prisma.MessageWhereUniqueInput | Prisma.MessageWhereUniqueInput[]
+  disconnect?: Prisma.MessageWhereUniqueInput | Prisma.MessageWhereUniqueInput[]
+  delete?: Prisma.MessageWhereUniqueInput | Prisma.MessageWhereUniqueInput[]
+  connect?: Prisma.MessageWhereUniqueInput | Prisma.MessageWhereUniqueInput[]
+  update?: Prisma.MessageUpdateWithWhereUniqueWithoutDmChannelInput | Prisma.MessageUpdateWithWhereUniqueWithoutDmChannelInput[]
+  updateMany?: Prisma.MessageUpdateManyWithWhereWithoutDmChannelInput | Prisma.MessageUpdateManyWithWhereWithoutDmChannelInput[]
+  deleteMany?: Prisma.MessageScalarWhereInput | Prisma.MessageScalarWhereInput[]
+}
+
 export type MessageCreateWithoutAuthorInput = {
   messageId?: bigint | number
   content: string
@@ -524,7 +571,8 @@ export type MessageCreateWithoutAuthorInput = {
   attachments?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   editedAt?: Date | string | null
-  channel: Prisma.ChannelCreateNestedOneWithoutMessagesInput
+  channel?: Prisma.ChannelCreateNestedOneWithoutMessagesInput
+  dmChannel?: Prisma.DirectChannelCreateNestedOneWithoutMessagesInput
 }
 
 export type MessageUncheckedCreateWithoutAuthorInput = {
@@ -584,6 +632,7 @@ export type MessageCreateWithoutChannelInput = {
   attachments?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   editedAt?: Date | string | null
+  dmChannel?: Prisma.DirectChannelCreateNestedOneWithoutMessagesInput
   author: Prisma.UserCreateNestedOneWithoutMessagesInput
 }
 
@@ -623,6 +672,53 @@ export type MessageUpdateManyWithWhereWithoutChannelInput = {
   data: Prisma.XOR<Prisma.MessageUpdateManyMutationInput, Prisma.MessageUncheckedUpdateManyWithoutChannelInput>
 }
 
+export type MessageCreateWithoutDmChannelInput = {
+  messageId?: bigint | number
+  content: string
+  embeds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  attachments?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Date | string
+  editedAt?: Date | string | null
+  channel?: Prisma.ChannelCreateNestedOneWithoutMessagesInput
+  author: Prisma.UserCreateNestedOneWithoutMessagesInput
+}
+
+export type MessageUncheckedCreateWithoutDmChannelInput = {
+  messageId?: bigint | number
+  authorId: bigint | number
+  content: string
+  embeds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  attachments?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Date | string
+  editedAt?: Date | string | null
+}
+
+export type MessageCreateOrConnectWithoutDmChannelInput = {
+  where: Prisma.MessageWhereUniqueInput
+  create: Prisma.XOR<Prisma.MessageCreateWithoutDmChannelInput, Prisma.MessageUncheckedCreateWithoutDmChannelInput>
+}
+
+export type MessageCreateManyDmChannelInputEnvelope = {
+  data: Prisma.MessageCreateManyDmChannelInput | Prisma.MessageCreateManyDmChannelInput[]
+  skipDuplicates?: boolean
+}
+
+export type MessageUpsertWithWhereUniqueWithoutDmChannelInput = {
+  where: Prisma.MessageWhereUniqueInput
+  update: Prisma.XOR<Prisma.MessageUpdateWithoutDmChannelInput, Prisma.MessageUncheckedUpdateWithoutDmChannelInput>
+  create: Prisma.XOR<Prisma.MessageCreateWithoutDmChannelInput, Prisma.MessageUncheckedCreateWithoutDmChannelInput>
+}
+
+export type MessageUpdateWithWhereUniqueWithoutDmChannelInput = {
+  where: Prisma.MessageWhereUniqueInput
+  data: Prisma.XOR<Prisma.MessageUpdateWithoutDmChannelInput, Prisma.MessageUncheckedUpdateWithoutDmChannelInput>
+}
+
+export type MessageUpdateManyWithWhereWithoutDmChannelInput = {
+  where: Prisma.MessageScalarWhereInput
+  data: Prisma.XOR<Prisma.MessageUpdateManyMutationInput, Prisma.MessageUncheckedUpdateManyWithoutDmChannelInput>
+}
+
 export type MessageCreateManyAuthorInput = {
   messageId?: bigint | number
   channelId: bigint | number
@@ -640,7 +736,8 @@ export type MessageUpdateWithoutAuthorInput = {
   attachments?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   editedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  channel?: Prisma.ChannelUpdateOneRequiredWithoutMessagesNestedInput
+  channel?: Prisma.ChannelUpdateOneWithoutMessagesNestedInput
+  dmChannel?: Prisma.DirectChannelUpdateOneWithoutMessagesNestedInput
 }
 
 export type MessageUncheckedUpdateWithoutAuthorInput = {
@@ -680,6 +777,7 @@ export type MessageUpdateWithoutChannelInput = {
   attachments?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   editedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  dmChannel?: Prisma.DirectChannelUpdateOneWithoutMessagesNestedInput
   author?: Prisma.UserUpdateOneRequiredWithoutMessagesNestedInput
 }
 
@@ -703,6 +801,47 @@ export type MessageUncheckedUpdateManyWithoutChannelInput = {
   editedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
+export type MessageCreateManyDmChannelInput = {
+  messageId?: bigint | number
+  authorId: bigint | number
+  content: string
+  embeds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  attachments?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Date | string
+  editedAt?: Date | string | null
+}
+
+export type MessageUpdateWithoutDmChannelInput = {
+  messageId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  content?: Prisma.StringFieldUpdateOperationsInput | string
+  embeds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  attachments?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  editedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  channel?: Prisma.ChannelUpdateOneWithoutMessagesNestedInput
+  author?: Prisma.UserUpdateOneRequiredWithoutMessagesNestedInput
+}
+
+export type MessageUncheckedUpdateWithoutDmChannelInput = {
+  messageId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  authorId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  content?: Prisma.StringFieldUpdateOperationsInput | string
+  embeds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  attachments?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  editedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+}
+
+export type MessageUncheckedUpdateManyWithoutDmChannelInput = {
+  messageId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  authorId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  content?: Prisma.StringFieldUpdateOperationsInput | string
+  embeds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  attachments?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  editedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+}
+
 
 
 export type MessageSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -714,7 +853,8 @@ export type MessageSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   attachments?: boolean
   createdAt?: boolean
   editedAt?: boolean
-  channel?: boolean | Prisma.ChannelDefaultArgs<ExtArgs>
+  channel?: boolean | Prisma.Message$channelArgs<ExtArgs>
+  dmChannel?: boolean | Prisma.Message$dmChannelArgs<ExtArgs>
   author?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["message"]>
 
@@ -727,7 +867,8 @@ export type MessageSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   attachments?: boolean
   createdAt?: boolean
   editedAt?: boolean
-  channel?: boolean | Prisma.ChannelDefaultArgs<ExtArgs>
+  channel?: boolean | Prisma.Message$channelArgs<ExtArgs>
+  dmChannel?: boolean | Prisma.Message$dmChannelArgs<ExtArgs>
   author?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["message"]>
 
@@ -740,7 +881,8 @@ export type MessageSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   attachments?: boolean
   createdAt?: boolean
   editedAt?: boolean
-  channel?: boolean | Prisma.ChannelDefaultArgs<ExtArgs>
+  channel?: boolean | Prisma.Message$channelArgs<ExtArgs>
+  dmChannel?: boolean | Prisma.Message$dmChannelArgs<ExtArgs>
   author?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["message"]>
 
@@ -757,22 +899,26 @@ export type MessageSelectScalar = {
 
 export type MessageOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"messageId" | "channelId" | "authorId" | "content" | "embeds" | "attachments" | "createdAt" | "editedAt", ExtArgs["result"]["message"]>
 export type MessageInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  channel?: boolean | Prisma.ChannelDefaultArgs<ExtArgs>
+  channel?: boolean | Prisma.Message$channelArgs<ExtArgs>
+  dmChannel?: boolean | Prisma.Message$dmChannelArgs<ExtArgs>
   author?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
 export type MessageIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  channel?: boolean | Prisma.ChannelDefaultArgs<ExtArgs>
+  channel?: boolean | Prisma.Message$channelArgs<ExtArgs>
+  dmChannel?: boolean | Prisma.Message$dmChannelArgs<ExtArgs>
   author?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
 export type MessageIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  channel?: boolean | Prisma.ChannelDefaultArgs<ExtArgs>
+  channel?: boolean | Prisma.Message$channelArgs<ExtArgs>
+  dmChannel?: boolean | Prisma.Message$dmChannelArgs<ExtArgs>
   author?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
 
 export type $MessagePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Message"
   objects: {
-    channel: Prisma.$ChannelPayload<ExtArgs>
+    channel: Prisma.$ChannelPayload<ExtArgs> | null
+    dmChannel: Prisma.$DirectChannelPayload<ExtArgs> | null
     author: Prisma.$UserPayload<ExtArgs>
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
@@ -1178,7 +1324,8 @@ readonly fields: MessageFieldRefs;
  */
 export interface Prisma__MessageClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  channel<T extends Prisma.ChannelDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ChannelDefaultArgs<ExtArgs>>): Prisma.Prisma__ChannelClient<runtime.Types.Result.GetResult<Prisma.$ChannelPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  channel<T extends Prisma.Message$channelArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Message$channelArgs<ExtArgs>>): Prisma.Prisma__ChannelClient<runtime.Types.Result.GetResult<Prisma.$ChannelPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  dmChannel<T extends Prisma.Message$dmChannelArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Message$dmChannelArgs<ExtArgs>>): Prisma.Prisma__DirectChannelClient<runtime.Types.Result.GetResult<Prisma.$DirectChannelPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   author<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -1615,6 +1762,44 @@ export type MessageDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Inter
    * Limit how many Messages to delete.
    */
   limit?: number
+}
+
+/**
+ * Message.channel
+ */
+export type Message$channelArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Channel
+   */
+  select?: Prisma.ChannelSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Channel
+   */
+  omit?: Prisma.ChannelOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ChannelInclude<ExtArgs> | null
+  where?: Prisma.ChannelWhereInput
+}
+
+/**
+ * Message.dmChannel
+ */
+export type Message$dmChannelArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the DirectChannel
+   */
+  select?: Prisma.DirectChannelSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the DirectChannel
+   */
+  omit?: Prisma.DirectChannelOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.DirectChannelInclude<ExtArgs> | null
+  where?: Prisma.DirectChannelWhereInput
 }
 
 /**

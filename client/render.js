@@ -11,6 +11,7 @@ let activeUserTab = null;
 
 document.addEventListener('DOMContentLoaded', () => {
   prepareBlueprint();
+  setupNavigationEvents();
   setupComposer();
   loadCurrentUser();
   loadCollectives();
@@ -75,6 +76,86 @@ function prepareBlueprint() {
     const input = document.getElementById('channel-message-input');
     if (input) input.form?.requestSubmit();
   };
+}
+
+function setupNavigationEvents() {
+  document.querySelectorAll('.channel-container').forEach((header) => {
+    const category = header.closest('section');
+    const list = category?.querySelector('.channel-list');
+    const toggle = header.querySelector('.material-symbols-outlined');
+    if (!category || !list || !toggle) return;
+    header.setAttribute('role', 'button');
+    header.tabIndex = 0;
+    const toggleCategory = () => {
+      const collapsed = list.classList.toggle('hidden');
+      toggle.textContent = collapsed ? 'chevron_right' : 'expand_more';
+      header.setAttribute('aria-expanded', String(!collapsed));
+    };
+    header.addEventListener('click', toggleCategory);
+    header.addEventListener('keydown', event => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        toggleCategory();
+      }
+    });
+  });
+
+  document.querySelectorAll('.channel-button').forEach(button => {
+    button.addEventListener('click', () => {
+      document.querySelectorAll('.channel-button').forEach(item => {
+        item.classList.remove('bg-primary-container/20', 'text-primary');
+        item.classList.add('text-text-muted');
+      });
+      button.classList.remove('text-text-muted');
+      button.classList.add('bg-primary-container/20', 'text-primary');
+      setText('#active-stage-title', `#${button.querySelector('span:last-child')?.textContent.trim() || 'channel'}`);
+      setText('#active-stage-desc', 'This channel is not connected to a room yet. Choose a public room below to start chatting.');
+      showToast('Channel selected', 'Connect a public room to load live messages.');
+    });
+  });
+
+  document.querySelector('#header-search-box input')?.addEventListener('input', event => {
+    const query = event.target.value.trim().toLowerCase();
+    document.querySelectorAll('#stage-messages .message-content')?.forEach(message => {
+      const visible = !query || message.textContent.toLowerCase().includes(query);
+      message.closest('article')?.classList.toggle('hidden', !visible);
+    });
+  });
+
+  document.getElementById('pins-btn')?.addEventListener('click', () => showToast('Pinned messages', 'Pinned-message view is ready when this room has pins.'));
+  document.querySelector('[title="Open threads"]')?.addEventListener('click', () => showToast('Threads', 'Thread activity will appear here for the active channel.'));
+  document.querySelector('[title="Notification settings"]')?.addEventListener('click', event => {
+    const button = event.currentTarget;
+    const muted = button.dataset.muted === 'true';
+    button.dataset.muted = String(!muted);
+    button.title = muted ? 'Mute notifications' : 'Unmute notifications';
+    button.querySelector('.material-symbols-outlined').textContent = muted ? 'notifications' : 'notifications_off';
+    showToast(muted ? 'Notifications enabled' : 'Notifications muted', 'Your preference was updated for this channel.');
+  });
+  document.querySelector('[title="Inbox"]')?.addEventListener('click', () => showToast('Inbox', 'You have no new mentions or requests.'));
+  document.querySelector('[title="Help"]')?.addEventListener('click', () => showToast('Help', 'Use Enter to send, Shift + Enter for a new line, and the channel list to navigate.'));
+  document.getElementById('attachment-input')?.addEventListener('change', event => {
+    const file = event.target.files?.[0];
+    if (file) showToast('Attachment ready', file.name);
+  });
+  document.querySelector('[title="GIF picker"]')?.addEventListener('click', () => showToast('GIF picker', 'GIF search is ready for a media provider connection.'));
+  document.querySelector('[title="Sticker picker"]')?.addEventListener('click', () => showToast('Sticker picker', 'Sticker search is ready for a media provider connection.'));
+}
+
+function showToast(title, message) {
+  let toast = document.getElementById('client-toast');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'client-toast';
+    toast.className = 'fixed bottom-6 left-1/2 z-[60] hidden -translate-x-1/2 rounded-xl bg-surface-container-highest px-4 py-3 text-left shadow-2xl ring-1 ring-white/10';
+    document.body.appendChild(toast);
+  }
+  toast.innerHTML = `<p class="font-label-md text-label-md font-semibold text-text-main"></p><p class="mt-0.5 font-body-sm text-body-sm text-text-muted"></p>`;
+  toast.children[0].textContent = title;
+  toast.children[1].textContent = message;
+  toast.classList.remove('hidden');
+  clearTimeout(showToast.timer);
+  showToast.timer = setTimeout(() => toast.classList.add('hidden'), 3200);
 }
 
 function prepareUserSwitcher() {
@@ -232,7 +313,7 @@ async function createNewCollective() {
   const name = window.prompt('Collective name');
   if (!name?.trim()) return;
   try {
-    const collective = await createCollective({ userId: currentUserId, name });
+    const collective = await createCollective(currentUserId, name);
     await loadCollectives(collective.id);
   } catch (err) {
     window.alert(err.message);
@@ -257,8 +338,8 @@ async function createNewRoom() {
 async function createCollectiveInvite() {
   if (!activeCollectiveId) return window.alert('Select a collective first.');
   try {
-    const result = await createInvite(activeCollectiveId, { userId: currentUserId });
-    window.prompt('Copy this invite link', result.invite);
+    const result = await createInvite(activeCollectiveId, currentUserId);
+    window.prompt('Copy this invite token', result.token);
   } catch (err) {
     window.alert(err.message);
   }
@@ -289,8 +370,8 @@ function renderRooms(container, rooms) {
   // Update header stats from room list (active room = first, or one flagged current)
   const current = rooms.find(r => r.isMember) || rooms[0];
   if (current) {
-    setText('[data-collective-name]', current.collectiveName);
-    setText('[data-collective-name-tooltip]', current.collectiveName);
+    setText('[data-collective-name]', current.collectiveName || activeCollective?.name);
+    setText('[data-collective-name-tooltip]', current.collectiveName || activeCollective?.name);
     setText('[data-collective-online-count]', `${current.onlineCount ?? 0} Online`);
     setText('[data-collective-labs-count]', `${rooms.filter(r => r.status === 'active').length} Labs Active`);
     setText('[data-room-name]', current.name);
@@ -326,7 +407,7 @@ function setWelcomeHeader(room) {
 }
 
 function renderStageInner(container, innerHtml) {
-  container.innerHTML = `<div class="py-space-md pr-2 pl-3 sm:pl-4"><div id="stage-welcome" class="mb-6 pt-4 pb-2 border-b border-border-subtle"><div class="w-16 h-16 rounded-full bg-primary/15 text-primary flex items-center justify-center mb-3"><span class="material-symbols-outlined text-[36px]">tag</span></div><h2 class="font-headline-lg text-headline-md text-text-main font-bold">Welcome to <span id="welcome-channel-name">#the-room</span></h2><p class="font-body-md text-body-md text-text-muted mt-1 max-w-xl">This is the start of the channel. <span data-welcome-topic>Pick a public room or DM to open the conversation stage.</span></p></div>${innerHtml}</div>`;
+  container.innerHTML = `<div class="py-space-md pr-2 pl-3 sm:pl-4"><div id="stage-welcome" class="mb-6 pt-4 pb-2 border-b border-border-subtle"><div class="w-16 h-16 rounded-full bg-primary/15 text-primary flex items-center justify-center mb-3"><span class="material-symbols-outlined text-[36px]">tag</span></div><h2 class="font-headline-lg text-headline-md text-text-main font-bold">Welcome to <span id="welcome-channel-name">#the-room</span></h2><p class="font-body-md text-body-md text-text-muted mt-1 max-w-xl">This is the start of the channel. <span data-welcome-topic>Pick a public room or DM to open the conversation stage.</span></p></div><div class="separator flex items-center gap-2 text-text-muted" aria-label="Message date"><span class="h-px flex-1 bg-border-subtle"></span><time class="font-label-sm text-label-sm">Today</time><span class="h-px flex-1 bg-border-subtle"></span></div>${innerHtml}</div>`;
 }
 
 window.insertCodeBlock = function insertCodeBlock() {
@@ -519,6 +600,7 @@ async function loadRoom(room) {
       getRoomMembers(room.id, currentUserId),
     ]);
     renderMessages(container, messages || []);
+    setWelcomeHeader(room);
     renderRoster(members || [], room.capacity);
     setText('#room-connection-status', 'Ready');
   } catch (err) {
@@ -536,10 +618,17 @@ function renderRoster(members, capacity = 0) {
   for (const member of members) {
     const row = document.createElement('div');
     row.className = 'flex items-center gap-2.5 px-2 py-2 rounded-lg hover:bg-surface-container-high';
+    const presenceClass = member.status === 'online'
+      ? 'bg-secondary'
+      : member.status === 'dnd'
+        ? 'bg-tertiary-container'
+        : member.status === 'idle'
+          ? 'bg-amber-400'
+          : 'bg-text-muted';
     const avatar = member.avatarUrl
       ? `<img class="w-8 h-8 rounded-full object-cover" src="${escapeHtml(member.avatarUrl)}" alt="${escapeHtml(member.username)}" />`
       : `<div class="w-8 h-8 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center font-semibold">${escapeHtml(initials(member.username))}</div>`;
-    row.innerHTML = `${avatar}<div class="min-w-0 flex-1"><div class="flex items-center gap-1.5"><span class="text-sm font-semibold text-text-main truncate">${escapeHtml(member.username)}</span><span class="w-2 h-2 rounded-full ${member.status === 'online' ? 'bg-secondary' : 'bg-text-muted'}"></span></div><p class="text-[11px] text-text-muted truncate">${escapeHtml(member.roleTitle || member.currentActivity || 'Member')}</p></div>`;
+    row.innerHTML = `${avatar}<div class="min-w-0 flex-1"><div class="flex items-center gap-1.5"><span class="text-sm font-semibold text-text-main truncate">${escapeHtml(member.username)}</span><span class="w-2 h-2 rounded-full ${presenceClass}" title="${escapeHtml(member.status || 'offline')}"></span></div><p class="text-[11px] text-text-muted truncate">${escapeHtml(member.roleTitle || member.currentActivity || 'Member')}</p></div>`;
     container.appendChild(row);
   }
 }
@@ -664,7 +753,7 @@ async function sendRoomMessage(event) {
   input.disabled = true;
   sendBtn?.setAttribute('disabled', 'true');
   try {
-    await createRoomMessage(activeRoomId, { senderId: currentUserId, message });
+    await createRoomMessage(activeRoomId, currentUserId, message);
     input.value = '';
     input.dispatchEvent(new Event('input', { bubbles: true })); // reset auto-resize height
     await loadRoom({ id: activeRoomId, name: document.getElementById('active-stage-title').textContent.replace(/^#/, ''), topic: document.getElementById('active-stage-desc').textContent });
@@ -784,7 +873,16 @@ function setText(selector, value) {
 
 function setSrc(selector, value) {
   const el = document.querySelector(selector);
-  if (el) el.src = value || '';
+  if (!el) return;
+  const fallback = el.dataset.fallback;
+  if (!el.dataset.fallbackBound) {
+    el.addEventListener('error', () => {
+      if (fallback && el.src !== new URL(fallback, document.baseURI).href) el.src = fallback;
+    });
+    el.dataset.fallbackBound = 'true';
+  }
+  if (value) el.src = value;
+  else if (fallback) el.src = fallback;
 }
 
 function initials(name) {

@@ -92,6 +92,13 @@ button { font: inherit; color: inherit; cursor: pointer; background: none; borde
 .rail__btn.is-active { border-radius: .75rem; background: var(--primary-c); color: var(--on-primary-c); }
 .rail__btn--ghost { background: var(--cont); color: var(--secondary); }
 
+
+
+
+
+
+
+
 #sub-channel-column { width: 16rem; display: flex; flex-direction: column; height: 100%; background: var(--low); }
 .col-head { height: 3.5rem; flex: none; padding: 0 .75rem; display: flex; align-items: center; justify-content: space-between; gap: .5rem; box-shadow: 0 1px 3px rgba(0, 0, 0, .25); }
 .col-head strong { font-size: .875rem; }
@@ -129,6 +136,116 @@ button { font: inherit; color: inherit; cursor: pointer; background: none; borde
 .dm-row__time { font-size: 10px; color: var(--muted); }
 .status-dot { position: absolute; right: -1px; bottom: -1px; width: .625rem; height: .625rem; border-radius: 9999px; box-shadow: 0 0 0 2px var(--low); }
 .avatar { display: inline-flex; align-items: center; justify-content: center; flex: none; border-radius: 9999px; object-fit: cover; color: #fff; font-weight: 700; user-select: none; }
+
+
+.col-tabs { padding: 0; gap: 0; }
+.col-tab { flex: 1; height: 100%; font-size: 12px; font-weight: 600; color: var(--muted);
+  border-bottom: 2px solid transparent; transition: color .15s, background .15s; }
+.col-tab:hover { background: var(--cont); color: var(--text); }
+.col-tab.is-active { color: var(--primary); border-bottom-color: var(--primary-c); }
+.col-tabs .icon-btn { margin: 0 .5rem; }
+.col-scroll { gap: .25rem; }
+
+
+
+/* rooms: bigger + bg image */
+.room-card { position: relative; overflow: hidden; min-height: 5rem; padding: .75rem; isolation: isolate; }
+.room-card::before { content: ''; position: absolute; inset: 0; z-index: -1; opacity: 0; transition: opacity .15s; }
+.room-card.has-bg::before {
+  opacity: 1;
+  background: linear-gradient(90deg, rgba(7,14,29,.85), rgba(7,14,29,.35)), var(--bg) center / cover no-repeat;
+}
+.room-card.has-bg:hover::before { filter: brightness(1.15); }
+.room-card.has-bg .room-card__icon { background: rgba(7,14,29,.6); }
+.room-card__icon { width: 2.5rem; height: 2.5rem; }
+.room-card__name { font-size: .9375rem; }
+.room-card__topic { font-size: 12px; }
+.room-card.has-bg .room-card__topic { color: #dce2f7; }
+
+/* server icons: bigger + bg image */
+#collective-rail { width: 4.5rem; }
+.rail__btn { width: 3rem; height: 3rem; background-size: cover; background-position: center; overflow: hidden; }
+.rail__btn.has-img:hover { filter: brightness(1.15); background-color: transparent; }
+.rail__btn.has-img.is-active { background-color: transparent; box-shadow: 0 0 0 2px var(--primary-c); }
+
+.profile-panel { display:flex; flex-direction:column; gap:16px; padding:12px; }
+.profile-card { display:flex; flex-direction:column; align-items:center; gap:4px; }
+.setting-row { display:flex; justify-content:space-between; align-items:center; padding:8px 0; }
+
+/* ornate frame card (rooms + contacts) */
+/* .frame-card {
+  --bg-base: #0c1222;
+  position: relative; isolation: isolate; overflow: visible;
+  width: 100%; min-height: 5rem; margin: .625rem 0 .875rem; padding: .75rem 1rem;
+  display: flex; align-items: center; gap: .75rem;
+  border: 2px solid transparent; border-radius: .5rem; color: #fff;
+  background:
+    linear-gradient(var(--bg-base), var(--bg-base)) padding-box,
+    linear-gradient(135deg, #b4bdd3, #3a4256 35%, #9aa5bd 60%, #2b3142) border-box;
+  box-shadow:
+    0 0 14px color-mix(in srgb, var(--accent) 45%, transparent),
+    inset 0 0 18px color-mix(in srgb, var(--accent) 35%, transparent);
+  transition: transform .18s ease, box-shadow .18s;
+} */
+/* energy fill / banner image */
+/* .frame-card::before {
+  content: ''; position: absolute; inset: 0; z-index: -1; border-radius: .3rem;
+  background:
+    radial-gradient(120% 160% at 15% 0%, color-mix(in srgb, var(--accent) 55%, var(--bg-base)), transparent 70%),
+    radial-gradient(100% 120% at 90% 100%, color-mix(in srgb, var(--accent) 30%, var(--bg-base)), transparent 65%),
+    var(--bg-base);
+  transition: filter .18s;
+} */
+/* .frame-card.has-bg::before {
+  background:
+    linear-gradient(90deg, rgba(7,14,29,.85), rgba(7,14,29,.3)),
+    var(--bg) center / cover no-repeat;
+} */
+/* inner bevel line */
+/* .frame-card::after {
+  content: ''; position: absolute; inset: 3px; border-radius: .3rem; pointer-events: none;
+  border: 1px solid color-mix(in srgb, var(--accent) 55%, transparent);
+} */
+/* .frame-card:hover { transform: translateY(-2px);
+  box-shadow: 0 0 22px color-mix(in srgb, var(--accent) 70%, transparent),
+              inset 0 0 22px color-mix(in srgb, var(--accent) 45%, transparent); }
+.frame-card:hover::before { filter: brightness(1.2); }
+.frame-card.is-active { box-shadow: 0 0 0 1px var(--accent),
+  0 0 26px color-mix(in srgb, var(--accent) 80%, transparent),
+  inset 0 0 24px color-mix(in srgb, var(--accent) 50%, transparent); } */
+
+/* top/bottom diamond gems */
+/* .fc-gem { position: absolute; left: 50%; z-index: 2; width: .75rem; height: .75rem;
+  background: var(--accent); border: 2px solid #b8c0d4; transform: translate(-50%, -50%) rotate(45deg);
+  box-shadow: 0 0 8px var(--accent); }
+.fc-gem--t { top: 0; }
+.fc-gem--b { top: 100%; } */
+
+/* rune medallion */
+/* .rune { flex: none; width: 2.5rem; height: 2.5rem; display: grid; place-items: center;
+  border-radius: 9999px; border: 2px solid #aab3c8; background: rgba(7,14,29,.75);
+  font: 700 1.125rem 'JetBrains Mono', monospace;
+  color: color-mix(in srgb, var(--accent) 40%, #fff);
+  text-shadow: 0 0 8px var(--accent); box-shadow: 0 0 10px color-mix(in srgb, var(--accent) 60%, transparent); } */
+
+/* text */
+/* .fc-name { display: block; font-size: .9375rem; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.fc-sub { display: block; font-size: 12px; color: #dce2f7; opacity: .85; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.fc-time { font: 11px 'JetBrains Mono', monospace; color: #dce2f7; }
+.frame-card .room-card__count { background: rgba(7,14,29,.7); color: #fff; }
+.frame-card .room-card__count.is-full { background: rgba(255,84,81,.35); } */
+
+/* tabs: active = ornate purple */
+.col-tab.is-active {
+  background: linear-gradient(180deg, rgba(74,47,134,.15), rgba(111,70,200,.55));
+  color: #fff; border-bottom-color: #a78bfa;
+  box-shadow: inset 0 -10px 18px -10px rgba(167,139,250,.7);
+}
+
+
+
+
+
 
 /* ===== stage ===== */
 #stage { flex: 1 1 0; min-width: 0; min-height: 0; display: flex; flex-direction: column; position: relative; background: var(--surface); container: stage / inline-size; }

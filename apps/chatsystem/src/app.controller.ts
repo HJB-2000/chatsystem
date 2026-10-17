@@ -83,7 +83,6 @@ export class AppController {
     return this.chat.getRoomMembers(id, userId);
   }
 
-  @Get('channels/:id/messages')
   @Get('rooms/:id/messages')
   messages(
     @Param('id') id: string,
@@ -94,9 +93,30 @@ export class AppController {
     return this.chat.getRoomMessages(id, userId, Number(limit) || 50, before);
   }
 
-  @Post('channels/:id/messages')
+  @Get('channels/:id/messages')
+  channelMessages(
+    @Param('id') id: string,
+    @Query('userId') userId: string,
+    @Query('limit') limit?: string,
+    @Query('before') before?: string,
+  ) {
+    return this.chat.getRoomMessages(id, userId, Number(limit) || 50, before);
+  }
+
   @Post('rooms/:id/messages')
   sendMessage(
+    @Param('id') id: string,
+    @Body() body: { senderId: string; userId?: string; message?: string; content?: string },
+  ) {
+    return this.chat.createRoomMessage(
+      id,
+      body.senderId ?? body.userId!,
+      body.message ?? body.content ?? '',
+    );
+  }
+
+  @Post('channels/:id/messages')
+  channelSendMessage(
     @Param('id') id: string,
     @Body() body: { senderId: string; userId?: string; message?: string; content?: string },
   ) {

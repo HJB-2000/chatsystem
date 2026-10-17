@@ -62,6 +62,7 @@ export class ChatService {
       roleTitle: user.roleTitle,
       currentActivity: user.currentActivity,
       subject: user.currentActivity,
+      status: user.lastPresence ?? 'offline',
     };
   }
 

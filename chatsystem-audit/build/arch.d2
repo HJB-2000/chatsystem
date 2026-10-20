@@ -1,0 +1,17 @@
+direction: down
+client: React client
+chat: "chatsystem\nREST"
+gw: "gateway\nWS"
+kafka: Kafka
+pg: PostgreSQL
+redis: Redis
+voice: "voice stub" { style.stroke-dash: 4; style.font-color: "#888"; style.stroke: "#aaa"; style.fill: "#f2f2f2" }
+scylla: "Scylla + 7 empty libs" { style.stroke-dash: 4; style.font-color: "#888"; style.stroke: "#aaa"; style.fill: "#f2f2f2" }
+client -> chat: "sends, userId (HTTP)"
+client -> gw: "id as token (WS)" { style.stroke: "#c0392b"; style.font-color: "#c0392b" }
+gw -> client: "pushes (WS)"
+chat -> pg: writes
+chat -> kafka: publishes
+kafka -> gw: delivers
+gw -> pg: reads
+gw -> redis: sets presence

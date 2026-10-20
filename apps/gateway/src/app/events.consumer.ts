@@ -20,13 +20,14 @@ export class EventsConsumer {
     const channelId = String(v?.channel_id ?? '');
     const messageId = String(v?.message_id ?? '');
     if (!channelId || !messageId) return;
-    const out = dispatch(Evt.MESSAGE_CREATE, {
+    const eventType = v.type === 'MESSAGE_EDIT' ? Evt.MESSAGE_UPDATE : v.type === 'MESSAGE_DELETE' ? Evt.MESSAGE_DELETE : Evt.MESSAGE_CREATE;
+    const out = dispatch(eventType, {
       ...v,
       channel_id: channelId,
       message_id: messageId,
       author_id: v.author_id != null ? String(v.author_id) : undefined,
     });
-    this.registry.remember(channelId, messageId, out);
+    if (eventType === Evt.MESSAGE_CREATE) this.registry.remember(channelId, messageId, out);
     this.registry.toChannel(channelId, out); // serialized once, shared
   }
 

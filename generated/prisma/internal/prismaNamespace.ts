@@ -1207,6 +1207,7 @@ export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof
 
 export const UserScalarFieldEnum = {
   userId: 'userId',
+  userTagId: 'userTagId',
   username: 'username',
   avatarUrl: 'avatarUrl',
   roleTitle: 'roleTitle',
@@ -1269,6 +1270,7 @@ export type RoleScalarFieldEnum = (typeof RoleScalarFieldEnum)[keyof typeof Role
 export const MessageScalarFieldEnum = {
   messageId: 'messageId',
   channelId: 'channelId',
+  dmChannelId: 'dmChannelId',
   authorId: 'authorId',
   content: 'content',
   embeds: 'embeds',
@@ -1313,7 +1315,8 @@ export type DirectChannelScalarFieldEnum = (typeof DirectChannelScalarFieldEnum)
 
 export const DirectChannelMemberScalarFieldEnum = {
   channelId: 'channelId',
-  userId: 'userId'
+  userId: 'userId',
+  lastReadMessageId: 'lastReadMessageId'
 } as const
 
 export type DirectChannelMemberScalarFieldEnum = (typeof DirectChannelMemberScalarFieldEnum)[keyof typeof DirectChannelMemberScalarFieldEnum]

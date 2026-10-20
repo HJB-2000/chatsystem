@@ -1,12 +1,12 @@
 import 'dotenv/config';
-import { join } from 'node:path';
 import { NestFactory } from '@nestjs/core';
+import { ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  app.useStaticAssets(join(process.cwd(), 'client'));
-  app.enableCors({ origin: true });
+  app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
+  app.enableCors({ origin: process.env.FRONTEND_ORIGIN ?? 'http://localhost:5173' });
   await app.listen(process.env.CHAT_PORT ?? process.env.PORT ?? 3000);
 }
 void bootstrap();

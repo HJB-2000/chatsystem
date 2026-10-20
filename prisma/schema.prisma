@@ -18,7 +18,8 @@ enum ChannelType {
 
 // Minimal stub. Real user table belongs to the larger project.
 model User {
-  userId          BigInt                @id @default(autoincrement()) @map("user_id")
+  userId    BigInt  @id @default(autoincrement()) @map("user_id")
+  userTagId String? @unique @map("user_tag_id")
   username        String                @unique
   avatarUrl       String?               @map("avatar_url")
   roleTitle       String?               @map("role_title")
@@ -98,24 +99,25 @@ model Role {
   @@index([guildId])
   @@map("role")
 }
-
 model Message {
   messageId   BigInt         @id @default(autoincrement()) @map("message_id")
-  channelId   BigInt         @map("channel_id")
+  channelId   BigInt?        @map("channel_id")
+  dmChannelId BigInt?        @map("dm_channel_id")
   authorId    BigInt         @map("author_id")
   content     String
   embeds      Json?
   attachments Json?
   createdAt   DateTime       @default(now()) @map("created_at")
   editedAt    DateTime?      @map("edited_at")
+
   channel     Channel?       @relation("ChannelMessages", fields: [channelId], references: [channelId], onDelete: Cascade, map: "message_channel_id_fkey")
-  dmChannel   DirectChannel? @relation("DmChannelMessages", fields: [channelId], references: [channelId], onDelete: Cascade, map: "message_dm_channel_id_fkey")
+  dmChannel   DirectChannel? @relation("DmChannelMessages", fields: [dmChannelId], references: [channelId], onDelete: Cascade, map: "message_dm_channel_id_fkey")
   author      User           @relation(fields: [authorId], references: [userId])
 
   @@index([channelId, messageId])
+  @@index([dmChannelId, messageId])
   @@map("message")
 }
-
 model Friendship {
   userId    BigInt   @map("user_id")
   friendId  BigInt   @map("friend_id")
@@ -159,6 +161,7 @@ model DirectChannel {
 model DirectChannelMember {
   channelId BigInt        @map("channel_id")
   userId    BigInt        @map("user_id")
+  lastReadMessageId BigInt? @map("last_read_message_id")
   channel   DirectChannel @relation(fields: [channelId], references: [channelId], onDelete: Cascade)
   user      User          @relation(fields: [userId], references: [userId], onDelete: Cascade)
 

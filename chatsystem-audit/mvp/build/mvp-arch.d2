@@ -1,0 +1,23 @@
+direction: down
+
+browser: "Browser\nReact SPA (static files)"
+proxy: "HTTPS proxy (nginx)\n:8443, one origin"
+auth: "Auth service\n(teammate)"
+chat: "chatsystem\nREST /api"
+gw: "gateway\nWebSocket /gateway"
+pg: "Postgres\nchat DB + auth DB"
+kafka: "Kafka\nevents"
+redis: "Redis\npresence"
+turn: "coturn (optional)\nrelay for voice" {style.stroke-dash: 4}
+
+browser -> proxy: "HTTPS + WSS"
+proxy -> auth: "/auth/*"
+proxy -> chat: "/api/*"
+proxy -> gw: "/gateway (upgrade)"
+chat -> pg: "reads/writes"
+chat -> kafka: "publishes"
+kafka -> gw: "delivers"
+gw -> redis: "stores presence"
+gw -> pg: "loads membership"
+auth -> pg: "stores users"
+browser -> turn: "relays media (if NAT)" {style.stroke-dash: 4}

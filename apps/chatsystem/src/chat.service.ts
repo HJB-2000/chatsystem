@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from './prisma.service';
 import { KafkaService } from './kafka.service';
+import { UserCheckService, parseId } from './auth-check.service';
 
 const randomCode = () => randomBytes(6).toString('base64url');
 
@@ -24,10 +25,10 @@ const TOPICS = { messages: 'messages', presence: 'presence', voice: 'voice_state
 const s = (v: bigint | number | string | null | undefined) =>
   v == null ? undefined : String(v);
 
-/** BigInt-safe shaping of a Message row for the wire. */
+/** BigInt-safe shaping of a Message row for the wire. Never include userTagId. */
 const shapeMessage = (m: any) => ({
   id: s(m.messageId),
-  channelId: s(m.channelId),
+  channelId: s(m.channelId ?? m.dmChannelId),
   senderId: s(m.authorId),
   senderName: m.author?.username ?? 'Unknown',
   avatarUrl: m.author?.avatarUrl ?? null,
@@ -41,18 +42,44 @@ export class ChatService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly kafka: KafkaService,
+    private readonly userCheck: UserCheckService,
   ) {}
 
+  // ---------- identity helpers ----------
+  /**
+   * Caller identity. Input = userTagId (secret hash from client).
+   * Output = internal numeric User.userId. 401 on fail.
+   */
+  private async uid(userTagId: string): Promise<bigint> {
+    return (await this.userCheck.requireUser(userTagId)).userId;
+  }
+
+  /** Target user (public numeric id, not the caller): 400 / 404. */
+  private async targetUser(id: string, name = 'id'): Promise<bigint> {
+    const uid = parseId(id, name);
+    const u = await this.prisma.user.findUnique({
+      where: { userId: uid },
+      select: { userId: true },
+    });
+    if (!u) throw new NotFoundException('User not found');
+    return uid;
+  }
+
   // ---------- users ----------
-  async getUsers() {
+  async getUsers(userTagId: string) {
+    const uid = await this.uid(userTagId);
     const users = await this.prisma.user.findMany({
+      where: { userId: uid },
       select: { userId: true, username: true },
     });
     return users.map((u) => ({ id: s(u.userId), name: u.username, username: u.username }));
   }
 
-  async getUser(id: string) {
-    const user = await this.prisma.user.findUnique({ where: { userId: BigInt(id) } });
+  async getUser(id: string, userTagId: string) {
+    const uid = parseId(id, 'id');
+    const callerId = await this.uid(userTagId);
+    if (uid !== callerId) throw new ForbiddenException('Cannot read another user');
+    const user = await this.prisma.user.findUnique({ where: { userId: uid } });
     if (!user) throw new NotFoundException('User not found');
     return {
       id: s(user.userId),
@@ -63,12 +90,21 @@ export class ChatService {
       currentActivity: user.currentActivity,
       subject: user.currentActivity,
       status: user.lastPresence ?? 'offline',
+      // ! userTagId intentionally omitted
     };
   }
 
-  async updateUser(id: string, data: { name?: string; roleTitle?: string; currentActivity?: string; avatarUrl?: string }) {
-    const user = await this.prisma.user.update({
-      where: { userId: BigInt(id) },
+  /** Caller must be the user being edited. */
+  async updateUser(
+    id: string,
+    userTagId: string,
+    data: { name?: string; roleTitle?: string; currentActivity?: string; avatarUrl?: string },
+  ) {
+    const callerId = await this.uid(userTagId);
+    const targetId = parseId(id, 'id');
+    if (callerId !== targetId) throw new ForbiddenException('Cannot edit another user');
+    await this.prisma.user.update({
+      where: { userId: targetId },
       data: {
         username: data.name || undefined,
         roleTitle: data.roleTitle || undefined,
@@ -76,7 +112,7 @@ export class ChatService {
         avatarUrl: data.avatarUrl || undefined,
       },
     });
-    return this.getUser(s(user.userId)!);
+    return this.getUser(String(targetId), userTagId);
   }
 
   // ---------- guilds ("collectives") ----------
@@ -87,7 +123,7 @@ export class ChatService {
       orderBy: { position: 'asc' },
       include: {
         _count: { select: { messages: true } },
-        messages: { orderBy: { messageId: 'desc' }, take: 1 },
+        messages: { orderBy: { messageId: 'desc' }, take: 1, include: { author: { select: { username: true } } } },
       },
     });
   }
@@ -111,8 +147,8 @@ export class ChatService {
     };
   }
 
-  async getCollectives(userId: string) {
-    const uid = BigInt(userId);
+  async getCollectives(userTagId: string) {
+    const uid = await this.uid(userTagId);
     const memberships = await this.prisma.member.findMany({
       where: { userId: uid },
       select: { guildId: true },
@@ -141,9 +177,9 @@ export class ChatService {
     return out;
   }
 
-  async createCollective(userId: string, name: string) {
+  async createCollective(userTagId: string, name: string) {
+    const uid = await this.uid(userTagId);
     if (!name?.trim()) throw new BadRequestException('name required');
-    const uid = BigInt(userId);
     const guild = await this.prisma.guild.create({
       data: {
         name: name.trim(),
@@ -156,21 +192,27 @@ export class ChatService {
     return { id: s(guild.guildId), name: guild.name };
   }
 
-  async getCollectiveRooms(collectiveId: string, userId: string) {
-    const gid = BigInt(collectiveId);
-    const uid = BigInt(userId);
+  async getCollectiveRooms(collectiveId: string, userTagId: string) {
+    const uid = await this.uid(userTagId);
+    const gid = parseId(collectiveId, 'collectiveId');
     const guild = await this.prisma.guild.findUnique({ where: { guildId: gid } });
     if (!guild) throw new NotFoundException('Collective not found');
     const isMember = !!(await this.prisma.member.findUnique({
       where: { guildId_userId: { guildId: gid, userId: uid } },
     }));
+    if (!isMember) throw new ForbiddenException('Not a member of this collective');
     const channels = await this.guildChannels(gid);
     return channels.map((c) => this.shapeRoom(c, guild.memberCount, isMember));
   }
 
-  async createCollectiveRoom(collectiveId: string, userId: string, data: { name: string; topic?: string; capacity?: number; icon?: string; type?: string }) {
-    const gid = BigInt(collectiveId);
-    await this.assertMember(gid, BigInt(userId));
+  async createCollectiveRoom(
+    collectiveId: string,
+    userTagId: string,
+    data: { name: string; topic?: string; capacity?: number; icon?: string; type?: string },
+  ) {
+    const uid = await this.uid(userTagId);
+    const gid = parseId(collectiveId, 'collectiveId');
+    await this.assertMember(gid, uid);
     if (!data.name?.trim()) throw new BadRequestException('name required');
     const count = await this.prisma.channel.count({ where: { guildId: gid } });
     const channel = await this.prisma.channel.create({
@@ -195,38 +237,39 @@ export class ChatService {
     if (!ok) throw new ForbiddenException('Not a member of this collective');
   }
 
-  async joinRoom(roomId: string, userId: string) {
-    const cid = BigInt(roomId);
-    const uid = BigInt(userId);
-    const channel = await this.prisma.channel.findUnique({ where: { channelId: cid } });
-    if (!channel) throw new NotFoundException('Room not found');
-    const member = await this.prisma.member.findUnique({
-      where: { guildId_userId: { guildId: channel.guildId, userId: uid } },
-    });
-    if (!member) {
-      await this.prisma.$transaction([
-        this.prisma.member.create({ data: { guildId: channel.guildId, userId: uid } }),
-        this.prisma.guild.update({
-          where: { guildId: channel.guildId },
-          data: { memberCount: { increment: 1 } },
-        }),
-      ]);
-    }
-    return { ok: true, collectiveId: s(channel.guildId) };
-  }
+  // async joinRoom(roomId: string, userTagId: string) {
+  //   const uid = await this.uid(userTagId);
+  //   const cid = parseId(roomId, 'roomId');
+  //   const channel = await this.prisma.channel.findUnique({ where: { channelId: cid } });
+  //   if (!channel) throw new NotFoundException('Room not found');
+  //   const member = await this.prisma.member.findUnique({
+  //     where: { guildId_userId: { guildId: channel.guildId, userId: uid } },
+  //   });
+  //   if (!member) {
+  //     await this.prisma.$transaction([
+  //       this.prisma.member.create({ data: { guildId: channel.guildId, userId: uid } }),
+  //       this.prisma.guild.update({
+  //         where: { guildId: channel.guildId },
+  //         data: { memberCount: { increment: 1 } },
+  //       }),
+  //     ]);
+  //   }
+  //   return { ok: true, collectiveId: s(channel.guildId) };
+  // }
 
-  async createInvite(collectiveId: string, userId: string) {
-    const gid = BigInt(collectiveId);
-    await this.assertMember(gid, BigInt(userId));
+  async createInvite(collectiveId: string, userTagId: string) {
+    const uid = await this.uid(userTagId);
+    const gid = parseId(collectiveId, 'collectiveId');
+    await this.assertMember(gid, uid);
     const invite = await this.prisma.invite.create({
-      data: { guildId: gid, code: randomCode(), createdById: BigInt(userId) },
+      data: { guildId: gid, code: randomCode(), createdById: uid },
     });
     return { token: invite.code, collectiveId: s(invite.guildId) };
   }
 
-  async joinByInvite(token: string, userId: string) {
-    const uid = BigInt(userId);
-    const invite = await this.prisma.invite.findUnique({ where: { code: token } });
+  async joinByInvite(token: string, userTagId: string) {
+    const uid = await this.uid(userTagId);
+    const invite = await this.prisma.invite.findUnique({ where: { code: String(token ?? '') } });
     if (!invite) throw new NotFoundException('Invalid invite');
     const existing = await this.prisma.member.findUnique({
       where: { guildId_userId: { guildId: invite.guildId, userId: uid } },
@@ -246,15 +289,15 @@ export class ChatService {
 
   // ---------- messages ----------
   /**
-   * Resolve a room id against BOTH channel tables. Guild channels and DM
-   * channels now share one id sequence, but an id can only live in one of them.
+   * Resolve a room id against BOTH channel tables. Missing room -> 403
+   * (same as no access) so ids can't be probed.
    */
   private async resolveChannel(cid: bigint) {
     const guildChannel = await this.prisma.channel.findUnique({ where: { channelId: cid } });
     if (guildChannel) return { kind: 'guild' as const, channel: guildChannel };
     const dmChannel = await this.prisma.directChannel.findUnique({ where: { channelId: cid } });
     if (dmChannel) return { kind: 'dm' as const, channel: dmChannel };
-    throw new NotFoundException('Room not found');
+    throw new ForbiddenException('No access');
   }
 
   /** Membership check that works for guild channels and DM channels alike. */
@@ -272,14 +315,16 @@ export class ChatService {
     return resolved;
   }
 
-  async getRoomMessages(roomId: string, userId: string, limit = 50, before?: string) {
-    const cid = BigInt(roomId);
-    await this.assertCanReadChannel(cid, BigInt(userId));
+  async getRoomMessages(roomId: string, userTagId: string, limit = 50, before?: string) {
+    const uid = await this.uid(userTagId);
+    const cid = parseId(roomId, 'roomId');
+    const beforeId = before ? parseId(before, 'before') : undefined;
+    const resolved = await this.assertCanReadChannel(cid, uid);
     const take = Math.min(Math.max(Number(limit) || 50, 1), 100);
     const messages = await this.prisma.message.findMany({
       where: {
-        channelId: cid,
-        ...(before ? { messageId: { lt: BigInt(before) } } : {}),
+        ...(resolved.kind === 'guild' ? { channelId: cid } : { dmChannelId: cid }),
+        ...(beforeId !== undefined ? { messageId: { lt: beforeId } } : {}),
       },
       orderBy: { messageId: 'desc' },
       take: take + 1,
@@ -295,23 +340,31 @@ export class ChatService {
   /** Guild channels only (used by the roster endpoint). */
   private async assertGuildChannel(channelId: bigint, userId: bigint) {
     const resolved = await this.resolveChannel(channelId);
-    if (resolved.kind !== 'guild') throw new NotFoundException('Room not found');
+    if (resolved.kind !== 'guild') throw new ForbiddenException('No access');
     await this.assertMember(resolved.channel.guildId, userId);
     return resolved.channel;
   }
 
-  /** Spec flow: validate -> persist -> publish to Kafka (key = channel_id) */
-  async createRoomMessage(roomId: string, senderId: string, content: string) {
-    const cid = BigInt(roomId);
-    const uid = BigInt(senderId);
+  /** Public entry: caller identified by userTagId. */
+  async createRoomMessage(roomId: string, userTagId: string, content: string) {
+    const uid = await this.uid(userTagId);
+    const cid = parseId(roomId, 'roomId');
+    return this.postMessage(uid, cid, content);
+  }
+
+  /** Internal: identity already verified. validate -> persist -> publish to Kafka. */
+  private async postMessage(uid: bigint, cid: bigint, content: string) {
     const text = String(content ?? '').trim();
     if (!text) throw new BadRequestException('Empty message');
     if (text.length > 4000) throw new BadRequestException('Message too long');
-    // Works for guild channels AND DM channels (the old code rejected every DM).
     const resolved = await this.assertCanReadChannel(cid, uid);
 
     const message = await this.prisma.message.create({
-      data: { channelId: cid, authorId: uid, content: text },
+      data: {
+        ...(resolved.kind === 'guild' ? { channelId: cid } : { dmChannelId: cid }),
+        authorId: uid,
+        content: text,
+      },
       include: { author: { select: { username: true, avatarUrl: true } } },
     });
 
@@ -330,19 +383,26 @@ export class ChatService {
     return shapeMessage(message);
   }
 
-  async editMessage(roomId: string, messageId: string, userId: string, content: string) {
-    const mid = BigInt(messageId);
+  async editMessage(roomId: string, messageId: string, userTagId: string, content: string) {
+    const uid = await this.uid(userTagId);
+    const cid = parseId(roomId, 'roomId');
+    const mid = parseId(messageId, 'messageId');
+    const text = String(content ?? '').trim();
+    if (!text) throw new BadRequestException('Empty message');
+    if (text.length > 4000) throw new BadRequestException('Message too long');
+
     const message = await this.prisma.message.findUnique({ where: { messageId: mid } });
-    if (!message || String(message.channelId) !== roomId)
-      throw new NotFoundException('Message not found');
-    if (message.authorId !== BigInt(userId)) throw new ForbiddenException('Cannot edit');
+    if (!message || (message.channelId ?? message.dmChannelId) !== cid) throw new NotFoundException('Message not found');
+    if (message.authorId !== uid) throw new ForbiddenException('Cannot edit');
+
     const updated = await this.prisma.message.update({
       where: { messageId: mid },
-      data: { content: String(content).trim(), editedAt: new Date() },
+      data: { content: text, editedAt: new Date() },
       include: { author: { select: { username: true, avatarUrl: true } } },
     });
-    void this.kafka.publish(TOPICS.messages, `channel:${message.channelId}`, {
-      channel_id: String(message.channelId),
+    const messageChannelId = message.channelId ?? message.dmChannelId;
+    void this.kafka.publish(TOPICS.messages, `channel:${messageChannelId}`, {
+      channel_id: String(messageChannelId),
       message_id: String(mid),
       type: 'MESSAGE_EDIT',
       content: updated.content,
@@ -351,15 +411,19 @@ export class ChatService {
     return shapeMessage(updated);
   }
 
-  async deleteMessage(roomId: string, messageId: string, userId: string) {
-    const mid = BigInt(messageId);
+  async deleteMessage(roomId: string, messageId: string, userTagId: string) {
+    const uid = await this.uid(userTagId);
+    const cid = parseId(roomId, 'roomId');
+    const mid = parseId(messageId, 'messageId');
+
     const message = await this.prisma.message.findUnique({ where: { messageId: mid } });
-    if (!message || String(message.channelId) !== roomId)
-      throw new NotFoundException('Message not found');
-    if (message.authorId !== BigInt(userId)) throw new ForbiddenException('Cannot delete');
+    if (!message || (message.channelId ?? message.dmChannelId) !== cid) throw new NotFoundException('Message not found');
+    if (message.authorId !== uid) throw new ForbiddenException('Cannot delete');
+
     await this.prisma.message.delete({ where: { messageId: mid } });
-    void this.kafka.publish(TOPICS.messages, `channel:${message.channelId}`, {
-      channel_id: String(message.channelId),
+    const messageChannelId = message.channelId ?? message.dmChannelId;
+    void this.kafka.publish(TOPICS.messages, `channel:${messageChannelId}`, {
+      channel_id: String(messageChannelId),
       message_id: String(mid),
       type: 'MESSAGE_DELETE',
       timestamp: new Date().toISOString(),
@@ -368,12 +432,23 @@ export class ChatService {
   }
 
   // ---------- roster / presence ----------
-  async getRoomMembers(roomId: string, userId: string) {
-    const cid = BigInt(roomId);
-    const channel = await this.assertGuildChannel(cid, BigInt(userId));
+  async getRoomMembers(roomId: string, userTagId: string) {
+    const uid = await this.uid(userTagId);
+    const cid = parseId(roomId, 'roomId');
+    const channel = await this.assertGuildChannel(cid, uid);
     const members = await this.prisma.member.findMany({
       where: { guildId: channel.guildId },
-      include: { user: true },
+      include: {
+        user: {
+          select: {
+            username: true,
+            avatarUrl: true,
+            roleTitle: true,
+            currentActivity: true,
+            lastPresence: true,
+          },
+        },
+      },
       orderBy: { joinedAt: 'asc' },
     });
     return members.map((m) => ({
@@ -391,8 +466,8 @@ export class ChatService {
     }));
   }
 
-  async setPresence(userId: string, status: string) {
-    const uid = BigInt(userId);
+  async setPresence(userTagId: string, status: string) {
+    const uid = await this.uid(userTagId);
     if (!['online', 'idle', 'dnd'].includes(status))
       throw new BadRequestException('bad status');
     await this.prisma.user.update({
@@ -408,22 +483,38 @@ export class ChatService {
   }
 
   // ---------- DMs (friend graph, direct channels) ----------
-  async getDirectMessages(userId: string) {
-    const uid = BigInt(userId);
+  async getDirectMessages(userTagId: string) {
+    const uid = await this.uid(userTagId);
     const friendships = await this.prisma.friendship.findMany({
       where: { userId: uid },
-      include: { friend: true },
+      include: {
+        friend: {
+          select: {
+            username: true,
+            avatarUrl: true,
+            roleTitle: true,
+            lastPresence: true,
+          },
+        },
+      },
     });
     const out = [];
     for (const f of friendships) {
-      const dm = await this.getOrCreateDm(uid, f.friendId);
+      const lo = uid < f.friendId ? uid : f.friendId;
+      const hi = uid < f.friendId ? f.friendId : uid;
+      const dm = await this.prisma.directChannel.findUnique({ where: { userA_userB: { userA: lo, userB: hi } } });
+      if (!dm) {
+        out.push({ partnerId: s(f.friendId), id: s(f.friendId), name: f.friend.username, username: f.friend.username, avatarUrl: f.friend.avatarUrl, roleTitle: f.friend.roleTitle, status: f.friend.lastPresence ?? 'offline', channelId: null, lastMessage: null, lastActiveLabel: '', unreadCount: 0 });
+        continue;
+      }
+      const readState = await this.prisma.directChannelMember.findUnique({ where: { channelId_userId: { channelId: dm.channelId, userId: uid } }, select: { lastReadMessageId: true } });
       const last = await this.prisma.message.findFirst({
-        where: { channelId: dm.channelId },
+        where: { dmChannelId: dm.channelId },
         orderBy: { messageId: 'desc' },
         include: { author: { select: { username: true } } },
       });
       const unread = await this.prisma.message.count({
-        where: { channelId: dm.channelId, authorId: { not: uid } },
+        where: { dmChannelId: dm.channelId, authorId: { not: uid }, messageId: { gt: readState?.lastReadMessageId ?? 0n } },
       });
       out.push({
         partnerId: s(f.friendId),
@@ -442,20 +533,41 @@ export class ChatService {
     return out;
   }
 
-  async getDirectMessageHistory(userId: string, partnerId: string) {
-    const dm = await this.getOrCreateDm(BigInt(userId), BigInt(partnerId));
+  async getDirectMessageHistory(userTagId: string, partnerId: string) {
+    const uid = await this.uid(userTagId);
+    const pid = await this.targetUser(partnerId, 'partnerId');
+    await this.assertFriends(uid, pid);
+    const dm = await this.getOrCreateDm(uid, pid);
     const messages = await this.prisma.message.findMany({
-      where: { channelId: dm.channelId },
+      where: { dmChannelId: dm.channelId },
       orderBy: { messageId: 'asc' },
       take: 200,
-      include: { author: { select: { username: true } } },
+      include: { author: { select: { username: true, avatarUrl: true } } },
     });
+    const last = messages.at(-1);
+    if (last) await this.markDmRead(uid, dm.channelId, last.messageId);
     return messages.map(shapeMessage);
   }
 
-  async sendDirectMessage(userId: string, partnerId: string, content: string) {
-    const dm = await this.getOrCreateDm(BigInt(userId), BigInt(partnerId));
-    return this.createRoomMessage(String(dm.channelId), userId, content);
+  async markDmRead(userTagId: string, partnerId: string) {
+    const uid = await this.uid(userTagId);
+    const pid = await this.targetUser(partnerId, 'partnerId');
+    await this.assertFriends(uid, pid);
+    const lo = uid < pid ? uid : pid;
+    const hi = uid < pid ? pid : uid;
+    const dm = await this.prisma.directChannel.findUnique({ where: { userA_userB: { userA: lo, userB: hi } } });
+    if (!dm) return { ok: true };
+    const last = await this.prisma.message.findFirst({ where: { dmChannelId: dm.channelId }, orderBy: { messageId: 'desc' }, select: { messageId: true } });
+    if (last) await this.prisma.directChannelMember.update({ where: { channelId_userId: { channelId: dm.channelId, userId: uid } }, data: { lastReadMessageId: last.messageId } });
+    return { ok: true };
+  }
+
+  async sendDirectMessage(userTagId: string, partnerId: string, content: string) {
+    const uid = await this.uid(userTagId);
+    const pid = await this.targetUser(partnerId, 'partnerId');
+    await this.assertFriends(uid, pid);
+    const dm = await this.getOrCreateDm(uid, pid);
+    return this.postMessage(uid, dm.channelId, content);
   }
 
   private async getOrCreateDm(a: bigint, b: bigint) {
@@ -466,21 +578,29 @@ export class ChatService {
       where: { userA_userB: { userA: lo, userB: hi } },
     });
     if (!dm) {
-      dm = await this.prisma.directChannel.create({ data: { userA: lo, userB: hi } });
-      await this.prisma.directChannelMember.createMany({
-        data: [
-          { channelId: dm.channelId, userId: lo },
-          { channelId: dm.channelId, userId: hi },
-        ],
-      });
+      try {
+        dm = await this.prisma.$transaction(async (tx) => {
+          const created = await tx.directChannel.create({ data: { userA: lo, userB: hi } });
+          await tx.directChannelMember.createMany({ data: [{ channelId: created.channelId, userId: lo }, { channelId: created.channelId, userId: hi }] });
+          return created;
+        });
+      } catch {
+        dm = await this.prisma.directChannel.findUniqueOrThrow({ where: { userA_userB: { userA: lo, userB: hi } } });
+      }
     }
     return dm;
   }
 
+  private async assertFriends(a: bigint, b: bigint) {
+    const friendship = await this.prisma.friendship.findUnique({ where: { userId_friendId: { userId: a, friendId: b } } });
+    if (!friendship) throw new ForbiddenException('You must be friends to use direct messages');
+  }
+
   /** add friend both ways -> creates DM channel */
-  async addFriend(userId: string, partnerId: string) {
-    const a = BigInt(userId);
-    const b = BigInt(partnerId);
+  async addFriend(userTagId: string, partnerId: string) {
+    const a = await this.uid(userTagId);
+    const b = await this.targetUser(partnerId, 'partnerId');
+    if (a === b) throw new BadRequestException('Cannot friend self');
     await this.prisma.$transaction([
       this.prisma.friendship.upsert({
         where: { userId_friendId: { userId: a, friendId: b } },
@@ -498,9 +618,9 @@ export class ChatService {
   }
 
   // ---------- voice signaling passthrough events ----------
-  async joinVoice(channelId: string, userId: string) {
-    const cid = BigInt(channelId);
-    const uid = BigInt(userId);
+  async joinVoice(channelId: string, userTagId: string) {
+    const uid = await this.uid(userTagId);
+    const cid = parseId(channelId, 'channelId');
     const channel = await this.prisma.channel.findUnique({ where: { channelId: cid } });
     if (!channel || channel.type !== 'VOICE') throw new BadRequestException('Not a voice channel');
     await this.assertMember(channel.guildId, uid);
@@ -519,9 +639,9 @@ export class ChatService {
     return { ok: true, sfu: process.env.SFU_URL ?? 'wss://sfu.local.example/stream' };
   }
 
-  async leaveVoice(channelId: string, userId: string) {
-    const cid = BigInt(channelId);
-    const uid = BigInt(userId);
+  async leaveVoice(channelId: string, userTagId: string) {
+    const uid = await this.uid(userTagId);
+    const cid = parseId(channelId, 'channelId');
     const channel = await this.prisma.channel.findUnique({ where: { channelId: cid } });
     if (!channel) throw new NotFoundException('Channel not found');
     await this.prisma.member.updateMany({

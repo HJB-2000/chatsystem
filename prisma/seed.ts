@@ -1,4 +1,5 @@
 import 'dotenv/config';
+import { randomBytes } from 'crypto';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient } from '../generated/prisma/client';
 
@@ -6,17 +7,28 @@ const prisma = new PrismaClient({
   adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL }),
 });
 
+const newTag = () => randomBytes(32).toString('hex'); // 64 hex chars
+
 const demoUsers = [
   { username: 'demo_user', roleTitle: 'Community Builder', currentActivity: 'Testing NexusCampus', avatarUrl: 'https://i.pravatar.cc/160?u=demo_user' },
   { username: 'demo_friend', roleTitle: 'Frontend Engineer', currentActivity: 'Reviewing the chat UI', avatarUrl: 'https://i.pravatar.cc/160?u=demo_friend' },
   { username: 'demo_moderator', roleTitle: 'Moderator', currentActivity: 'Online', avatarUrl: 'https://i.pravatar.cc/160?u=demo_moderator' },
 ];
 
+/**
+ * userTagId is set on create only. Re-running the seed must not rotate it.
+ * Existing rows with a NULL tag (pre-migration) get one.
+ */
 async function upsertDemoUser(user: (typeof demoUsers)[number]) {
-  return prisma.user.upsert({
+  const row = await prisma.user.upsert({
     where: { username: user.username },
     update: { ...user, lastPresence: 'online' },
-    create: { ...user, lastPresence: 'online' },
+    create: { ...user, lastPresence: 'online', userTagId: newTag() },
+  });
+  if (row.userTagId) return row;
+  return prisma.user.update({
+    where: { userId: row.userId },
+    data: { userTagId: newTag() },
   });
 }
 
@@ -102,8 +114,10 @@ async function main() {
     }
   }
 
+  // ! DEV ONLY: prints secrets so curl tests work. Remove for any shared/prod seed.
   console.log(JSON.stringify({
-    userId: demoUser.userId.toString(), username: demoUser.username, friendId: demoFriend.userId.toString(),
+    users: members.map((u) => ({ userId: u.userId.toString(), username: u.username, userTagId: u.userTagId })),
+    friendId: demoFriend.userId.toString(),
     servers: seededServers.map(({ guild, rooms }) => ({ id: guild.guildId.toString(), name: guild.name, rooms: rooms.map((room) => ({ id: room.channelId.toString(), name: room.name, type: room.type })) })),
   }, null, 2));
 }

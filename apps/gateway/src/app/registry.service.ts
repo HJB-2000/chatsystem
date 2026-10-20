@@ -45,9 +45,7 @@ export class RegistryService {
     add(s: Session) {
     let m = this.sessions.get(s.userId);
     if (!m) this.sessions.set(s.userId, (m = new Map()));
-    const first = m.size === 0;
     m.set(s.id, s);
-    if (!first) return;
     for (const [c, g] of s.channels) {
         put(this.channelUsers, c, s.userId);
         this.channelGuild.set(c, g);

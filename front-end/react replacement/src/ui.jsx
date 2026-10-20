@@ -1,11 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { emojis, placeholderUser } from './data/placeholders.js';
-import { chatApi } from './api/chatApi';
+import { chatApi, getUserTag, setUserTag } from './api/chatApi';
 import { GatewayClient } from './realtime/gatewayClient';
 
-const configuredUserId = globalThis.__NEXUS_CONFIG__?.VITE_USER_ID
-    ?? new URLSearchParams(window.location.search).get('userId');
-const emptyUser = { ...placeholderUser, id: configuredUserId ?? null, username: 'Connecting...' };
+const emptyUser = { ...placeholderUser, id: null, username: 'Connecting...' };
 
 
 
@@ -25,16 +23,16 @@ function Avatar({ user = placeholderUser, size = 40 }) {
 
 function TopBar({ user, onToggleSidebar }) {
     return <header id="topbar">
-        <div className="topbar__brand"><button className="icon-btn" aria-label="Toggle sidebar" onClick={onToggleSidebar}><Icon>menu_open</Icon></button><strong>NexusCampus</strong></div>
+        {/* <div className="topbar__brand"><button className="icon-btn" aria-label="Toggle sidebar" onClick={onToggleSidebar}><Icon>menu_open</Icon></button><strong>NexusCampus</strong></div>
         <div id="topbar-search"><Icon>search</Icon><input aria-label="Search" placeholder="Search roadmaps, rooms, security logs..." /></div>
-        <div className="topbar__actions"><button className="copilot-button"><Icon>auto_awesome</Icon><span>Copilot</span></button><button className="icon-btn" aria-label="Notifications"><Icon>notifications</Icon></button><Avatar user={user} size={32} /><div className="topbar__user"><b>{user.username}</b><span>{user.roleTitle}</span></div></div>
+        <div className="topbar__actions"><button className="copilot-button"><Icon>auto_awesome</Icon><span>Copilot</span></button><button className="icon-btn" aria-label="Notifications"><Icon>notifications</Icon></button><Avatar user={user} size={32} /><div className="topbar__user"><b>{user.username}</b><span>{user.roleTitle}</span></div></div> */}
     </header>;
 }
 
 function Sidebar({ collapsed }) {
     const links = ['Dashboard', 'AI Roadmap & Tracks', 'Notes & AI Studio', 'Live Study Rooms', 'Schedule Planner', 'SOC & Fail2ban', 'IP Blacklist & Access', 'About'];
     return <aside id="app-sidebar" className={collapsed ? 'is-collapsed' : ''}>
-        <nav><p className="nav-heading">Navigation</p>{links.map(link => <a href="#" className={link === 'Live Study Rooms' ? 'is-current' : ''} key={link}>{link}</a>)}</nav><nav><a href="#">Settings</a><a href="#">Help &amp; Docs</a></nav>
+        {/* <nav><p className="nav-heading">Navigation</p>{links.map(link => <a href="#" className={link === 'Live Study Rooms' ? 'is-current' : ''} key={link}>{link}</a>)}</nav><nav><a href="#">Settings</a><a href="#">Help &amp; Docs</a></nav> */}
     </aside>;
 }
 
@@ -321,6 +319,28 @@ function Dialog({ title, onClose, children }) {
     </div>;
 }
 
+function AuthPanel({ onAuthenticated }) {
+    const [userTagId, setUserTagId] = useState('');
+    const [error, setError] = useState('');
+    const submit = async event => {
+        event.preventDefault();
+        setError('');
+        try {
+            setUserTag(userTagId.trim());
+            await chatApi.getCollectives();
+            onAuthenticated({ ...emptyUser, id: userTagId.trim(), username: 'Connected' });
+        } catch (cause) {
+            setError(cause instanceof Error ? cause.message : 'Authentication failed');
+        }
+    };
+    return <main className="auth-panel"><form onSubmit={submit} className="auth-card">
+        <p className="eyebrow">ChatSystem</p><h1>Connect your account</h1>
+        <label>User tag ID<input value={userTagId} onChange={event => setUserTagId(event.target.value)} autoComplete="off" required /></label>
+        {error && <p className="form-error">{error}</p>}
+        <button className="btn btn--primary" type="submit">Connect</button>
+    </form></main>;
+}
+
 export function App() {
     const [collapsed, setCollapsed] = useState(false);
     const [channelsOpen, setChannelsOpen] = useState(true);
@@ -329,6 +349,7 @@ export function App() {
     const shellRef = useRef(null);
     const gatewayRef = useRef(null);
     const [user, setUser] = useState(emptyUser);
+    const [userTagId, setAuthUserTagId] = useState(getUserTag());
     const [servers, setServers] = useState([]);
     const [rooms, setRooms] = useState([]);
     const [contacts, setContacts] = useState([]);
@@ -342,6 +363,8 @@ export function App() {
     const [toast, setToast] = useState('');
     const [messages, setMessages] = useState([]);
     const [connectionStatus, setConnectionStatus] = useState('offline');
+    const roomRef = useRef(null);
+    roomRef.current = room;
 
     const notify = message => { setToast(message); window.setTimeout(() => setToast(''), 3000); };
     const addMessage = message => {
@@ -350,7 +373,7 @@ export function App() {
     const send = async message => {
     if (!room || !user.id) return;
     try {
-        const created = await chatApi.sendMessage(room.id, user.id, message);
+        const created = room.type === 'DM' ? await chatApi.sendDm(room.partnerId, message) : await chatApi.sendMessage(room.id, message);
         addMessage(created);
         notify('Message sent');
     } catch (error) {
@@ -359,15 +382,12 @@ export function App() {
     };
 
     useEffect(() => {
-    if (!configuredUserId) {
-        notify('Set VITE_USER_ID to load a backend user');
-        return undefined;
-    }
+    if (!userTagId) return undefined;
     let active = true;
-    Promise.all([chatApi.getUser(configuredUserId), chatApi.getCollectives(configuredUserId), chatApi.getContacts(configuredUserId)])
-        .then(([nextUser, nextCollectives, nextContacts]) => {
+    Promise.all([chatApi.getCollectives(), chatApi.getContacts()])
+        .then(([nextCollectives, nextContacts]) => {
             if (!active) return;
-            setUser({ ...nextUser, userTag: nextUser.userTag ?? '0000' });
+            setUser({ ...emptyUser, id: userTagId, username: 'Connected' });
             setContacts(nextContacts.map(contact => ({ ...contact, id: contact.partnerId, time: contact.lastActiveLabel ?? '', last: contact.lastMessage ?? '', unread: contact.unreadCount ?? 0 })));
             const nextServers = nextCollectives.map(collective => ({ id: collective.id, name: collective.name, image: collective.iconUrl }));
             setServers(nextServers);
@@ -377,13 +397,13 @@ export function App() {
         })
         .catch(error => notify(error instanceof Error ? error.message : 'Backend connection failed'));
     return () => { active = false; };
-    }, []);
+    }, [userTagId]);
 
     useEffect(() => {
     if (!user.id || !serverId) return undefined;
     let active = true;
     setRoom(null);
-    chatApi.getRooms(serverId, user.id)
+    chatApi.getRooms(serverId)
         .then(nextRooms => {
             if (!active) return;
             const decoratedRooms = nextRooms.map((nextRoom, index) => ({
@@ -403,7 +423,8 @@ export function App() {
     if (!user.id || !room) return undefined;
     let active = true;
     setMessages([]);
-    Promise.all([chatApi.getMessages(room.id, user.id), chatApi.getMembers(room.id, user.id)])
+    if (room.type === 'DM') return undefined;
+    Promise.all([chatApi.getMessages(room.id), chatApi.getMembers(room.id)])
         .then(([page, nextMembers]) => { if (active) { setMessages(page.items); setMembers(nextMembers); } })
         .catch(error => notify(error instanceof Error ? error.message : 'Room failed to load'));
     return () => { active = false; };
@@ -414,14 +435,22 @@ export function App() {
     const gateway = new GatewayClient();
     gatewayRef.current = gateway;
     const removeStatus = gateway.onStatus(setConnectionStatus);
-    const removeMessage = gateway.on('MESSAGE_CREATE', event => addMessage({
+    const removeMessage = gateway.on('MESSAGE_CREATE', event => {
+        if (String(event.channel_id) !== String(roomRef.current?.id)) return;
+        addMessage({
         id: String(event.message_id), channelId: String(event.channel_id), senderId: String(event.author_id),
         senderName: event.author?.username ?? 'Unknown', avatarUrl: event.author?.avatarUrl ?? null,
         message: event.content ?? '', createdAt: event.timestamp ?? new Date().toISOString(),
-    }));
+        });
+    });
+    const removeUpdate = gateway.on('MESSAGE_UPDATE', event => {
+        if (String(event.channel_id) !== String(roomRef.current?.id)) return;
+        setMessages(current => current.map(message => message.id === String(event.message_id) ? { ...message, message: event.content, editedAt: event.timestamp } : message));
+    });
+    const removeDelete = gateway.on('MESSAGE_DELETE', event => setMessages(current => current.filter(message => message.id !== String(event.message_id))));
     const removePresence = gateway.on('PRESENCE_UPDATE', event => setMembers(current => current.map(member => member.id === String(event.user_id) ? { ...member, status: event.status } : member)));
-    gateway.connect(user.id);
-    return () => { removeStatus(); removeMessage(); removePresence(); gateway.disconnect(); gatewayRef.current = null; };
+    gateway.connect(getUserTag() ?? '');
+    return () => { removeStatus(); removeMessage(); removeUpdate(); removeDelete(); removePresence(); gateway.disconnect(); gatewayRef.current = null; };
     }, [user.id]);
 
     useEffect(() => {
@@ -448,6 +477,7 @@ export function App() {
     return () => observer.disconnect();
     }, []);
 
+    if (!userTagId) return <AuthPanel onAuthenticated={nextUser => { setAuthUserTagId(getUserTag()); setUser(nextUser); }} />;
     return (
     <div className={`react-app ${collapsed ? 'sidebar-collapsed' : ''}`}>
         <TopBar user={user} onToggleSidebar={() => setCollapsed(v => !v)} />
@@ -469,7 +499,15 @@ export function App() {
                 activeRoom={room?.id}
                 onToggle={() => setChannelsOpen(false)}
                 onSelectRoom={id => setRoom(rooms.find(r => r.id === id) ?? null)}
-                onSelectContact={() => setDialog('dm')}
+                onSelectContact={async id => {
+                    const contact = contacts.find(item => item.id === id);
+                    if (!contact) return;
+                    try {
+                        const dmMessages = await chatApi.getDm(id);
+                        setMessages(dmMessages);
+                        setRoom({ id: contact.channelId ?? `dm-${id}`, name: contact.username, topic: 'Direct message', type: 'DM', partnerId: id });
+                    } catch (error) { notify(error instanceof Error ? error.message : 'Direct message failed'); }
+                }}
                 onAction={setDialog}
                 onProfile={() => setDialog('profile')}
             />

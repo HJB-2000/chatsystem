@@ -18,11 +18,11 @@ export class KafkaService implements OnModuleInit, OnModuleDestroy {
     createPartitioner: Partitioners.DefaultPartitioner,
   });
   private connected = false;
+  private connecting?: Promise<void>;
 
   async onModuleInit() {
     try {
-      await this.producer.connect();
-      this.connected = true;
+      await this.ensureConnected();
       this.log.log('producer connected');
     } catch (e) {
       this.log.warn(`Kafka unavailable: ${(e as Error).message}`);
@@ -30,8 +30,8 @@ export class KafkaService implements OnModuleInit, OnModuleDestroy {
   }
 
   async publish(topic: string, key: string, value: unknown) {
-    if (!this.connected) return false;
     try {
+      await this.ensureConnected();
       await this.producer.send({
         topic,
         messages: [{ key, value: JSON.stringify(value) }],
@@ -41,6 +41,18 @@ export class KafkaService implements OnModuleInit, OnModuleDestroy {
       this.log.warn(`publish ${topic} failed: ${(e as Error).message}`);
       return false;
     }
+  }
+
+  private async ensureConnected() {
+    if (this.connected) return;
+    if (!this.connecting) {
+      this.connecting = this.producer.connect().then(() => {
+        this.connected = true;
+      }).finally(() => {
+        this.connecting = undefined;
+      });
+    }
+    await this.connecting;
   }
 
   async onModuleDestroy() {

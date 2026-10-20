@@ -29,18 +29,21 @@ export type AggregateMessage = {
 export type MessageAvgAggregateOutputType = {
   messageId: number | null
   channelId: number | null
+  dmChannelId: number | null
   authorId: number | null
 }
 
 export type MessageSumAggregateOutputType = {
   messageId: bigint | null
   channelId: bigint | null
+  dmChannelId: bigint | null
   authorId: bigint | null
 }
 
 export type MessageMinAggregateOutputType = {
   messageId: bigint | null
   channelId: bigint | null
+  dmChannelId: bigint | null
   authorId: bigint | null
   content: string | null
   createdAt: Date | null
@@ -50,6 +53,7 @@ export type MessageMinAggregateOutputType = {
 export type MessageMaxAggregateOutputType = {
   messageId: bigint | null
   channelId: bigint | null
+  dmChannelId: bigint | null
   authorId: bigint | null
   content: string | null
   createdAt: Date | null
@@ -59,6 +63,7 @@ export type MessageMaxAggregateOutputType = {
 export type MessageCountAggregateOutputType = {
   messageId: number
   channelId: number
+  dmChannelId: number
   authorId: number
   content: number
   embeds: number
@@ -72,18 +77,21 @@ export type MessageCountAggregateOutputType = {
 export type MessageAvgAggregateInputType = {
   messageId?: true
   channelId?: true
+  dmChannelId?: true
   authorId?: true
 }
 
 export type MessageSumAggregateInputType = {
   messageId?: true
   channelId?: true
+  dmChannelId?: true
   authorId?: true
 }
 
 export type MessageMinAggregateInputType = {
   messageId?: true
   channelId?: true
+  dmChannelId?: true
   authorId?: true
   content?: true
   createdAt?: true
@@ -93,6 +101,7 @@ export type MessageMinAggregateInputType = {
 export type MessageMaxAggregateInputType = {
   messageId?: true
   channelId?: true
+  dmChannelId?: true
   authorId?: true
   content?: true
   createdAt?: true
@@ -102,6 +111,7 @@ export type MessageMaxAggregateInputType = {
 export type MessageCountAggregateInputType = {
   messageId?: true
   channelId?: true
+  dmChannelId?: true
   authorId?: true
   content?: true
   embeds?: true
@@ -199,7 +209,8 @@ export type MessageGroupByArgs<ExtArgs extends runtime.Types.Extensions.Internal
 
 export type MessageGroupByOutputType = {
   messageId: bigint
-  channelId: bigint
+  channelId: bigint | null
+  dmChannelId: bigint | null
   authorId: bigint
   content: string
   embeds: runtime.JsonValue | null
@@ -233,7 +244,8 @@ export type MessageWhereInput = {
   OR?: Prisma.MessageWhereInput[]
   NOT?: Prisma.MessageWhereInput | Prisma.MessageWhereInput[]
   messageId?: Prisma.BigIntFilter<"Message"> | bigint | number
-  channelId?: Prisma.BigIntFilter<"Message"> | bigint | number
+  channelId?: Prisma.BigIntNullableFilter<"Message"> | bigint | number | null
+  dmChannelId?: Prisma.BigIntNullableFilter<"Message"> | bigint | number | null
   authorId?: Prisma.BigIntFilter<"Message"> | bigint | number
   content?: Prisma.StringFilter<"Message"> | string
   embeds?: Prisma.JsonNullableFilter<"Message">
@@ -247,7 +259,8 @@ export type MessageWhereInput = {
 
 export type MessageOrderByWithRelationInput = {
   messageId?: Prisma.SortOrder
-  channelId?: Prisma.SortOrder
+  channelId?: Prisma.SortOrderInput | Prisma.SortOrder
+  dmChannelId?: Prisma.SortOrderInput | Prisma.SortOrder
   authorId?: Prisma.SortOrder
   content?: Prisma.SortOrder
   embeds?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -264,7 +277,8 @@ export type MessageWhereUniqueInput = Prisma.AtLeast<{
   AND?: Prisma.MessageWhereInput | Prisma.MessageWhereInput[]
   OR?: Prisma.MessageWhereInput[]
   NOT?: Prisma.MessageWhereInput | Prisma.MessageWhereInput[]
-  channelId?: Prisma.BigIntFilter<"Message"> | bigint | number
+  channelId?: Prisma.BigIntNullableFilter<"Message"> | bigint | number | null
+  dmChannelId?: Prisma.BigIntNullableFilter<"Message"> | bigint | number | null
   authorId?: Prisma.BigIntFilter<"Message"> | bigint | number
   content?: Prisma.StringFilter<"Message"> | string
   embeds?: Prisma.JsonNullableFilter<"Message">
@@ -278,7 +292,8 @@ export type MessageWhereUniqueInput = Prisma.AtLeast<{
 
 export type MessageOrderByWithAggregationInput = {
   messageId?: Prisma.SortOrder
-  channelId?: Prisma.SortOrder
+  channelId?: Prisma.SortOrderInput | Prisma.SortOrder
+  dmChannelId?: Prisma.SortOrderInput | Prisma.SortOrder
   authorId?: Prisma.SortOrder
   content?: Prisma.SortOrder
   embeds?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -297,7 +312,8 @@ export type MessageScalarWhereWithAggregatesInput = {
   OR?: Prisma.MessageScalarWhereWithAggregatesInput[]
   NOT?: Prisma.MessageScalarWhereWithAggregatesInput | Prisma.MessageScalarWhereWithAggregatesInput[]
   messageId?: Prisma.BigIntWithAggregatesFilter<"Message"> | bigint | number
-  channelId?: Prisma.BigIntWithAggregatesFilter<"Message"> | bigint | number
+  channelId?: Prisma.BigIntNullableWithAggregatesFilter<"Message"> | bigint | number | null
+  dmChannelId?: Prisma.BigIntNullableWithAggregatesFilter<"Message"> | bigint | number | null
   authorId?: Prisma.BigIntWithAggregatesFilter<"Message"> | bigint | number
   content?: Prisma.StringWithAggregatesFilter<"Message"> | string
   embeds?: Prisma.JsonNullableWithAggregatesFilter<"Message">
@@ -320,7 +336,8 @@ export type MessageCreateInput = {
 
 export type MessageUncheckedCreateInput = {
   messageId?: bigint | number
-  channelId: bigint | number
+  channelId?: bigint | number | null
+  dmChannelId?: bigint | number | null
   authorId: bigint | number
   content: string
   embeds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -343,7 +360,8 @@ export type MessageUpdateInput = {
 
 export type MessageUncheckedUpdateInput = {
   messageId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
-  channelId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  channelId?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  dmChannelId?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   authorId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   content?: Prisma.StringFieldUpdateOperationsInput | string
   embeds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -354,7 +372,8 @@ export type MessageUncheckedUpdateInput = {
 
 export type MessageCreateManyInput = {
   messageId?: bigint | number
-  channelId: bigint | number
+  channelId?: bigint | number | null
+  dmChannelId?: bigint | number | null
   authorId: bigint | number
   content: string
   embeds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -374,7 +393,8 @@ export type MessageUpdateManyMutationInput = {
 
 export type MessageUncheckedUpdateManyInput = {
   messageId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
-  channelId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  channelId?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  dmChannelId?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   authorId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   content?: Prisma.StringFieldUpdateOperationsInput | string
   embeds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -396,6 +416,7 @@ export type MessageOrderByRelationAggregateInput = {
 export type MessageCountOrderByAggregateInput = {
   messageId?: Prisma.SortOrder
   channelId?: Prisma.SortOrder
+  dmChannelId?: Prisma.SortOrder
   authorId?: Prisma.SortOrder
   content?: Prisma.SortOrder
   embeds?: Prisma.SortOrder
@@ -407,12 +428,14 @@ export type MessageCountOrderByAggregateInput = {
 export type MessageAvgOrderByAggregateInput = {
   messageId?: Prisma.SortOrder
   channelId?: Prisma.SortOrder
+  dmChannelId?: Prisma.SortOrder
   authorId?: Prisma.SortOrder
 }
 
 export type MessageMaxOrderByAggregateInput = {
   messageId?: Prisma.SortOrder
   channelId?: Prisma.SortOrder
+  dmChannelId?: Prisma.SortOrder
   authorId?: Prisma.SortOrder
   content?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -422,6 +445,7 @@ export type MessageMaxOrderByAggregateInput = {
 export type MessageMinOrderByAggregateInput = {
   messageId?: Prisma.SortOrder
   channelId?: Prisma.SortOrder
+  dmChannelId?: Prisma.SortOrder
   authorId?: Prisma.SortOrder
   content?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -431,6 +455,7 @@ export type MessageMinOrderByAggregateInput = {
 export type MessageSumOrderByAggregateInput = {
   messageId?: Prisma.SortOrder
   channelId?: Prisma.SortOrder
+  dmChannelId?: Prisma.SortOrder
   authorId?: Prisma.SortOrder
 }
 
@@ -577,7 +602,8 @@ export type MessageCreateWithoutAuthorInput = {
 
 export type MessageUncheckedCreateWithoutAuthorInput = {
   messageId?: bigint | number
-  channelId: bigint | number
+  channelId?: bigint | number | null
+  dmChannelId?: bigint | number | null
   content: string
   embeds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   attachments?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -616,7 +642,8 @@ export type MessageScalarWhereInput = {
   OR?: Prisma.MessageScalarWhereInput[]
   NOT?: Prisma.MessageScalarWhereInput | Prisma.MessageScalarWhereInput[]
   messageId?: Prisma.BigIntFilter<"Message"> | bigint | number
-  channelId?: Prisma.BigIntFilter<"Message"> | bigint | number
+  channelId?: Prisma.BigIntNullableFilter<"Message"> | bigint | number | null
+  dmChannelId?: Prisma.BigIntNullableFilter<"Message"> | bigint | number | null
   authorId?: Prisma.BigIntFilter<"Message"> | bigint | number
   content?: Prisma.StringFilter<"Message"> | string
   embeds?: Prisma.JsonNullableFilter<"Message">
@@ -638,6 +665,7 @@ export type MessageCreateWithoutChannelInput = {
 
 export type MessageUncheckedCreateWithoutChannelInput = {
   messageId?: bigint | number
+  dmChannelId?: bigint | number | null
   authorId: bigint | number
   content: string
   embeds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -685,6 +713,7 @@ export type MessageCreateWithoutDmChannelInput = {
 
 export type MessageUncheckedCreateWithoutDmChannelInput = {
   messageId?: bigint | number
+  channelId?: bigint | number | null
   authorId: bigint | number
   content: string
   embeds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -721,7 +750,8 @@ export type MessageUpdateManyWithWhereWithoutDmChannelInput = {
 
 export type MessageCreateManyAuthorInput = {
   messageId?: bigint | number
-  channelId: bigint | number
+  channelId?: bigint | number | null
+  dmChannelId?: bigint | number | null
   content: string
   embeds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   attachments?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -742,7 +772,8 @@ export type MessageUpdateWithoutAuthorInput = {
 
 export type MessageUncheckedUpdateWithoutAuthorInput = {
   messageId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
-  channelId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  channelId?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  dmChannelId?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   content?: Prisma.StringFieldUpdateOperationsInput | string
   embeds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   attachments?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -752,7 +783,8 @@ export type MessageUncheckedUpdateWithoutAuthorInput = {
 
 export type MessageUncheckedUpdateManyWithoutAuthorInput = {
   messageId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
-  channelId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  channelId?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  dmChannelId?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   content?: Prisma.StringFieldUpdateOperationsInput | string
   embeds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   attachments?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -762,6 +794,7 @@ export type MessageUncheckedUpdateManyWithoutAuthorInput = {
 
 export type MessageCreateManyChannelInput = {
   messageId?: bigint | number
+  dmChannelId?: bigint | number | null
   authorId: bigint | number
   content: string
   embeds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -783,6 +816,7 @@ export type MessageUpdateWithoutChannelInput = {
 
 export type MessageUncheckedUpdateWithoutChannelInput = {
   messageId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  dmChannelId?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   authorId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   content?: Prisma.StringFieldUpdateOperationsInput | string
   embeds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -793,6 +827,7 @@ export type MessageUncheckedUpdateWithoutChannelInput = {
 
 export type MessageUncheckedUpdateManyWithoutChannelInput = {
   messageId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  dmChannelId?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   authorId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   content?: Prisma.StringFieldUpdateOperationsInput | string
   embeds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -803,6 +838,7 @@ export type MessageUncheckedUpdateManyWithoutChannelInput = {
 
 export type MessageCreateManyDmChannelInput = {
   messageId?: bigint | number
+  channelId?: bigint | number | null
   authorId: bigint | number
   content: string
   embeds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -824,6 +860,7 @@ export type MessageUpdateWithoutDmChannelInput = {
 
 export type MessageUncheckedUpdateWithoutDmChannelInput = {
   messageId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  channelId?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   authorId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   content?: Prisma.StringFieldUpdateOperationsInput | string
   embeds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -834,6 +871,7 @@ export type MessageUncheckedUpdateWithoutDmChannelInput = {
 
 export type MessageUncheckedUpdateManyWithoutDmChannelInput = {
   messageId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  channelId?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   authorId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   content?: Prisma.StringFieldUpdateOperationsInput | string
   embeds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -847,6 +885,7 @@ export type MessageUncheckedUpdateManyWithoutDmChannelInput = {
 export type MessageSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   messageId?: boolean
   channelId?: boolean
+  dmChannelId?: boolean
   authorId?: boolean
   content?: boolean
   embeds?: boolean
@@ -861,6 +900,7 @@ export type MessageSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
 export type MessageSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   messageId?: boolean
   channelId?: boolean
+  dmChannelId?: boolean
   authorId?: boolean
   content?: boolean
   embeds?: boolean
@@ -875,6 +915,7 @@ export type MessageSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
 export type MessageSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   messageId?: boolean
   channelId?: boolean
+  dmChannelId?: boolean
   authorId?: boolean
   content?: boolean
   embeds?: boolean
@@ -889,6 +930,7 @@ export type MessageSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
 export type MessageSelectScalar = {
   messageId?: boolean
   channelId?: boolean
+  dmChannelId?: boolean
   authorId?: boolean
   content?: boolean
   embeds?: boolean
@@ -897,7 +939,7 @@ export type MessageSelectScalar = {
   editedAt?: boolean
 }
 
-export type MessageOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"messageId" | "channelId" | "authorId" | "content" | "embeds" | "attachments" | "createdAt" | "editedAt", ExtArgs["result"]["message"]>
+export type MessageOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"messageId" | "channelId" | "dmChannelId" | "authorId" | "content" | "embeds" | "attachments" | "createdAt" | "editedAt", ExtArgs["result"]["message"]>
 export type MessageInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   channel?: boolean | Prisma.Message$channelArgs<ExtArgs>
   dmChannel?: boolean | Prisma.Message$dmChannelArgs<ExtArgs>
@@ -923,7 +965,8 @@ export type $MessagePayload<ExtArgs extends runtime.Types.Extensions.InternalArg
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     messageId: bigint
-    channelId: bigint
+    channelId: bigint | null
+    dmChannelId: bigint | null
     authorId: bigint
     content: string
     embeds: runtime.JsonValue | null
@@ -1358,6 +1401,7 @@ export interface Prisma__MessageClient<T, Null = never, ExtArgs extends runtime.
 export interface MessageFieldRefs {
   readonly messageId: Prisma.FieldRef<"Message", 'BigInt'>
   readonly channelId: Prisma.FieldRef<"Message", 'BigInt'>
+  readonly dmChannelId: Prisma.FieldRef<"Message", 'BigInt'>
   readonly authorId: Prisma.FieldRef<"Message", 'BigInt'>
   readonly content: Prisma.FieldRef<"Message", 'String'>
   readonly embeds: Prisma.FieldRef<"Message", 'Json'>

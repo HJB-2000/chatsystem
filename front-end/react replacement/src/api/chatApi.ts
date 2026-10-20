@@ -1,17 +1,25 @@
 import type { Collective, Contact, Member, Message, MessagePage, Room, User } from './types';
 
-type RuntimeConfig = { VITE_API_URL?: string };
-const runtimeEnv = (globalThis as typeof globalThis & { __NEXUS_CONFIG__?: RuntimeConfig }).__NEXUS_CONFIG__ ?? {};
-const API_URL = runtimeEnv.VITE_API_URL?.replace(/\/$/, '') ?? 'http://localhost:3000';
+const API_URL = (import.meta.env.VITE_API_URL ?? 'http://localhost:3000').replace(/\/$/, '');
+const TAG_KEY = 'chatsystem.user-tag-id';
+
+export const getUserTag = () => sessionStorage.getItem(TAG_KEY);
+export const setUserTag = (tag: string | null) => tag ? sessionStorage.setItem(TAG_KEY, tag) : sessionStorage.removeItem(TAG_KEY);
 
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
+  const userTagId = getUserTag();
   const response = await fetch(`${API_URL}${path}`, {
     ...options,
-    headers: { 'Content-Type': 'application/json', ...options.headers },
+    headers: {
+      'Content-Type': 'application/json',
+      ...(userTagId ? { 'x-user-tag': userTagId } : {}),
+      ...options.headers,
+    },
   });
   const data = await response.json().catch(() => null);
   if (!response.ok) {
-    throw new Error((data as { message?: string } | null)?.message ?? `Request failed (${response.status})`);
+    const message = (data as { message?: string | string[] } | null)?.message;
+    throw new Error(Array.isArray(message) ? message.join(', ') : message ?? `Request failed (${response.status})`);
   }
   return data as T;
 }
@@ -20,13 +28,14 @@ const json = (body: unknown): RequestInit => ({ method: 'POST', body: JSON.strin
 
 export const chatApi = {
   getUser: (id: string) => request<User>(`/api/users/${encodeURIComponent(id)}`),
-  getCollectives: (userId: string) => request<Collective[]>(`/api/collectives?userId=${encodeURIComponent(userId)}`),
-  getRooms: (collectiveId: string, userId: string) => request<Room[]>(`/api/collectives/${collectiveId}/rooms?userId=${encodeURIComponent(userId)}`),
-  getContacts: (userId: string) => request<Contact[]>(`/api/dms/${userId}`),
-  getMessages: (roomId: string, userId: string, limit = 50, before?: string) => request<MessagePage>(`/api/rooms/${roomId}/messages?userId=${userId}&limit=${limit}${before ? `&before=${before}` : ''}`),
-  getMembers: (roomId: string, userId: string) => request<Member[]>(`/api/rooms/${roomId}/members?userId=${userId}`),
-  sendMessage: (roomId: string, senderId: string, message: string) => request<Message>(`/api/rooms/${roomId}/messages`, { ...json({ senderId, message }) }),
-  joinRoom: (roomId: string, userId: string) => request<{ ok: boolean }>(`/api/rooms/${roomId}/join`, { ...json({ userId }) }),
-  joinVoice: (roomId: string, userId: string) => request<{ ok: boolean; sfu: string }>(`/api/channels/${roomId}/join-voice`, { ...json({ userId }) }),
-  leaveVoice: (roomId: string, userId: string) => request<{ ok: boolean }>(`/api/channels/${roomId}/leave-voice`, { ...json({ userId }) }),
+  getCollectives: () => request<Collective[]>('/api/collectives'),
+  getRooms: (collectiveId: string) => request<Room[]>(`/api/collectives/${collectiveId}/rooms`),
+  getContacts: () => request<Contact[]>('/api/dms'),
+  getMessages: (roomId: string, limit = 50, before?: string) => request<MessagePage>(`/api/rooms/${roomId}/messages?limit=${limit}${before ? `&before=${before}` : ''}`),
+  getMembers: (roomId: string) => request<Member[]>(`/api/rooms/${roomId}/members`),
+  sendMessage: (roomId: string, message: string) => request<Message>(`/api/rooms/${roomId}/messages`, { ...json({ message }) }),
+  joinVoice: (roomId: string) => request<{ ok: boolean; sfu: string }>(`/api/channels/${roomId}/join-voice`, { ...json({}) }),
+  leaveVoice: (roomId: string) => request<{ ok: boolean }>(`/api/channels/${roomId}/leave-voice`, { ...json({}) }),
+  getDm: (partnerId: string) => request<Message[]>(`/api/dms/${partnerId}`),
+  sendDm: (partnerId: string, message: string) => request<Message>(`/api/dms/${partnerId}`, { ...json({ message }) }),
 };

@@ -1,0 +1,19 @@
+shape: sequence_diagram
+a: Client A
+chat: chatsystem
+pg: Postgres
+k: Kafka
+gw: gateway
+b: Client B
+a -> chat: "1 POST /rooms/:id/messages (senderId in body)"
+chat.n1: "Trusts senderId from the body.\nNo auth (B-01)" { style.fill: "#fdecea"; style.stroke: "#c0392b" }
+chat -> pg: 2 INSERT message
+pg -> chat: row
+chat -> k: 3 publish (fire-and-forget)
+chat.n2: "If Kafka was down at boot:\nsilently dropped (B-07)" { style.fill: "#fdecea"; style.stroke: "#c0392b" }
+chat -> a: 4 201 + message
+k -> gw: 5 consume
+gw.n3: "Edit/delete re-sent as\nMESSAGE_CREATE (B-05)" { style.fill: "#fdecea"; style.stroke: "#c0392b" }
+gw -> b: 6 MESSAGE_CREATE
+gw -> a: 6 MESSAGE_CREATE (echo)
+b.n4: "DM channel never indexed:\nnothing arrives (B-02)" { style.fill: "#fdecea"; style.stroke: "#c0392b" }

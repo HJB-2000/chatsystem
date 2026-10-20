@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { ID_RE } from './protocol';
 import { PrismaService } from './prisma.service';
 
 export interface LoadedSession {
@@ -11,26 +10,21 @@ export interface LoadedSession {
 }
 
 /**
- * Stand-in for the auth service (spec: "Gateway validates token with auth
- * service, which returns user, servers, channels").
- * Auth is upstream and trusted: token == user id.
- * Replace body of load() with an HTTP call to the real service.
+ * The gateway validates the user_tag_id issued by the auth service.
  */
 @Injectable()
 export class SessionLoader {
   constructor(private readonly prisma: PrismaService) {}
 
   async load(token: string): Promise<LoadedSession | null> {
-    if (!ID_RE.test(token)) return null;
-    const userId = BigInt(token);
-
     const user = await this.prisma.user.findUnique({
-      where: { userId },
-      select: { username: true },
+      where: { userTagId: token },
+      select: { userId: true, username: true },
     });
     if (!user) return null;
+    const userId = user.userId;
 
-    const [members, friends] = await Promise.all([
+    const [members, friends, directChannels] = await Promise.all([
       this.prisma.member.findMany({
         where: { userId },
         select: {
@@ -49,12 +43,14 @@ export class SessionLoader {
         where: { userId },
         select: { friendId: true },
       }),
+      this.prisma.directChannelMember.findMany({ where: { userId }, select: { channelId: true } }),
     ]);
 
     const channels = new Map<string, string>();
     for (const m of members)
       for (const c of m.guild.channels)
         channels.set(c.channelId.toString(), m.guildId.toString());
+    for (const c of directChannels) channels.set(c.channelId.toString(), '');
 
     return {
       userId: userId.toString(),

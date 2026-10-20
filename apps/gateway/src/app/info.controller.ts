@@ -1,9 +1,13 @@
-import { Controller, Get, Post } from '@nestjs/common';
+import { Controller, Get, Post, Req, UnauthorizedException } from '@nestjs/common';
 import { RegistryService } from './registry.service';
+import { SessionLoader } from './session-loader.service';
 
 @Controller('gateway')
 export class InfoController {
-  constructor(private readonly registry: RegistryService) {}
+  constructor(
+    private readonly registry: RegistryService,
+    private readonly loader: SessionLoader,
+  ) {}
 
   /** spec: client asks API for best gateway URL (geo/load routing goes here) */
   @Post('url')
@@ -16,7 +20,9 @@ export class InfoController {
   }
 
   @Get('stats')
-  stats() {
+  async stats(@Req() request: { headers: { 'x-user-tag'?: string } }) {
+    const userTagId = request.headers['x-user-tag'];
+    if (!userTagId || !(await this.loader.load(userTagId))) throw new UnauthorizedException();
     return this.registry.stats();
   }
 }

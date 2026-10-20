@@ -1,1 +1,10 @@
-(empty)
+node_modules/
+dist/
+generated/
+coverage/
+.env
+.env.*
+!.env.example
+*.swp
+*.zip
+*.log

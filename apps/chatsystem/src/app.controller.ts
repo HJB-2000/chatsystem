@@ -9,16 +9,12 @@ import {
   Query,
 } from '@nestjs/common';
 import { ChatService } from './chat.service';
+import { UserTag } from './user-tag.decorator';
 
-/**
- * Stateless REST API (spec: "REST API Servers (Stateless)").
- * Routes mirror client/Api.js so the front-end needs no changes.
- */
 @Controller('api')
 export class AppController {
   constructor(private readonly chat: ChatService) {}
 
-  // ---- gateway discovery ----
   @Post('gateway/url')
   @Get('gateway/url')
   gatewayUrl() {
@@ -27,168 +23,159 @@ export class AppController {
 
   // ---- users ----
   @Get('users')
-  users() {
-    return this.chat.getUsers();
+  users(@UserTag() tag: string) {
+    return this.chat.getUsers(tag);
   }
 
   @Get('users/:id')
-  user(@Param('id') id: string) {
-    return this.chat.getUser(id);
+  user(@Param('id') id: string, @UserTag() tag: string) {
+    return this.chat.getUser(id, tag);
   }
 
   @Patch('users/:id')
-  updateUser(@Param('id') id: string, @Body() body: any) {
-    return this.chat.updateUser(id, body);
+  updateUser(@Param('id') id: string, @UserTag() tag: string, @Body() body: any) {
+    return this.chat.updateUser(id, tag, body);
+  }
+
+  // ---- presence ----
+  @Patch('users/me/presence')
+  presence(@UserTag() tag: string, @Body() body: { status: string }) {
+    return this.chat.setPresence(tag, body.status);
   }
 
   // ---- guilds / collectives ----
   @Get('collectives')
-  collectives(@Query('userId') userId: string) {
-    return this.chat.getCollectives(userId);
+  collectives(@UserTag() tag: string) {
+    return this.chat.getCollectives(tag);
   }
 
   @Post('collectives')
-  createCollective(@Body() body: { userId: string; name: string }) {
-    return this.chat.createCollective(body.userId, body.name);
+  createCollective(@UserTag() tag: string, @Body() body: { name: string }) {
+    return this.chat.createCollective(tag, body.name);
   }
 
   @Get('collectives/:id/rooms')
-  rooms(@Param('id') id: string, @Query('userId') userId: string) {
-    return this.chat.getCollectiveRooms(id, userId);
+  rooms(@Param('id') id: string, @UserTag() tag: string) {
+    return this.chat.getCollectiveRooms(id, tag);
   }
 
   @Post('collectives/:id/rooms')
-  createRoom(@Param('id') id: string, @Body() body: any) {
-    return this.chat.createCollectiveRoom(id, body.userId, body);
+  createRoom(@Param('id') id: string, @UserTag() tag: string, @Body() body: any) {
+    return this.chat.createCollectiveRoom(id, tag, body);
   }
 
   @Post('collectives/:id/invites')
-  invite(@Param('id') id: string, @Body() body: { userId: string }) {
-    return this.chat.createInvite(id, body.userId);
+  invite(@Param('id') id: string, @UserTag() tag: string) {
+    return this.chat.createInvite(id, tag);
   }
 
   @Post('invites/:token/join')
-  joinInvite(@Param('token') token: string, @Body() body: { userId: string }) {
-    return this.chat.joinByInvite(token, body.userId);
+  joinInvite(@Param('token') token: string, @UserTag() tag: string) {
+    return this.chat.joinByInvite(token, tag);
   }
 
   // ---- channels / rooms ----
-  @Post('rooms/:id/join')
-  joinRoom(@Param('id') id: string, @Body() body: { userId: string }) {
-    return this.chat.joinRoom(id, body.userId);
-  }
+  // @Post('rooms/:id/join')
+  // joinRoom(@Param('id') id: string, @UserTag() tag: string) {
+  //   return this.chat.joinRoom(id, tag);
+  // }
 
   @Get('rooms/:id/members')
-  members(@Param('id') id: string, @Query('userId') userId: string) {
-    return this.chat.getRoomMembers(id, userId);
+  members(@Param('id') id: string, @UserTag() tag: string) {
+    return this.chat.getRoomMembers(id, tag);
   }
 
   @Get('rooms/:id/messages')
   messages(
     @Param('id') id: string,
-    @Query('userId') userId: string,
+    @UserTag() tag: string,
     @Query('limit') limit?: string,
     @Query('before') before?: string,
   ) {
-    return this.chat.getRoomMessages(id, userId, Number(limit) || 50, before);
+    return this.chat.getRoomMessages(id, tag, Number(limit) || 50, before);
   }
 
   @Get('channels/:id/messages')
   channelMessages(
     @Param('id') id: string,
-    @Query('userId') userId: string,
+    @UserTag() tag: string,
     @Query('limit') limit?: string,
     @Query('before') before?: string,
   ) {
-    return this.chat.getRoomMessages(id, userId, Number(limit) || 50, before);
+    return this.chat.getRoomMessages(id, tag, Number(limit) || 50, before);
   }
 
   @Post('rooms/:id/messages')
   sendMessage(
     @Param('id') id: string,
-    @Body() body: { senderId: string; userId?: string; message?: string; content?: string },
+    @UserTag() tag: string,
+    @Body() body: { message?: string; content?: string },
   ) {
-    return this.chat.createRoomMessage(
-      id,
-      body.senderId ?? body.userId!,
-      body.message ?? body.content ?? '',
-    );
+    return this.chat.createRoomMessage(id, tag, body.message ?? body.content ?? '');
   }
 
   @Post('channels/:id/messages')
   channelSendMessage(
     @Param('id') id: string,
-    @Body() body: { senderId: string; userId?: string; message?: string; content?: string },
+    @UserTag() tag: string,
+    @Body() body: { message?: string; content?: string },
   ) {
-    return this.chat.createRoomMessage(
-      id,
-      body.senderId ?? body.userId!,
-      body.message ?? body.content ?? '',
-    );
+    return this.chat.createRoomMessage(id, tag, body.message ?? body.content ?? '');
   }
 
   @Patch('rooms/:roomId/messages/:messageId')
   editMessage(
     @Param('roomId') roomId: string,
     @Param('messageId') messageId: string,
-    @Body() body: { userId: string; message: string },
+    @UserTag() tag: string,
+    @Body() body: { message: string },
   ) {
-    return this.chat.editMessage(roomId, messageId, body.userId, body.message);
+    return this.chat.editMessage(roomId, messageId, tag, body.message);
   }
 
   @Delete('rooms/:roomId/messages/:messageId')
   deleteMessage(
     @Param('roomId') roomId: string,
     @Param('messageId') messageId: string,
-    @Query('userId') userId: string,
+    @UserTag() tag: string,
   ) {
-    return this.chat.deleteMessage(roomId, messageId, userId);
+    return this.chat.deleteMessage(roomId, messageId, tag);
   }
 
   // ---- voice ----
   @Post('channels/:id/join-voice')
-  joinVoice(@Param('id') id: string, @Body() body: { userId: string }) {
-    return this.chat.joinVoice(id, body.userId);
+  joinVoice(@Param('id') id: string, @UserTag() tag: string) {
+    return this.chat.joinVoice(id, tag);
   }
 
   @Post('channels/:id/leave-voice')
-  leaveVoice(@Param('id') id: string, @Body() body: { userId: string }) {
-    return this.chat.leaveVoice(id, body.userId);
+  leaveVoice(@Param('id') id: string, @UserTag() tag: string) {
+    return this.chat.leaveVoice(id, tag);
   }
 
-  // ---- presence ----
-  @Patch('users/:id/presence')
-  presence(@Param('id') id: string, @Body() body: { status: string }) {
-    return this.chat.setPresence(id, body.status);
+  // ---- DMs (caller = header, :partnerId = public numeric id) ----
+  @Get('dms')
+  dms(@UserTag() tag: string) {
+    return this.chat.getDirectMessages(tag);
   }
 
-  // ---- DMs ----
-  @Get('dms/:userId')
-  dms(@Param('userId') userId: string) {
-    return this.chat.getDirectMessages(userId);
+  @Get('dms/:partnerId')
+  dmHistory(@UserTag() tag: string, @Param('partnerId') partnerId: string) {
+    return this.chat.getDirectMessageHistory(tag, partnerId);
   }
 
-  @Get('dms/:userId/:partnerId')
-  dmHistory(@Param('userId') userId: string, @Param('partnerId') partnerId: string) {
-    return this.chat.getDirectMessageHistory(userId, partnerId);
-  }
-
-  @Post('dms/:userId/:partnerId')
+  @Post('dms/:partnerId')
   sendDm(
-    @Param('userId') userId: string,
+    @UserTag() tag: string,
     @Param('partnerId') partnerId: string,
     @Body() body: { message: string },
   ) {
-    return this.chat.sendDirectMessage(userId, partnerId, body.message);
+    return this.chat.sendDirectMessage(tag, partnerId, body.message);
   }
 
-  @Patch('dms/:userId/:partnerId/read')
-  readDm(@Param('userId') _userId: string, @Param('partnerId') _partnerId: string) {
-    return { ok: true };
+  @Patch('dms/:partnerId/read')
+  readDm(@UserTag() tag: string, @Param('partnerId') partnerId: string) {
+    return this.chat.markDmRead(tag, partnerId);
   }
 
-  @Post('friends/:userId/:partnerId')
-  addFriend(@Param('userId') userId: string, @Param('partnerId') partnerId: string) {
-    return this.chat.addFriend(userId, partnerId);
-  }
 }

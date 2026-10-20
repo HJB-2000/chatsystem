@@ -1,0 +1,19 @@
+shape: sequence_diagram
+
+u: "React app"
+a: "Auth service\n(teammate)"
+c: "chatsystem\nREST"
+g: "gateway\nWS"
+
+u -> a: "1 POST /auth/login"
+a -> u: "2 JWT (HS256)"
+u -> c: "3 GET /api/me\nBearer JWT"
+c -> c: "4 verify, upsert user"
+c -> u: "5 200 profile"
+u -> g: "6 connect wss"
+g -> u: "7 HELLO"
+u -> g: "8 IDENTIFY token"
+g -> g: "9 verify, load rooms"
+g -> u: "10 READY"
+g -> u: "11 close 4011 at exp"
+u -> a: "12 login again"

@@ -36,6 +36,7 @@ export type UserSumAggregateOutputType = {
 
 export type UserMinAggregateOutputType = {
   userId: bigint | null
+  userTagId: string | null
   username: string | null
   avatarUrl: string | null
   roleTitle: string | null
@@ -45,6 +46,7 @@ export type UserMinAggregateOutputType = {
 
 export type UserMaxAggregateOutputType = {
   userId: bigint | null
+  userTagId: string | null
   username: string | null
   avatarUrl: string | null
   roleTitle: string | null
@@ -54,6 +56,7 @@ export type UserMaxAggregateOutputType = {
 
 export type UserCountAggregateOutputType = {
   userId: number
+  userTagId: number
   username: number
   avatarUrl: number
   roleTitle: number
@@ -73,6 +76,7 @@ export type UserSumAggregateInputType = {
 
 export type UserMinAggregateInputType = {
   userId?: true
+  userTagId?: true
   username?: true
   avatarUrl?: true
   roleTitle?: true
@@ -82,6 +86,7 @@ export type UserMinAggregateInputType = {
 
 export type UserMaxAggregateInputType = {
   userId?: true
+  userTagId?: true
   username?: true
   avatarUrl?: true
   roleTitle?: true
@@ -91,6 +96,7 @@ export type UserMaxAggregateInputType = {
 
 export type UserCountAggregateInputType = {
   userId?: true
+  userTagId?: true
   username?: true
   avatarUrl?: true
   roleTitle?: true
@@ -187,6 +193,7 @@ export type UserGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
 
 export type UserGroupByOutputType = {
   userId: bigint
+  userTagId: string | null
   username: string
   avatarUrl: string | null
   roleTitle: string | null
@@ -219,6 +226,7 @@ export type UserWhereInput = {
   OR?: Prisma.UserWhereInput[]
   NOT?: Prisma.UserWhereInput | Prisma.UserWhereInput[]
   userId?: Prisma.BigIntFilter<"User"> | bigint | number
+  userTagId?: Prisma.StringNullableFilter<"User"> | string | null
   username?: Prisma.StringFilter<"User"> | string
   avatarUrl?: Prisma.StringNullableFilter<"User"> | string | null
   roleTitle?: Prisma.StringNullableFilter<"User"> | string | null
@@ -235,6 +243,7 @@ export type UserWhereInput = {
 
 export type UserOrderByWithRelationInput = {
   userId?: Prisma.SortOrder
+  userTagId?: Prisma.SortOrderInput | Prisma.SortOrder
   username?: Prisma.SortOrder
   avatarUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   roleTitle?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -251,6 +260,7 @@ export type UserOrderByWithRelationInput = {
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
   userId?: bigint | number
+  userTagId?: string
   username?: string
   AND?: Prisma.UserWhereInput | Prisma.UserWhereInput[]
   OR?: Prisma.UserWhereInput[]
@@ -266,10 +276,11 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   friendOf?: Prisma.FriendshipListRelationFilter
   dmChannels?: Prisma.DirectChannelMemberListRelationFilter
   invitesCreated?: Prisma.InviteListRelationFilter
-}, "userId" | "username">
+}, "userId" | "userTagId" | "username">
 
 export type UserOrderByWithAggregationInput = {
   userId?: Prisma.SortOrder
+  userTagId?: Prisma.SortOrderInput | Prisma.SortOrder
   username?: Prisma.SortOrder
   avatarUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   roleTitle?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -287,6 +298,7 @@ export type UserScalarWhereWithAggregatesInput = {
   OR?: Prisma.UserScalarWhereWithAggregatesInput[]
   NOT?: Prisma.UserScalarWhereWithAggregatesInput | Prisma.UserScalarWhereWithAggregatesInput[]
   userId?: Prisma.BigIntWithAggregatesFilter<"User"> | bigint | number
+  userTagId?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   username?: Prisma.StringWithAggregatesFilter<"User"> | string
   avatarUrl?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   roleTitle?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
@@ -296,6 +308,7 @@ export type UserScalarWhereWithAggregatesInput = {
 
 export type UserCreateInput = {
   userId?: bigint | number
+  userTagId?: string | null
   username: string
   avatarUrl?: string | null
   roleTitle?: string | null
@@ -312,6 +325,7 @@ export type UserCreateInput = {
 
 export type UserUncheckedCreateInput = {
   userId?: bigint | number
+  userTagId?: string | null
   username: string
   avatarUrl?: string | null
   roleTitle?: string | null
@@ -328,6 +342,7 @@ export type UserUncheckedCreateInput = {
 
 export type UserUpdateInput = {
   userId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  userTagId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   username?: Prisma.StringFieldUpdateOperationsInput | string
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   roleTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -344,6 +359,7 @@ export type UserUpdateInput = {
 
 export type UserUncheckedUpdateInput = {
   userId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  userTagId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   username?: Prisma.StringFieldUpdateOperationsInput | string
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   roleTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -360,6 +376,7 @@ export type UserUncheckedUpdateInput = {
 
 export type UserCreateManyInput = {
   userId?: bigint | number
+  userTagId?: string | null
   username: string
   avatarUrl?: string | null
   roleTitle?: string | null
@@ -369,6 +386,7 @@ export type UserCreateManyInput = {
 
 export type UserUpdateManyMutationInput = {
   userId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  userTagId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   username?: Prisma.StringFieldUpdateOperationsInput | string
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   roleTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -378,6 +396,7 @@ export type UserUpdateManyMutationInput = {
 
 export type UserUncheckedUpdateManyInput = {
   userId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  userTagId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   username?: Prisma.StringFieldUpdateOperationsInput | string
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   roleTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -387,6 +406,7 @@ export type UserUncheckedUpdateManyInput = {
 
 export type UserCountOrderByAggregateInput = {
   userId?: Prisma.SortOrder
+  userTagId?: Prisma.SortOrder
   username?: Prisma.SortOrder
   avatarUrl?: Prisma.SortOrder
   roleTitle?: Prisma.SortOrder
@@ -400,6 +420,7 @@ export type UserAvgOrderByAggregateInput = {
 
 export type UserMaxOrderByAggregateInput = {
   userId?: Prisma.SortOrder
+  userTagId?: Prisma.SortOrder
   username?: Prisma.SortOrder
   avatarUrl?: Prisma.SortOrder
   roleTitle?: Prisma.SortOrder
@@ -409,6 +430,7 @@ export type UserMaxOrderByAggregateInput = {
 
 export type UserMinOrderByAggregateInput = {
   userId?: Prisma.SortOrder
+  userTagId?: Prisma.SortOrder
   username?: Prisma.SortOrder
   avatarUrl?: Prisma.SortOrder
   roleTitle?: Prisma.SortOrder
@@ -433,12 +455,12 @@ export type BigIntFieldUpdateOperationsInput = {
   divide?: bigint | number
 }
 
-export type StringFieldUpdateOperationsInput = {
-  set?: string
-}
-
 export type NullableStringFieldUpdateOperationsInput = {
   set?: string | null
+}
+
+export type StringFieldUpdateOperationsInput = {
+  set?: string
 }
 
 export type UserCreateNestedOneWithoutGuildsInput = {
@@ -541,6 +563,7 @@ export type UserUpdateOneRequiredWithoutDmChannelsNestedInput = {
 
 export type UserCreateWithoutGuildsInput = {
   userId?: bigint | number
+  userTagId?: string | null
   username: string
   avatarUrl?: string | null
   roleTitle?: string | null
@@ -556,6 +579,7 @@ export type UserCreateWithoutGuildsInput = {
 
 export type UserUncheckedCreateWithoutGuildsInput = {
   userId?: bigint | number
+  userTagId?: string | null
   username: string
   avatarUrl?: string | null
   roleTitle?: string | null
@@ -587,6 +611,7 @@ export type UserUpdateToOneWithWhereWithoutGuildsInput = {
 
 export type UserUpdateWithoutGuildsInput = {
   userId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  userTagId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   username?: Prisma.StringFieldUpdateOperationsInput | string
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   roleTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -602,6 +627,7 @@ export type UserUpdateWithoutGuildsInput = {
 
 export type UserUncheckedUpdateWithoutGuildsInput = {
   userId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  userTagId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   username?: Prisma.StringFieldUpdateOperationsInput | string
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   roleTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -617,6 +643,7 @@ export type UserUncheckedUpdateWithoutGuildsInput = {
 
 export type UserCreateWithoutMembersInput = {
   userId?: bigint | number
+  userTagId?: string | null
   username: string
   avatarUrl?: string | null
   roleTitle?: string | null
@@ -632,6 +659,7 @@ export type UserCreateWithoutMembersInput = {
 
 export type UserUncheckedCreateWithoutMembersInput = {
   userId?: bigint | number
+  userTagId?: string | null
   username: string
   avatarUrl?: string | null
   roleTitle?: string | null
@@ -663,6 +691,7 @@ export type UserUpdateToOneWithWhereWithoutMembersInput = {
 
 export type UserUpdateWithoutMembersInput = {
   userId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  userTagId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   username?: Prisma.StringFieldUpdateOperationsInput | string
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   roleTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -678,6 +707,7 @@ export type UserUpdateWithoutMembersInput = {
 
 export type UserUncheckedUpdateWithoutMembersInput = {
   userId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  userTagId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   username?: Prisma.StringFieldUpdateOperationsInput | string
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   roleTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -693,6 +723,7 @@ export type UserUncheckedUpdateWithoutMembersInput = {
 
 export type UserCreateWithoutMessagesInput = {
   userId?: bigint | number
+  userTagId?: string | null
   username: string
   avatarUrl?: string | null
   roleTitle?: string | null
@@ -708,6 +739,7 @@ export type UserCreateWithoutMessagesInput = {
 
 export type UserUncheckedCreateWithoutMessagesInput = {
   userId?: bigint | number
+  userTagId?: string | null
   username: string
   avatarUrl?: string | null
   roleTitle?: string | null
@@ -739,6 +771,7 @@ export type UserUpdateToOneWithWhereWithoutMessagesInput = {
 
 export type UserUpdateWithoutMessagesInput = {
   userId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  userTagId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   username?: Prisma.StringFieldUpdateOperationsInput | string
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   roleTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -754,6 +787,7 @@ export type UserUpdateWithoutMessagesInput = {
 
 export type UserUncheckedUpdateWithoutMessagesInput = {
   userId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  userTagId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   username?: Prisma.StringFieldUpdateOperationsInput | string
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   roleTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -769,6 +803,7 @@ export type UserUncheckedUpdateWithoutMessagesInput = {
 
 export type UserCreateWithoutFriendshipsInput = {
   userId?: bigint | number
+  userTagId?: string | null
   username: string
   avatarUrl?: string | null
   roleTitle?: string | null
@@ -784,6 +819,7 @@ export type UserCreateWithoutFriendshipsInput = {
 
 export type UserUncheckedCreateWithoutFriendshipsInput = {
   userId?: bigint | number
+  userTagId?: string | null
   username: string
   avatarUrl?: string | null
   roleTitle?: string | null
@@ -804,6 +840,7 @@ export type UserCreateOrConnectWithoutFriendshipsInput = {
 
 export type UserCreateWithoutFriendOfInput = {
   userId?: bigint | number
+  userTagId?: string | null
   username: string
   avatarUrl?: string | null
   roleTitle?: string | null
@@ -819,6 +856,7 @@ export type UserCreateWithoutFriendOfInput = {
 
 export type UserUncheckedCreateWithoutFriendOfInput = {
   userId?: bigint | number
+  userTagId?: string | null
   username: string
   avatarUrl?: string | null
   roleTitle?: string | null
@@ -850,6 +888,7 @@ export type UserUpdateToOneWithWhereWithoutFriendshipsInput = {
 
 export type UserUpdateWithoutFriendshipsInput = {
   userId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  userTagId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   username?: Prisma.StringFieldUpdateOperationsInput | string
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   roleTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -865,6 +904,7 @@ export type UserUpdateWithoutFriendshipsInput = {
 
 export type UserUncheckedUpdateWithoutFriendshipsInput = {
   userId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  userTagId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   username?: Prisma.StringFieldUpdateOperationsInput | string
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   roleTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -891,6 +931,7 @@ export type UserUpdateToOneWithWhereWithoutFriendOfInput = {
 
 export type UserUpdateWithoutFriendOfInput = {
   userId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  userTagId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   username?: Prisma.StringFieldUpdateOperationsInput | string
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   roleTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -906,6 +947,7 @@ export type UserUpdateWithoutFriendOfInput = {
 
 export type UserUncheckedUpdateWithoutFriendOfInput = {
   userId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  userTagId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   username?: Prisma.StringFieldUpdateOperationsInput | string
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   roleTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -921,6 +963,7 @@ export type UserUncheckedUpdateWithoutFriendOfInput = {
 
 export type UserCreateWithoutInvitesCreatedInput = {
   userId?: bigint | number
+  userTagId?: string | null
   username: string
   avatarUrl?: string | null
   roleTitle?: string | null
@@ -936,6 +979,7 @@ export type UserCreateWithoutInvitesCreatedInput = {
 
 export type UserUncheckedCreateWithoutInvitesCreatedInput = {
   userId?: bigint | number
+  userTagId?: string | null
   username: string
   avatarUrl?: string | null
   roleTitle?: string | null
@@ -967,6 +1011,7 @@ export type UserUpdateToOneWithWhereWithoutInvitesCreatedInput = {
 
 export type UserUpdateWithoutInvitesCreatedInput = {
   userId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  userTagId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   username?: Prisma.StringFieldUpdateOperationsInput | string
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   roleTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -982,6 +1027,7 @@ export type UserUpdateWithoutInvitesCreatedInput = {
 
 export type UserUncheckedUpdateWithoutInvitesCreatedInput = {
   userId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  userTagId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   username?: Prisma.StringFieldUpdateOperationsInput | string
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   roleTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -997,6 +1043,7 @@ export type UserUncheckedUpdateWithoutInvitesCreatedInput = {
 
 export type UserCreateWithoutDmChannelsInput = {
   userId?: bigint | number
+  userTagId?: string | null
   username: string
   avatarUrl?: string | null
   roleTitle?: string | null
@@ -1012,6 +1059,7 @@ export type UserCreateWithoutDmChannelsInput = {
 
 export type UserUncheckedCreateWithoutDmChannelsInput = {
   userId?: bigint | number
+  userTagId?: string | null
   username: string
   avatarUrl?: string | null
   roleTitle?: string | null
@@ -1043,6 +1091,7 @@ export type UserUpdateToOneWithWhereWithoutDmChannelsInput = {
 
 export type UserUpdateWithoutDmChannelsInput = {
   userId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  userTagId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   username?: Prisma.StringFieldUpdateOperationsInput | string
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   roleTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1058,6 +1107,7 @@ export type UserUpdateWithoutDmChannelsInput = {
 
 export type UserUncheckedUpdateWithoutDmChannelsInput = {
   userId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  userTagId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   username?: Prisma.StringFieldUpdateOperationsInput | string
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   roleTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1158,6 +1208,7 @@ export type UserCountOutputTypeCountInvitesCreatedArgs<ExtArgs extends runtime.T
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   userId?: boolean
+  userTagId?: boolean
   username?: boolean
   avatarUrl?: boolean
   roleTitle?: boolean
@@ -1175,6 +1226,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
 
 export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   userId?: boolean
+  userTagId?: boolean
   username?: boolean
   avatarUrl?: boolean
   roleTitle?: boolean
@@ -1184,6 +1236,7 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
 
 export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   userId?: boolean
+  userTagId?: boolean
   username?: boolean
   avatarUrl?: boolean
   roleTitle?: boolean
@@ -1193,6 +1246,7 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
 
 export type UserSelectScalar = {
   userId?: boolean
+  userTagId?: boolean
   username?: boolean
   avatarUrl?: boolean
   roleTitle?: boolean
@@ -1200,7 +1254,7 @@ export type UserSelectScalar = {
   lastPresence?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"userId" | "username" | "avatarUrl" | "roleTitle" | "currentActivity" | "lastPresence", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"userId" | "userTagId" | "username" | "avatarUrl" | "roleTitle" | "currentActivity" | "lastPresence", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   guilds?: boolean | Prisma.User$guildsArgs<ExtArgs>
   members?: boolean | Prisma.User$membersArgs<ExtArgs>
@@ -1227,6 +1281,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     userId: bigint
+    userTagId: string | null
     username: string
     avatarUrl: string | null
     roleTitle: string | null
@@ -1663,6 +1718,7 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
  */
 export interface UserFieldRefs {
   readonly userId: Prisma.FieldRef<"User", 'BigInt'>
+  readonly userTagId: Prisma.FieldRef<"User", 'String'>
   readonly username: Prisma.FieldRef<"User", 'String'>
   readonly avatarUrl: Prisma.FieldRef<"User", 'String'>
   readonly roleTitle: Prisma.FieldRef<"User", 'String'>

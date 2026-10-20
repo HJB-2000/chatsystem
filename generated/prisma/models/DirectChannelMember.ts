@@ -29,26 +29,31 @@ export type AggregateDirectChannelMember = {
 export type DirectChannelMemberAvgAggregateOutputType = {
   channelId: number | null
   userId: number | null
+  lastReadMessageId: number | null
 }
 
 export type DirectChannelMemberSumAggregateOutputType = {
   channelId: bigint | null
   userId: bigint | null
+  lastReadMessageId: bigint | null
 }
 
 export type DirectChannelMemberMinAggregateOutputType = {
   channelId: bigint | null
   userId: bigint | null
+  lastReadMessageId: bigint | null
 }
 
 export type DirectChannelMemberMaxAggregateOutputType = {
   channelId: bigint | null
   userId: bigint | null
+  lastReadMessageId: bigint | null
 }
 
 export type DirectChannelMemberCountAggregateOutputType = {
   channelId: number
   userId: number
+  lastReadMessageId: number
   _all: number
 }
 
@@ -56,26 +61,31 @@ export type DirectChannelMemberCountAggregateOutputType = {
 export type DirectChannelMemberAvgAggregateInputType = {
   channelId?: true
   userId?: true
+  lastReadMessageId?: true
 }
 
 export type DirectChannelMemberSumAggregateInputType = {
   channelId?: true
   userId?: true
+  lastReadMessageId?: true
 }
 
 export type DirectChannelMemberMinAggregateInputType = {
   channelId?: true
   userId?: true
+  lastReadMessageId?: true
 }
 
 export type DirectChannelMemberMaxAggregateInputType = {
   channelId?: true
   userId?: true
+  lastReadMessageId?: true
 }
 
 export type DirectChannelMemberCountAggregateInputType = {
   channelId?: true
   userId?: true
+  lastReadMessageId?: true
   _all?: true
 }
 
@@ -168,6 +178,7 @@ export type DirectChannelMemberGroupByArgs<ExtArgs extends runtime.Types.Extensi
 export type DirectChannelMemberGroupByOutputType = {
   channelId: bigint
   userId: bigint
+  lastReadMessageId: bigint | null
   _count: DirectChannelMemberCountAggregateOutputType | null
   _avg: DirectChannelMemberAvgAggregateOutputType | null
   _sum: DirectChannelMemberSumAggregateOutputType | null
@@ -196,6 +207,7 @@ export type DirectChannelMemberWhereInput = {
   NOT?: Prisma.DirectChannelMemberWhereInput | Prisma.DirectChannelMemberWhereInput[]
   channelId?: Prisma.BigIntFilter<"DirectChannelMember"> | bigint | number
   userId?: Prisma.BigIntFilter<"DirectChannelMember"> | bigint | number
+  lastReadMessageId?: Prisma.BigIntNullableFilter<"DirectChannelMember"> | bigint | number | null
   channel?: Prisma.XOR<Prisma.DirectChannelScalarRelationFilter, Prisma.DirectChannelWhereInput>
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }
@@ -203,6 +215,7 @@ export type DirectChannelMemberWhereInput = {
 export type DirectChannelMemberOrderByWithRelationInput = {
   channelId?: Prisma.SortOrder
   userId?: Prisma.SortOrder
+  lastReadMessageId?: Prisma.SortOrderInput | Prisma.SortOrder
   channel?: Prisma.DirectChannelOrderByWithRelationInput
   user?: Prisma.UserOrderByWithRelationInput
 }
@@ -214,6 +227,7 @@ export type DirectChannelMemberWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.DirectChannelMemberWhereInput | Prisma.DirectChannelMemberWhereInput[]
   channelId?: Prisma.BigIntFilter<"DirectChannelMember"> | bigint | number
   userId?: Prisma.BigIntFilter<"DirectChannelMember"> | bigint | number
+  lastReadMessageId?: Prisma.BigIntNullableFilter<"DirectChannelMember"> | bigint | number | null
   channel?: Prisma.XOR<Prisma.DirectChannelScalarRelationFilter, Prisma.DirectChannelWhereInput>
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }, "channelId_userId">
@@ -221,6 +235,7 @@ export type DirectChannelMemberWhereUniqueInput = Prisma.AtLeast<{
 export type DirectChannelMemberOrderByWithAggregationInput = {
   channelId?: Prisma.SortOrder
   userId?: Prisma.SortOrder
+  lastReadMessageId?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.DirectChannelMemberCountOrderByAggregateInput
   _avg?: Prisma.DirectChannelMemberAvgOrderByAggregateInput
   _max?: Prisma.DirectChannelMemberMaxOrderByAggregateInput
@@ -234,9 +249,11 @@ export type DirectChannelMemberScalarWhereWithAggregatesInput = {
   NOT?: Prisma.DirectChannelMemberScalarWhereWithAggregatesInput | Prisma.DirectChannelMemberScalarWhereWithAggregatesInput[]
   channelId?: Prisma.BigIntWithAggregatesFilter<"DirectChannelMember"> | bigint | number
   userId?: Prisma.BigIntWithAggregatesFilter<"DirectChannelMember"> | bigint | number
+  lastReadMessageId?: Prisma.BigIntNullableWithAggregatesFilter<"DirectChannelMember"> | bigint | number | null
 }
 
 export type DirectChannelMemberCreateInput = {
+  lastReadMessageId?: bigint | number | null
   channel: Prisma.DirectChannelCreateNestedOneWithoutMembersInput
   user: Prisma.UserCreateNestedOneWithoutDmChannelsInput
 }
@@ -244,9 +261,11 @@ export type DirectChannelMemberCreateInput = {
 export type DirectChannelMemberUncheckedCreateInput = {
   channelId: bigint | number
   userId: bigint | number
+  lastReadMessageId?: bigint | number | null
 }
 
 export type DirectChannelMemberUpdateInput = {
+  lastReadMessageId?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   channel?: Prisma.DirectChannelUpdateOneRequiredWithoutMembersNestedInput
   user?: Prisma.UserUpdateOneRequiredWithoutDmChannelsNestedInput
 }
@@ -254,20 +273,23 @@ export type DirectChannelMemberUpdateInput = {
 export type DirectChannelMemberUncheckedUpdateInput = {
   channelId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   userId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  lastReadMessageId?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
 }
 
 export type DirectChannelMemberCreateManyInput = {
   channelId: bigint | number
   userId: bigint | number
+  lastReadMessageId?: bigint | number | null
 }
 
 export type DirectChannelMemberUpdateManyMutationInput = {
-
+  lastReadMessageId?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
 }
 
 export type DirectChannelMemberUncheckedUpdateManyInput = {
   channelId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   userId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  lastReadMessageId?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
 }
 
 export type DirectChannelMemberListRelationFilter = {
@@ -288,26 +310,31 @@ export type DirectChannelMemberChannelIdUserIdCompoundUniqueInput = {
 export type DirectChannelMemberCountOrderByAggregateInput = {
   channelId?: Prisma.SortOrder
   userId?: Prisma.SortOrder
+  lastReadMessageId?: Prisma.SortOrder
 }
 
 export type DirectChannelMemberAvgOrderByAggregateInput = {
   channelId?: Prisma.SortOrder
   userId?: Prisma.SortOrder
+  lastReadMessageId?: Prisma.SortOrder
 }
 
 export type DirectChannelMemberMaxOrderByAggregateInput = {
   channelId?: Prisma.SortOrder
   userId?: Prisma.SortOrder
+  lastReadMessageId?: Prisma.SortOrder
 }
 
 export type DirectChannelMemberMinOrderByAggregateInput = {
   channelId?: Prisma.SortOrder
   userId?: Prisma.SortOrder
+  lastReadMessageId?: Prisma.SortOrder
 }
 
 export type DirectChannelMemberSumOrderByAggregateInput = {
   channelId?: Prisma.SortOrder
   userId?: Prisma.SortOrder
+  lastReadMessageId?: Prisma.SortOrder
 }
 
 export type DirectChannelMemberCreateNestedManyWithoutUserInput = {
@@ -395,11 +422,13 @@ export type DirectChannelMemberUncheckedUpdateManyWithoutChannelNestedInput = {
 }
 
 export type DirectChannelMemberCreateWithoutUserInput = {
+  lastReadMessageId?: bigint | number | null
   channel: Prisma.DirectChannelCreateNestedOneWithoutMembersInput
 }
 
 export type DirectChannelMemberUncheckedCreateWithoutUserInput = {
   channelId: bigint | number
+  lastReadMessageId?: bigint | number | null
 }
 
 export type DirectChannelMemberCreateOrConnectWithoutUserInput = {
@@ -434,14 +463,17 @@ export type DirectChannelMemberScalarWhereInput = {
   NOT?: Prisma.DirectChannelMemberScalarWhereInput | Prisma.DirectChannelMemberScalarWhereInput[]
   channelId?: Prisma.BigIntFilter<"DirectChannelMember"> | bigint | number
   userId?: Prisma.BigIntFilter<"DirectChannelMember"> | bigint | number
+  lastReadMessageId?: Prisma.BigIntNullableFilter<"DirectChannelMember"> | bigint | number | null
 }
 
 export type DirectChannelMemberCreateWithoutChannelInput = {
+  lastReadMessageId?: bigint | number | null
   user: Prisma.UserCreateNestedOneWithoutDmChannelsInput
 }
 
 export type DirectChannelMemberUncheckedCreateWithoutChannelInput = {
   userId: bigint | number
+  lastReadMessageId?: bigint | number | null
 }
 
 export type DirectChannelMemberCreateOrConnectWithoutChannelInput = {
@@ -472,34 +504,42 @@ export type DirectChannelMemberUpdateManyWithWhereWithoutChannelInput = {
 
 export type DirectChannelMemberCreateManyUserInput = {
   channelId: bigint | number
+  lastReadMessageId?: bigint | number | null
 }
 
 export type DirectChannelMemberUpdateWithoutUserInput = {
+  lastReadMessageId?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   channel?: Prisma.DirectChannelUpdateOneRequiredWithoutMembersNestedInput
 }
 
 export type DirectChannelMemberUncheckedUpdateWithoutUserInput = {
   channelId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  lastReadMessageId?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
 }
 
 export type DirectChannelMemberUncheckedUpdateManyWithoutUserInput = {
   channelId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  lastReadMessageId?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
 }
 
 export type DirectChannelMemberCreateManyChannelInput = {
   userId: bigint | number
+  lastReadMessageId?: bigint | number | null
 }
 
 export type DirectChannelMemberUpdateWithoutChannelInput = {
+  lastReadMessageId?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   user?: Prisma.UserUpdateOneRequiredWithoutDmChannelsNestedInput
 }
 
 export type DirectChannelMemberUncheckedUpdateWithoutChannelInput = {
   userId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  lastReadMessageId?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
 }
 
 export type DirectChannelMemberUncheckedUpdateManyWithoutChannelInput = {
   userId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  lastReadMessageId?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
 }
 
 
@@ -507,6 +547,7 @@ export type DirectChannelMemberUncheckedUpdateManyWithoutChannelInput = {
 export type DirectChannelMemberSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   channelId?: boolean
   userId?: boolean
+  lastReadMessageId?: boolean
   channel?: boolean | Prisma.DirectChannelDefaultArgs<ExtArgs>
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["directChannelMember"]>
@@ -514,6 +555,7 @@ export type DirectChannelMemberSelect<ExtArgs extends runtime.Types.Extensions.I
 export type DirectChannelMemberSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   channelId?: boolean
   userId?: boolean
+  lastReadMessageId?: boolean
   channel?: boolean | Prisma.DirectChannelDefaultArgs<ExtArgs>
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["directChannelMember"]>
@@ -521,6 +563,7 @@ export type DirectChannelMemberSelectCreateManyAndReturn<ExtArgs extends runtime
 export type DirectChannelMemberSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   channelId?: boolean
   userId?: boolean
+  lastReadMessageId?: boolean
   channel?: boolean | Prisma.DirectChannelDefaultArgs<ExtArgs>
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["directChannelMember"]>
@@ -528,9 +571,10 @@ export type DirectChannelMemberSelectUpdateManyAndReturn<ExtArgs extends runtime
 export type DirectChannelMemberSelectScalar = {
   channelId?: boolean
   userId?: boolean
+  lastReadMessageId?: boolean
 }
 
-export type DirectChannelMemberOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"channelId" | "userId", ExtArgs["result"]["directChannelMember"]>
+export type DirectChannelMemberOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"channelId" | "userId" | "lastReadMessageId", ExtArgs["result"]["directChannelMember"]>
 export type DirectChannelMemberInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   channel?: boolean | Prisma.DirectChannelDefaultArgs<ExtArgs>
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -553,6 +597,7 @@ export type $DirectChannelMemberPayload<ExtArgs extends runtime.Types.Extensions
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     channelId: bigint
     userId: bigint
+    lastReadMessageId: bigint | null
   }, ExtArgs["result"]["directChannelMember"]>
   composites: {}
 }
@@ -980,6 +1025,7 @@ export interface Prisma__DirectChannelMemberClient<T, Null = never, ExtArgs exte
 export interface DirectChannelMemberFieldRefs {
   readonly channelId: Prisma.FieldRef<"DirectChannelMember", 'BigInt'>
   readonly userId: Prisma.FieldRef<"DirectChannelMember", 'BigInt'>
+  readonly lastReadMessageId: Prisma.FieldRef<"DirectChannelMember", 'BigInt'>
 }
     
 

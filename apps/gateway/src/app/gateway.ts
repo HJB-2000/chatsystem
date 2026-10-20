@@ -101,7 +101,12 @@ export class MyGateway
   private async onMessage(conn: Conn, raw: RawData) {
     let msg: { op?: number; d?: any } | null;
     try {
-      msg = JSON.parse(raw.toString());
+      const text = typeof raw === 'string'
+        ? raw
+        : Array.isArray(raw)
+          ? Buffer.concat(raw).toString()
+          : Buffer.from(raw).toString();
+      msg = JSON.parse(text);
     } catch {
       conn.ws.close(Close.DECODE, 'decode error');
       return;
@@ -145,7 +150,7 @@ export class MyGateway
     clearTimeout(conn.identifyTimer);
 
     try {
-      const state = await this.loader.load(String(d?.token ?? ''));
+      const state = await this.loader.load(String(d?.user_tag_id ?? ''));
       if (!state) {
         conn.ws.close(Close.AUTH_FAILED, 'authentication failed');
         return;

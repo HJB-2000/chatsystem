@@ -1,0 +1,11 @@
+direction: down
+client: React client
+app: "One Nest app\nREST + WS (JWT)"
+pg: PostgreSQL
+mem: "In-memory\nsockets, presence"
+redis: "Redis pub/sub\nonly if 2+ instances" { style.stroke-dash: 4; style.font-color: "#888"; style.stroke: "#aaa" }
+client -> app: "logs in, sends (HTTPS)"
+app -> client: "pushes (WS)"
+app -> pg: "reads, writes"
+app -> mem: "tracks"
+app -> redis: "fans out (later)" { style.stroke-dash: 4 }

@@ -1,0 +1,18 @@
+shape: sequence_diagram
+
+a: "Alice (in room)"
+g: "gateway"
+b: "Bob (joining)"
+
+b -> g: "1 VOICE_JOIN channel"
+g -> b: "2 VOICE_PEERS [Alice]"
+g -> a: "3 VOICE_PEER_JOIN Bob"
+b -> g: "4 VOICE_SIGNAL offer to Alice"
+g -> a: "5 VOICE_SIGNAL offer from Bob"
+a -> g: "6 VOICE_SIGNAL answer to Bob"
+g -> b: "7 VOICE_SIGNAL answer from Alice"
+b -> g: "8 VOICE_SIGNAL ice"
+g -> a: "9 VOICE_SIGNAL ice"
+a -> b: "10 audio over WebRTC (P2P)"
+b -> g: "11 VOICE_LEAVE"
+g -> a: "12 VOICE_PEER_LEAVE Bob"

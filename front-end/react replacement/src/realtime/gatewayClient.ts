@@ -1,8 +1,7 @@
-import { getUserTag } from '../api/chatApi';
+import { chatApi ,getUserTag } from '../api/chatApi';
 
 export type GatewayEvent = { op: number; t?: string; d?: any };
 type EventHandler = (data: any) => void;
-const gatewayUrl = import.meta.env.VITE_GATEWAY_URL ?? 'ws://localhost:3001/gateway';
 
 export class GatewayClient {
   private socket: WebSocket | null = null;
@@ -28,14 +27,45 @@ export class GatewayClient {
   sendTyping(channelId: string) { this.send({ op: 8, d: { channel_id: channelId } }); }
   acknowledge(channelId: string, messageId: string) { this.send({ op: 11, d: { channel_id: channelId, last_message_id: messageId } }); }
 
-  private open() {
-    this.clearTimers(); this.setStatus('connecting');
-    const socket = new WebSocket(gatewayUrl); this.socket = socket;
+  private async open() {
+  this.clearTimers();
+  this.setStatus('connecting');
+
+  try {
+    const { url } = await chatApi.getGatewayUrl();
+    if (this.manuallyClosed) return;
+
+    const socket = new WebSocket(url);
+    this.socket = socket;
+
     socket.onopen = () => this.setStatus('identifying');
-    socket.onmessage = event => { try { this.handleMessage(JSON.parse(String(event.data)) as GatewayEvent); } catch { socket.close(4002, 'decode error'); } };
+
+    socket.onmessage = event => {
+      try {
+        this.handleMessage(JSON.parse(String(event.data)) as GatewayEvent);
+      } catch {
+        socket.close(4002, 'decode error');
+      }
+    };
+
     socket.onerror = () => this.setStatus('error');
-    socket.onclose = event => { this.clearTimers(); this.socket = null; if (!this.manuallyClosed && event.code !== 4004) this.scheduleReconnect(); };
+
+    socket.onclose = event => {
+      this.clearTimers();
+      if (this.socket === socket) this.socket = null;
+
+      if (!this.manuallyClosed && event.code !== 4004) {
+        this.scheduleReconnect();
+      }
+    };
+  } catch (error) {
+    console.error('Failed to connect to gateway:', error);
+
+    if (!this.manuallyClosed) {
+      this.scheduleReconnect();
+    }
   }
+}
 
   private handleMessage(frame: GatewayEvent) {
     if (frame.op === 10) {

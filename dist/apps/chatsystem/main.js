@@ -48,7 +48,10 @@ function _ts_param(paramIndex, decorator) {
 
 
 class AppController {
-    gatewayUrl() {
+    gatewayUrlGet() {
+        return this.chat.gatewayUrl();
+    }
+    gatewayUrlPost() {
         return this.chat.gatewayUrl();
     }
     // ---- users ----
@@ -136,12 +139,17 @@ class AppController {
     }
 }
 _ts_decorate([
-    (0,_nestjs_common__rspack_import_0.Post)('gateway/url'),
     (0,_nestjs_common__rspack_import_0.Get)('gateway/url'),
     _ts_metadata("design:type", Function),
     _ts_metadata("design:paramtypes", []),
     _ts_metadata("design:returntype", void 0)
-], AppController.prototype, "gatewayUrl", null);
+], AppController.prototype, "gatewayUrlGet", null);
+_ts_decorate([
+    (0,_nestjs_common__rspack_import_0.Post)('gateway/url'),
+    _ts_metadata("design:type", Function),
+    _ts_metadata("design:paramtypes", []),
+    _ts_metadata("design:returntype", void 0)
+], AppController.prototype, "gatewayUrlPost", null);
 _ts_decorate([
     (0,_nestjs_common__rspack_import_0.Get)('users'),
     _ts_param(0, (0,_user_tag_decorator__rspack_import_2.UserTag)()),

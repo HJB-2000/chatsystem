@@ -15,12 +15,15 @@ import { UserTag } from './user-tag.decorator';
 export class AppController {
   constructor(private readonly chat: ChatService) {}
 
-  @Post('gateway/url')
   @Get('gateway/url')
-  gatewayUrl() {
+  gatewayUrlGet() {
     return this.chat.gatewayUrl();
   }
 
+  @Post('gateway/url')
+  gatewayUrlPost() {
+    return this.chat.gatewayUrl();
+  }
   // ---- users ----
   @Get('users')
   users(@UserTag() tag: string) {

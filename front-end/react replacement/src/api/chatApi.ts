@@ -27,6 +27,7 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
 const json = (body: unknown): RequestInit => ({ method: 'POST', body: JSON.stringify(body) });
 
 export const chatApi = {
+  getGatewayUrl: () => request<{ url: string }>('/api/gateway/url'),
   getUser: (id: string) => request<User>(`/api/users/${encodeURIComponent(id)}`),
   getCollectives: () => request<Collective[]>('/api/collectives'),
   getRooms: (collectiveId: string) => request<Room[]>(`/api/collectives/${collectiveId}/rooms`),
